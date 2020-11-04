@@ -1,0 +1,10 @@
+# Created by .ignore support plugin (hsz.mobi)
+/database.ini
+/server.py
+/PCORnet_to_PEDSnet_Transform.egg-info/
+/venv/
+/scripts/site_col.sql.bak
+/scripts/create_table.sql.bak
+/scripts/privileges.sql.bak
+/.idea
+/__pycache__
