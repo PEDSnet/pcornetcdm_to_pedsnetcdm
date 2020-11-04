@@ -32,8 +32,8 @@ CASE WHEN demo.RACE != '06' OR (demo.RACE='06' AND demo.raw_race is null) then r
 demo.raw_race AS race_source_value,
 EXTRACT(YEAR FROM BIRTH_DATE) AS YEAR_OF_BIRTH, 
 'PCORNET_DEMOGRAPHIC' AS DOMAIN_SOURCE,
-'stlouis' as site      
-FROM stlouis_pcornet.DEMOGRAPHIC demo
+'SITE' as site
+FROM SITE_pcornet.DEMOGRAPHIC demo
 left join pcornet_maps.pedsnet_pcornet_valueset_map lang on source_concept_class = 'Language' 
            and source_concept_id is not null 
 		   and lang.target_concept = demo.pat_pref_language_spoken

@@ -12,10 +12,10 @@ d.DEATH_DATE as DEATH_DATE,
 coalesce (impu.source_concept_id::int, 44814650)  as death_impute_concept_id, 
 dt.TARGET_CONCEPT_ID as DEATH_TYPE_CONCEPT_ID,
 d.patid::int AS PERSON_ID,
-'stlouis' as site,
+'SITE' as site,
 'PCORNET_DEATH' AS DOMAIN_SOURCE
-FROM stlouis_pcornet.Death d
-LEFT JOIN stlouis_pcornet.DEATH_CAUSE dc on dc.PATID=d.PATID
+FROM SITE_pcornet.Death d
+LEFT JOIN SITE_pcornet.DEATH_CAUSE dc on dc.PATID=d.PATID
 left join pcornet_maps.pedsnet_pcornet_valueset_map impu on impu.source_concept_class = 'Death date impute' and target_concept = d.death_date_impute
 LEFT JOIN CDMH_STAGING.p2o_death_term_xwalk dt on dt.cdm_tbl='DEATH' AND dt.cdm_column_name='DEATH_SOURCE' AND dt.src_code=d.DEATH_SOURCE
 LEFT JOIN CDMH_STAGING.p2o_code_xwalk_standard cs on cs.cdm_tbl ='DEATH_CAUSE' and dc.DEATH_CAUSE_CODE = cs.SRC_CODE_TYPE and dc.DEATH_CAUSE = cs.SOURCE_CODE;

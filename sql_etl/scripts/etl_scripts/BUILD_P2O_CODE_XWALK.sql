@@ -36,7 +36,7 @@ INSERT INTO CDMH_STAGING.p2o_code_xwalk_standard ( CDM_TBL, src_code, src_code_t
         source_code, source_concept_id, source_code_description, source_vocabulary_id, source_domain_id, 
         target_concept_id, target_concept_name, target_vocabulary_id, target_domain_id, target_concept_class_id ---target_concept_id = omop concept id , target_concept_name = concept name target_domain_id = condition
         FROM cte_vocab_map
-        right outer join stlouis_pcornet.death_cause dt
+        right outer join SITE_pcornet.death_cause dt
         on source_code = dt.death_cause
         where source_vocabulary_id in( 'ICD9CM', 'ICD10CM', 'SNOMED') --50,672/ death cause +2 9 or 10
         AND target_standard_concept = 'S' 
@@ -77,7 +77,7 @@ COMMIT;
         source_code, source_concept_id, source_code_description, source_vocabulary_id, source_domain_id,
         target_concept_id, target_concept_name, target_vocabulary_id, target_domain_id, target_concept_class_id ---target_concept_id = omop concept id , target_concept_name = concept name target_domain_id = condition
         FROM cte_vocab_map
-        join stlouis_pcornet.diagnosis d
+        join SITE_pcornet.diagnosis d
         on source_code = d.dx
         where source_vocabulary_id in( 'ICD9CM', 'ICD10CM', 'ICD11CM', 'SNOMED') ---
         AND target_standard_concept = 'S'
@@ -121,7 +121,7 @@ COMMIT;
              source_code, source_concept_id, source_code_description, source_vocabulary_id, source_domain_id, 
         target_concept_id, target_concept_name, target_vocabulary_id, target_domain_id, target_concept_class_id ---target_concept_id = omop concept id , target_concept_name = concept name target_domain_id = condition
         FROM cte_vocab_map
-        join stlouis_pcornet.PROCEDURES p
+        join SITE_pcornet.PROCEDURES p
         on source_code = p.px   
         where source_vocabulary_id in( 'ICD10CM', 'CPT4', 'HCPCS', 'ICD10PCS', 'SNOMED', 'RxNorm', 'NDC' ) ---DIAGNOSIS and PROCEDURES 35,441
         AND target_standard_concept = 'S' 
@@ -162,7 +162,7 @@ COMMIT;
         source_code, source_concept_id, source_code_description, source_vocabulary_id, source_domain_id, 
         target_concept_id, target_concept_name, target_vocabulary_id, target_domain_id, target_concept_class_id ---target_concept_id = omop concept id , target_concept_name = concept name target_domain_id = condition
         FROM cte_vocab_map
-        join stlouis_pcornet.condition c
+        join SITE_pcornet.condition c
         on source_code = c.condition
         where source_vocabulary_id in( 'ICD9CM', 'ICD10CM') --- CONDITION.--50, types 9/10/ot/ag
         AND target_standard_concept = 'S' 
@@ -209,7 +209,7 @@ COMMIT;
         source_code, source_concept_id, source_code_description, source_vocabulary_id, source_domain_id, 
         target_concept_id, target_concept_name, target_vocabulary_id, target_domain_id, target_concept_class_id ---target_concept_id = omop concept id , target_concept_name = concept name target_domain_id = condition
         FROM cte_vocab_map
-        join stlouis_pcornet.lab_result_cm l
+        join SITE_pcornet.lab_result_cm l
         on source_code = l.lab_loinc
         where source_vocabulary_id in( 'LOINC') --50,672/ w/ 52,212 labs
         AND target_standard_concept = 'S' 
@@ -247,7 +247,7 @@ INSERT INTO CDMH_STAGING.p2o_code_xwalk_standard ( CDM_TBL, src_code, src_code_t
         source_code, source_concept_id, source_code_description, source_vocabulary_id, source_domain_id, 
         target_concept_id, target_concept_name, target_vocabulary_id, target_domain_id, target_concept_class_id ---target_concept_id = omop concept id , target_concept_name = concept name target_domain_id = condition
         FROM cte_vocab_map
-        join stlouis_pcornet.dispensing dx
+        join SITE_pcornet.dispensing dx
         on source_code=dx.ndc
         where source_vocabulary_id in( 'NDC') --50,672/ w/ 52,212 labs/ no dispensing record 
         AND target_standard_concept = 'S' 
@@ -287,7 +287,7 @@ INSERT INTO CDMH_STAGING.p2o_code_xwalk_standard ( CDM_TBL, src_code, src_code_t
         source_code, source_concept_id, source_code_description, source_vocabulary_id, source_domain_id, 
         target_concept_id, target_concept_name, target_vocabulary_id, target_domain_id, target_concept_class_id ---target_concept_id = omop concept id , target_concept_name = concept name target_domain_id = condition
         FROM cte_vocab_map
-        join stlouis_pcornet.MED_ADMIN m
+        join SITE_pcornet.MED_ADMIN m
         on source_code =  m.MEDADMIN_CODE
         where source_vocabulary_id in( 'RxNorm','NDC') --50,672/ w/ 52,212 labs/ no dispensing record /64,923 med_admin
         AND target_standard_concept = 'S' 
@@ -324,7 +324,7 @@ INSERT INTO CDMH_STAGING.p2o_code_xwalk_standard ( CDM_TBL, src_code, src_code_t
         source_code, source_concept_id, source_code_description, source_vocabulary_id, source_domain_id, 
         target_concept_id, target_concept_name, target_vocabulary_id, target_domain_id, target_concept_class_id ---target_concept_id = omop concept id , target_concept_name = concept name target_domain_id = condition
         FROM cte_vocab_map
-         join stlouis_pcornet.PRESCRIBING p
+         join SITE_pcornet.PRESCRIBING p
         on source_code= p.rxnorm_cui
         where source_vocabulary_id in( 'RxNorm','RxNorm Extension') --50,672/ w/ 52,212 labs/ no dispensing record /64,923 med_admin/70473 prescribing
         AND target_standard_concept = 'S' 
@@ -365,14 +365,14 @@ INSERT INTO CDMH_STAGING.p2o_code_xwalk_standard ( CDM_TBL, src_code, src_code_t
         source_code, source_concept_id, source_code_description, source_vocabulary_id, source_domain_id, 
         target_concept_id, target_concept_name, target_vocabulary_id, target_domain_id, target_concept_class_id ---target_concept_id = omop concept id , target_concept_name = concept name target_domain_id = condition
         FROM cte_vocab_map
-         join stlouis_pcornet.OBS_CLIN o
+         join SITE_pcornet.OBS_CLIN o
         on source_code= o.obsclin_code
         where source_vocabulary_id in( 'LOINC', 'SNOMED') --50,672/ w/ 52,212 labs/ no dispensing record /64,923 med_admin/70473 prescribing
         AND target_standard_concept = 'S' 
     ) ob ;
      count9:=sql%rowcount;
     COMMIT;
-    --select distinct obsclin_type, obsclin_code from stlouis_pcornet.OBS_CLIN o ;-- obsgen_code = 3000 or 2000
+    --select distinct obsclin_type, obsclin_code from SITE_pcornet.OBS_CLIN o ;-- obsgen_code = 3000 or 2000
     --PC_COVID	3000
     --PC_COVID	2000
     --No map exist - apply special rule, shong 6/12/20

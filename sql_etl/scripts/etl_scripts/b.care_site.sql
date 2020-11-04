@@ -11,9 +11,9 @@ substr(enc.facility_type, 1, 50) AS place_of_service_source_value,  -- ehr/encou
 coalesce(spec.source_concept_id::int,44814650)  as speciality_concept_id,
 spec.concept_description as specialty_source_value,
 'PCORNET_ENCOUNTER' AS domain_source,
-'stlouis' as site
-FROM stlouis_pcornet.encounter enc
-left join stlouis_pcornet.provider prov on prov.providerid = enc.providerid
+'SITE' as site
+FROM SITE_pcornet.encounter enc
+left join SITE_pcornet.provider prov on prov.providerid = enc.providerid
 JOIN cdmh_staging.p2o_facility_type_xwalk   fx ON fx.cdm_tbl = 'ENCOUNTER'
                                              AND fx.cdm_source = 'PCORnet'
                                              AND fx.src_facility_type = enc.facility_type
