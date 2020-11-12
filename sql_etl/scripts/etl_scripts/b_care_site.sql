@@ -1,5 +1,5 @@
 begin;
-INSERT INTO pcornet_pedsnet.care_site(care_site_id, care_site_name, care_site_source_value, 
+INSERT INTO SITE_pedsnet.care_site(care_site_id, care_site_name, care_site_source_value,
 location_id, place_of_service_concept_id, place_of_service_source_value, specialty_concept_id, 
 specialty_source_value, domain_source, site)
 SELECT distinct on (facilityid)facilityid::int  AS care_site_id,

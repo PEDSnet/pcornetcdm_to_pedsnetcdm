@@ -1,6 +1,6 @@
 begin;
 
-Insert into pcornet_pedsnet.person (PERSON_ID, birth_date, birth_datetime, care_site_id, day_of_birth, 
+Insert into SITE_pedsnet.person (PERSON_ID, birth_date, birth_datetime, care_site_id, day_of_birth,
 ethnicity_concept_id, ethnicity_source_concept_id, ethnicity_source_value, gender_concept_id, 
 gender_source_concept_id, gender_source_value, language_concept_id, language_source_concept_id, language_source_value, 
 location_id, month_of_birth, person_source_value, pn_gestational_age, provider_id, 

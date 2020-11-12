@@ -1,7 +1,7 @@
-CREATE SEQUENCE if not exists pcornet_pedsnet.death_seq;
+CREATE SEQUENCE if not exists SITE_pedsnet.death_seq;
 
 begin;
-INSERT INTO pcornet_pedsnet.death (cause_concept_id, cause_source_concept_id, cause_source_value, death_cause_id, death_date, death_datetime, death_impute_concept_id, death_type_concept_id, person_id, domain_source, site)
+INSERT INTO SITE_pedsnet.death (cause_concept_id, cause_source_concept_id, cause_source_value, death_cause_id, death_date, death_datetime, death_impute_concept_id, death_type_concept_id, person_id, domain_source, site)
 SELECT 
 coalesce(cs.target_concept_id::int, 44814650) as CAUSE_CONCEPT_ID,  -- this field is number, ICD codes don't fit
 null as CAUSE_SOURCE_CONCEPT_ID, -- this field is number, ICD codes don't fit
