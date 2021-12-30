@@ -72,6 +72,8 @@ left join vocabulary.concept_relationship cr_icd10
     and cr_icd10.relationship_id='Maps to'
 ;
 
+commit;
+
 -- visit diagnoses
 
 INSERT INTO SITE_pedsnet.condition_occurrence(
@@ -159,8 +161,6 @@ left join vocabulary.concept_relationship cr_icd10
     on c_icd10.concept_id = cr_icd10.concept_id_1
     and cr_icd10.relationship_id='Maps to'
 ;
-
-
 commit;
-*/
+
 

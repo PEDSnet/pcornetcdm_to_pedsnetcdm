@@ -2,29 +2,44 @@ create sequence SITE_pedsnet.obs_seq;
 
 begin;
 -- adding discharge statue AM info encounters
-INSERT INTO SITE_pedsnet.observation(observation_concept_id, observation_date, observation_datetime, observation_id,
-observation_source_concept_id, observation_source_value, observation_type_concept_id, person_id, provider_id, 
-qualifier_concept_id, qualifier_source_value, unit_concept_id, unit_source_value, value_as_concept_id, value_as_number, 
-value_as_string, visit_occurrence_id, domain_source, site)
-SELECT 4021968 AS observation_concept_id,
-coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
-coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
-nextval('pcornet_pedsnet.obs_seq')::int AS observation_id,
-44814692 AS observation_source_concept_id,
-'Discharge Status-AM' AS observation_source_value,
-32823 AS observation_type_concept_id,
-enc.patid::int AS person_id,
-enc.providerid::int AS provider_id,
-NULL AS qualifier_concept_id,
-NULL AS qualifier_source_value,
-NULL AS unit_concept_id,
-NULL AS unit_source_value,
-NULL AS value_as_concept_id,           
-NULL AS value_as_number,
-NULL AS value_as_string,
-enc.encounterid::int AS visit_occurrence_id,           
-'PCORNET_ENCOUNTER' domain_source,
-'SITE' as site
+INSERT INTO SITE_pedsnet.observation(
+     observation_concept_id,
+     observation_date, 
+     observation_datetime, 
+     observation_id,
+     observation_source_concept_id, 
+     observation_source_value, 
+     observation_type_concept_id, 
+     person_id, 
+     provider_id, 
+     qualifier_concept_id, 
+     qualifier_source_value, 
+     unit_concept_id, 
+     unit_source_value, 
+     value_as_concept_id, 
+     value_as_number, 
+     value_as_string, 
+     visit_occurrence_id, 
+     site)
+SELECT 
+     4021968 AS observation_concept_id,
+     coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
+     coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
+     nextval('pcornet_pedsnet.obs_seq')::int AS observation_id,
+     44814692 AS observation_source_concept_id,
+     'Discharge Status-AM' AS observation_source_value,
+     32823 AS observation_type_concept_id,
+     enc.patid::int AS person_id,
+     enc.providerid::int AS provider_id,
+     NULL AS qualifier_concept_id,
+     NULL AS qualifier_source_value,
+     NULL AS unit_concept_id,
+     NULL AS unit_source_value,
+     NULL AS value_as_concept_id,           
+     NULL AS value_as_number,
+     NULL AS value_as_string,
+     enc.encounterid::int AS visit_occurrence_id,           
+     'SITE' as site
 FROM SITE_pcornet.encounter enc
 WHERE enc.discharge_status = 'AM';
 
@@ -32,35 +47,50 @@ commit;
 
 begin;
 -- encounter dischrge info
-INSERT INTO SITE_pedsnet.observation(observation_concept_id, observation_date, observation_datetime, observation_id,
-observation_source_concept_id, observation_source_value, observation_type_concept_id, person_id, provider_id, 
-qualifier_concept_id, qualifier_source_value, unit_concept_id, unit_source_value, value_as_concept_id, value_as_number, 
-value_as_string, visit_occurrence_id, domain_source, site)
-SELECT 4137274 AS observation_concept_id,
-coalesce(enc.discharge_date,enc.admit_date) AS observation_date,
-coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
-nextval('pcornet_pedsnet.obs_seq')::int  AS observation_id,
-CASE WHEN enc.discharge_status = 'AW' THEN 306685000
-     WHEN enc.discharge_status = 'HO' THEN 44814696
-     WHEN enc.discharge_status = 'IP' THEN 44814698
-END AS observation_source_concept_id,
-CASE WHEN enc.discharge_status = 'AW' THEN 'Discharge Status-AW'
-      WHEN enc.discharge_status = 'HO' THEN 'Discharge Status-HO'
-     WHEN enc.discharge_status = 'IP' THEN 'Discharge Status-IP'
-END AS observation_source_value,
-32823 AS observation_type_concept_id,
-enc.patid::int AS person_id,
-enc.providerid::int AS provider_id,           
-NULL AS qualifier_concept_id,
-NULL AS qualifier_source_value,
-NULL AS unit_concept_id,
-NULL AS unit_source_value,
-NULL AS value_as_concept_id,           
-NULL AS value_as_number,
-NULL AS value_as_string,
-enc.encounterid::int AS visit_occurrence_id, 
-'PCORNET_ENCOUNTER' as domain_source,
-'SITE' as site
+INSERT INTO SITE_pedsnet.observation(
+     observation_concept_id,
+     observation_date, 
+     observation_datetime, 
+     observation_id,
+     observation_source_concept_id, 
+     observation_source_value, 
+     observation_type_concept_id, 
+     person_id, 
+     provider_id, 
+     qualifier_concept_id, 
+     qualifier_source_value, 
+     unit_concept_id, 
+     unit_source_value, 
+     value_as_concept_id, 
+     value_as_number, 
+     value_as_string, 
+     visit_occurrence_id, 
+     site)
+SELECT 
+     4137274 AS observation_concept_id,
+     coalesce(enc.discharge_date,enc.admit_date) AS observation_date,
+     coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
+     nextval('pcornet_pedsnet.obs_seq')::int  AS observation_id,
+     CASE WHEN enc.discharge_status = 'AW' THEN 306685000
+          WHEN enc.discharge_status = 'HO' THEN 44814696
+          WHEN enc.discharge_status = 'IP' THEN 44814698
+     END AS observation_source_concept_id,
+     CASE WHEN enc.discharge_status = 'AW' THEN 'Discharge Status-AW'
+           WHEN enc.discharge_status = 'HO' THEN 'Discharge Status-HO'
+          WHEN enc.discharge_status = 'IP' THEN 'Discharge Status-IP'
+     END AS observation_source_value,
+     32823 AS observation_type_concept_id,
+     enc.patid::int AS person_id,
+     enc.providerid::int AS provider_id,           
+     NULL AS qualifier_concept_id,
+     NULL AS qualifier_source_value,
+     NULL AS unit_concept_id,
+     NULL AS unit_source_value,
+     NULL AS value_as_concept_id,           
+     NULL AS value_as_number,
+     NULL AS value_as_string,
+     enc.encounterid::int AS visit_occurrence_id, 
+     'SITE' as site
 FROM SITE_pcornet.encounter enc
 WHERE enc.discharge_status IN ('AW','HO','IP');
 
