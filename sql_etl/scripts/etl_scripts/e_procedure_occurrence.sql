@@ -1,6 +1,8 @@
 Begin;
--- adding condition information
-INSERT INTO pcornet_pedsnet.procedure_occurrence (procedure_occurrence_id, modifier_concept_id, modifier_source_value, person_id, 
+-- adding procedure information
+INSERT INTO pcornet_pedsnet.procedure_occurrence (
+      procedure_occurrence_id, 
+      modifier_concept_id, modifier_source_value, person_id, 
 procedure_concept_id, procedure_date, procedure_datetime,  procedure_source_concept_id, 
 procedure_source_value, procedure_type_concept_id, provider_id, quantity, visit_occurrence_id, domain_source, site)
 SELECT distinct on (proc.proceduresid) proc.proceduresid::int AS PROCEDURE_OCCURRENCE_ID,
