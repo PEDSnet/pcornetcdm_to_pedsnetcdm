@@ -34,7 +34,7 @@ INSERT INTO SITE_pedsnet.measurement (
      visit_occurrence_id, 
      site)
 SELECT distinct
-     lab.lab_result_cm_id::bigint AS measurement_id,
+     nextval('pcornet_pedsnet.measurement_id_seq')::bigint AS measurement_id,
      coalesce(c.concept_id,0)  as measurement_concept_id,
      coalesce(lab.result_date,lab.specimen_date) as measurement_date, 
      coalesce(lab.result_date,lab.specimen_date)::timestamp as measurement_datetime,
@@ -46,10 +46,10 @@ SELECT distinct
      lab.LAB_LOINC as measuremnt_source_value,
      44818702 AS measurement_type_concept_id,
      coalesce(opa.source_concept_id::int, 0) as operator_concept_id,
-     lab.patid::bigint AS person_id,  
+     person.person_id AS person_id,  
      coalesce(priority.source_concept_id::int, 0) as priority_concept_id,
      null as priority_source_value,
-     enc.providerid::int as PROVIDER_ID,
+     vo.provider_id as PROVIDER_ID,
      lab.norm_range_high::numeric as range_high,
      coalesce(hi_mod.source_concept_id::int, 0) as range_high_operator_concept_id, 
      null as range_high_source_value,
@@ -84,10 +84,13 @@ SELECT distinct
      end as VALUE_AS_CONCEPT_ID,
      lab.result_num as VALUE_AS_NUMBER, 
      COALESCE(NULLIF(lab.result_num, 0)::text, lab.raw_result) as VALUE_SOURCE_VALUE,            
-     lab.encounterid::bigint as VISIT_OCCURRENCE_ID,    
+     vo.visit_occurrence_id as VISIT_OCCURRENCE_ID,    
      'SITE' as site
 FROM SITE_pcornet.LAB_RESULT_CM lab
 left join SITE_pcornet.encounter enc on enc.encounterid = lab.encounterid
+inner join SITE_pedsnet.person person on lab.patid=person.person_source_value
+left join SITE_pedsnet.visit_occurrence vo 
+     on lab.encounterid=vo.visit_source_value
 left join pcornet_maps.pedsnet_pcornet_valueset_map opa on opa.target_concept = lab.result_modifier and opa.source_concept_class = 'Result modifier'
 left join pcornet_maps.pedsnet_pcornet_valueset_map hi_mod on hi_mod.target_concept = lab.norm_modifier_high and hi_mod.source_concept_class = 'Result modifier'
 left join pcornet_maps.pedsnet_pcornet_valueset_map lo_mod on lo_mod.target_concept = lab.norm_modifier_low and lo_mod.source_concept_class = 'Result modifier'
@@ -111,10 +114,10 @@ SELECT distinct
      'Height in cm (converted from inches)' AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
      NULL AS operator_concept_id, 
-     v_ht.patid::bigint  AS person_id, 
+     person.person_id  AS person_id, 
      0  as priority_concept_id, 
      null as priority_source_value, 
-     enc.providerid::bigint as provider_id, 
+     vo.provider_id as provider_id, 
      null as range_high, 
      null as range_high_operator_concept_id, 
      null as range_high_source_value, 
@@ -129,10 +132,13 @@ SELECT distinct
      NULL AS value_as_concept_id, 
      (v_ht.ht*2.54) AS value_as_number, 
      v_ht.ht AS value_source_value,
-     enc.encounterid::bigint AS visit_occurrence_id, 
+     vo.visit_occurrence_id AS visit_occurrence_id, 
      'SITE' as site
 FROM SITE_pcornet.vital v_ht
 left join SITE_pcornet.encounter enc on enc.encounterid = v_ht.encounterid
+inner join SITE_pedsnet.person person on v_ht.patid=person.person_source_value
+left join SITE_pedsnet.visit_occurrence vo 
+     on v_ht.encounterid=vo.visit_source_value
 LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_ht.vital_source
 where v_ht.ht is not null;
 
@@ -166,10 +172,10 @@ SELECT
      'Weight (converted from pounds)' AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
      NULL AS operator_concept_id, 
-     v_wt.patid::bigint  AS person_id, 
+     person.person_id AS person_id, 
      0  as priority_concept_id, 
      null as priority_source_value, 
-     enc.providerid::bigint as provider_id, 
+     vo.provider_id as provider_id, 
      null as range_high, 
      null as range_high_operator_concept_id, 
      null as range_high_source_value, 
@@ -184,10 +190,13 @@ SELECT
      NULL AS value_as_concept_id, 
      (v_wt.wt*0.453592) AS value_as_number, 
      v_wt.wt AS value_source_value,
-     enc.encounterid::bigint AS visit_occurrence_id, 
+     vo.visit_occurrence_id AS visit_occurrence_id, 
      'SITE' as site
 FROM SITE_pcornet.vital v_wt
 left join SITE_pcornet.encounter enc on enc.encounterid = v_wt.encounterid
+inner join SITE_pedsnet.person person on v_wt.patid=person.person_source_value
+left join SITE_pedsnet.visit_occurrence vo 
+     on v_wt.encounterid=vo.visit_source_value
 LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_wt.vital_source
 where v_wt.wt is not null;
 
@@ -221,10 +230,10 @@ SELECT
      v_sys.raw_systolic AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
      NULL AS operator_concept_id, 
-     v_sys.patid::bigint  AS person_id, 
+     person.person_id  AS person_id, 
      0  as priority_concept_id, 
      null as priority_source_value, 
-     enc.providerid::bigint as provider_id, 
+     vo.provider_id as provider_id, 
      null as range_high, 
      null as range_high_operator_concept_id, 
      null as range_high_source_value, 
@@ -239,10 +248,13 @@ SELECT
      NULL AS value_as_concept_id, 
      v_sys.systolic AS value_as_number, 
      v_sys.raw_systolic AS value_source_value,
-     enc.encounterid::bigint AS visit_occurrence_id, 
+     vo.visit_occurrence_id AS visit_occurrence_id, 
      'SITE' as site
 FROM SITE_pcornet.vital v_sys
 left join SITE_pcornet.encounter enc on enc.encounterid = v_sys.encounterid
+inner join SITE_pedsnet.person person on v_sys.patid=person.person_source_value
+left join SITE_pedsnet.visit_occurrence vo 
+     on v_sys.encounterid=vo.visit_source_value
 left join pcornet_maps.pedsnet_pcornet_valueset_map sys_con on sys_con.target_concept = v_sys.bp_position
 	                                                            AND sys_con.source_concept_class='BP Position'
 LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_sys.vital_source
@@ -278,10 +290,10 @@ SELECT
      v_dia.raw_diastolic AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
      NULL AS operator_concept_id, 
-     v_dia.patid::bigint  AS person_id, 
+     person.person_id  AS person_id, 
      0  as priority_concept_id, 
      null as priority_source_value, 
-     enc.providerid::bigint as provider_id, 
+     vo.provider_id as provider_id, 
      null as range_high, 
      null as range_high_operator_concept_id, 
      null as range_high_source_value, 
@@ -296,10 +308,13 @@ SELECT
      NULL AS value_as_concept_id, 
      v_dia.diastolic AS value_as_number, 
      dia_con.concept_description AS value_source_value,
-     enc.encounterid::bigint AS visit_occurrence_id, 
+     vo.visit_occurrence_id AS visit_occurrence_id, 
      'SITE' as site
 FROM SITE_pcornet.vital v_dia
 left join SITE_pcornet.encounter enc on enc.encounterid = v_dia.encounterid
+inner join SITE_pedsnet.person person on v_dia.patid=person.person_source_value
+left join SITE_pedsnet.visit_occurrence vo 
+     on v_dia.encounterid=vo.visit_source_value
 left join pcornet_maps.pedsnet_pcornet_valueset_map dia_con on dia_con.target_concept = v_dia.bp_position
 	                                                            AND dia_con.source_concept_class='BP Position'
 LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_dia.vital_source
@@ -335,10 +350,10 @@ null as measurement_result_datetime,
 'Original BMI' AS measurement_source_value, 
 2000000033 as measurement_type_concept_id, 
 NULL AS operator_concept_id, 
-v_bmi.patid::bigint  AS person_id, 
+person.person_id  AS person_id, 
 0  as priority_concept_id, 
 null as priority_source_value, 
-enc.providerid::bigint as provider_id, 
+vo.provider_id as provider_id, 
 null as range_high, 
 null as range_high_operator_concept_id, 
 null as range_high_source_value, 
@@ -352,10 +367,13 @@ null AS unit_source_value,
 NULL AS value_as_concept_id, 
 v_bmi.original_bmi AS value_as_number, 
 v_bmi.original_bmi AS value_source_value,
-enc.encounterid::bigint AS visit_occurrence_id, 
+vo.visit_occurrence_id AS visit_occurrence_id, 
 'SITE' as site
 FROM SITE_pcornet.vital v_bmi
 left join SITE_pcornet.encounter enc on enc.encounterid = v_bmi.encounterid
+inner join SITE_pedsnet.person person on v_bmi.patid=person.person_source_value
+left join SITE_pedsnet.visit_occurrence vo 
+     on v_bmi.encounterid=vo.visit_source_value
 LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_bmi.vital_source
 where v_bmi.original_bmi is not null ;
 
