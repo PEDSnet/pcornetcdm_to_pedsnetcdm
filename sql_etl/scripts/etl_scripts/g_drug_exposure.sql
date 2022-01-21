@@ -174,52 +174,6 @@ insert into SITE_pedsnet.drug_exposure(
 select
 	null as days_supply,
 	0 as dispense_as_written_concept_id,
-	0 as dose_unit_concept_id,
-	medadmin_dose_admin_unit as dose_unit_source_value,
-	case
-		when medadmin_type='ND' then ndc_map.concept_id_2
-		when medadmin_type='RX' then rxnorm.concept_id
-		else 0 end as drug_concept_id,
-	medadmin_stop_date::date as drug_exposure_end_date,
-	(med_admin_stop_date || ' '|| med_admin_stop_time)::timestamp as drug_exposure_end_datetime,
-	nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
-	null as drug_exposure_order_date,
-	null as drug_exposure_order_datetime,
-	medadmin_start_date as drug_exposure_start_date,
-	(med_admin_start_date || ' '|| med_admin_start_time)::timestamp as drug_exposure_start_datetime,
-	case
-		when medadmin_type='ND' then ndc.concept_id
-		when medadmin_type='RX' then rxnorm.concept_id
-		else 0 end as drug_source_concept_id,
-	coalesce(raw_medadmin_med_name,' ')|'|'||coalesce(medadmin_code,' ') as drug_source_value,
-	38000180 as drug_type_concept_id,
-	null as eff_drug_dose_source_value,
-	medadmin_dose_admin as effective_drug_dose,
-	null as frequency,
-	null as lot_number,
-	person.person_id as person_id,
-	vo.provider_id as provider_id,
-	null as quantity,
-	null as refills,
-	0 as route_concept_id,
-	medadmin_route as route_source_value,
-	null as sig,
-	null as stop_reason,
-	vo.visit_occurrence_id as visit_occurrence_id
-from SITE_pcornet.med_admin medamin
-inner join SITE_pedsnet.person person 
-      on medadmin.patid = person.person_source_value
-inner join SITE_pedsnet.visit_occurrence vo 
-      on medadmin.encounterid = vo.visit_source_value
-left join vocabulary.concept ndc on medadmin.medadmin_code=ndc.concept_code and medadmin_type='ND' and ndc.vocabulary_id='NDC' and ndc.invalid_reason is null
-left join vocabulary.concept_relationship ndc_map on ndc.concept_id=ndc_map.concept_id_1 and ndc_map.relationship_id='Maps to'
-left join vocabulary.concept rxnorm as medadmin.medadmin_code=rxnorm.concept.code and medadmin_type='RX' and vocabulary_id='RxNorm' and standard_concept='S'
-;
-
-
-select
-	null as days_supply,
-	0 as dispense_as_written_concept_id,
 	ucum_maps.source_concept_id as dose_unit_concept_id,
 	medadmin_dose_admin_unit as dose_unit_source_value,
 	case
