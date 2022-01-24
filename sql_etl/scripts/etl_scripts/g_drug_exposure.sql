@@ -97,6 +97,7 @@ insert into SITE_pedsnet.drug_exposure(
 	sig,
 	stop_reason,
 	visit_occurrence_id)
+
 select
 	rx_days_supply as days_supply,
 	case 
@@ -143,38 +144,39 @@ left join vocabulary.concept rxnorm as presc.rxnorm_cui=rxnorm.concept.code and 
 commit;
 
 insert into SITE_pedsnet.drug_exposure(
-	days_supply,
-	dispense_as_written_concept_id,
-	dose_unit_concept_id,
-	dose_unit_source_value,
-	drug_concept_id,
-	drug_exposure_end_date,
-	drug_exposure_end_datetime,
-	drug_exposure_id,
-	drug_exposure_order_date,
-	drug_exposure_order_datetime,
-	drug_exposure_start_date,
-	drug_exposure_start_datetime,
-	drug_source_concept_id,
-	drug_source_value,
-	drug_type_concept_id,
-	eff_drug_dose_source_value,
-	effective_drug_dose,
-	frequency,
-	lot_number,
-	person_id,
-	provider_id,
-	quantity,
-	refills,
-	route_concept_id,
-	route_source_value,
-	sig,
-	stop_reason,
-	visit_occurrence_id)
+	days_supply,x
+	dispense_as_written_concept_id, x
+	dose_unit_concept_id, x
+	dose_unit_source_value, x
+	drug_concept_id, x
+	drug_exposure_end_date, x
+	drug_exposure_end_datetime, x
+	drug_exposure_id, x
+	drug_exposure_order_date, x
+	drug_exposure_order_datetime, x
+	drug_exposure_start_date, x
+	drug_exposure_start_datetime, x
+	drug_source_concept_id, x
+	drug_source_value, x
+	drug_type_concept_id, x
+	eff_drug_dose_source_value, x
+	effective_drug_dose,x
+	frequency, x
+	lot_number, x
+	person_id, x
+	provider_id, x
+	quantity,x
+	refills,x
+	route_concept_id, x
+	route_source_value,x
+	sig, x
+	stop_reason, x
+	visit_occurrence_id x)
+
 select
 	null as days_supply,
 	0 as dispense_as_written_concept_id,
-	ucum_maps.source_concept_id as dose_unit_concept_id,
+	ucum_maps.source_concept_id::integer as dose_unit_concept_id,
 	medadmin_dose_admin_unit as dose_unit_source_value,
 	case
 		when medadmin_type='ND' then ndc_map.concept_id_2
@@ -193,24 +195,26 @@ select
 		else 0 end as drug_source_concept_id,
 	coalesce(raw_medadmin_med_name,' ')||'|'||coalesce(medadmin_code,' ') as drug_source_value,
 	38000180 as drug_type_concept_id,
-	null as eff_drug_dose_source_value,
+	medadmin_dose_admin::varchar as eff_drug_dose_source_value,
 	medadmin_dose_admin as effective_drug_dose,
 	null as frequency,
 	null as lot_number,
 	person.person_id as person_id,
--- 	vo.provider_id as provider_id,
+	-- vo.provider_id as provider_id,
+	medadmin.medadmin_providerid::bigint as provider_id,
 	null as quantity,
 	null as refills,
 	voc.concept_id as route_concept_id,
 	medadmin_route as route_source_value,
 	null as sig,
-	null as stop_reason
--- 	vo.visit_occurrence_id as visit_occurrence_id
+	null as stop_reason,
+	-- vo.visit_occurrence_id as visit_occurrence_id
+	medadmin.encounterid::bigint as visit_occurrence_id
 from colorado_pcornet.med_admin as medadmin
 inner join colorado_pedsnet.person person 
 on medadmin.patid = person.person_source_value
 -- inner join colorado_pedsnet.visit_occurrence vo 
---       on medadmin.encounterid = vo.visit_source_value
+--       on med.encounterid = vo.visit_occurrence_id::varchar
 left join vocabulary.concept ndc on medadmin.medadmin_code=ndc.concept_code and medadmin_type='ND' and ndc.vocabulary_id='NDC' and ndc.invalid_reason is null
 left join vocabulary.concept_relationship ndc_map on ndc.concept_id=ndc_map.concept_id_1 and ndc_map.relationship_id='Maps to'
 left join vocabulary.concept rxnorm on medadmin.medadmin_code = rxnorm.concept_code and medadmin_type='RX' and rxnorm.vocabulary_id='RxNorm' and rxnorm.standard_concept='S'
