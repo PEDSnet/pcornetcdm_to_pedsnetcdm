@@ -144,34 +144,34 @@ left join vocabulary.concept rxnorm as presc.rxnorm_cui=rxnorm.concept.code and 
 commit;
 
 insert into SITE_pedsnet.drug_exposure(
-	days_supply,x
-	dispense_as_written_concept_id, x
-	dose_unit_concept_id, x
-	dose_unit_source_value, x
-	drug_concept_id, x
-	drug_exposure_end_date, x
-	drug_exposure_end_datetime, x
-	drug_exposure_id, x
-	drug_exposure_order_date, x
-	drug_exposure_order_datetime, x
-	drug_exposure_start_date, x
-	drug_exposure_start_datetime, x
-	drug_source_concept_id, x
-	drug_source_value, x
-	drug_type_concept_id, x
-	eff_drug_dose_source_value, x
-	effective_drug_dose,x
-	frequency, x
-	lot_number, x
-	person_id, x
-	provider_id, x
-	quantity,x
-	refills,x
-	route_concept_id, x
-	route_source_value,x
-	sig, x
-	stop_reason, x
-	visit_occurrence_id x)
+	days_supply,
+	dispense_as_written_concept_id, 
+	dose_unit_concept_id, 
+	dose_unit_source_value, 
+	drug_concept_id, 
+	drug_exposure_end_date, 
+	drug_exposure_end_datetime, 
+	drug_exposure_id, 
+	drug_exposure_order_date, 
+	drug_exposure_order_datetime, 
+	drug_exposure_start_date, 
+	drug_exposure_start_datetime, 
+	drug_source_concept_id, 
+	drug_source_value, 
+	drug_type_concept_id, 
+	eff_drug_dose_source_value, 
+	effective_drug_dose,
+	frequency, 
+	lot_number, 
+	person_id, 
+	provider_id, 
+	quantity,
+	refills,
+	route_concept_id, 
+	route_source_value,
+	sig, 
+	stop_reason, 
+	visit_occurrence_id)
 
 select
 	null as days_supply,
