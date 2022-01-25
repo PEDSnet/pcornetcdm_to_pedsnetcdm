@@ -3,14 +3,14 @@ create sequence SITE_pedsnet.drug_exposure_seq;
 begin;
 
 insert into SITE_pedsnet.drug_exposure(
-	days_supply, 
-	dispense_as_written_concept_id, 
-	dose_unit_concept_id, 
-	dose_unit_source_value, 
-	drug_concept_id, 
+	days_supply,
+	dispense_as_written_concept_id,
+	dose_unit_concept_id,
+	dose_unit_source_value,
+	drug_concept_id,
 	drug_exposure_end_date,
-	drug_exposure_end_datetime, x
-	drug_exposure_id, 
+	drug_exposure_end_datetime,
+	drug_exposure_id,
 	drug_exposure_order_date,
 	drug_exposure_order_datetime,
 	drug_exposure_start_date,
@@ -23,19 +23,19 @@ insert into SITE_pedsnet.drug_exposure(
 	frequency,
 	lot_number,
 	person_id,
-	provider_id, 
+	provider_id,
 	quantity,
 	refills,
 	route_concept_id,
 	route_source_value,
 	sig,
 	stop_reason,
-	visit_occurrence_id )
-	
+	visit_occurrence_id)
+
 select
 	dispense_sup as days_supply,
 	0 as dispense_as_written_concept_id, 
-	ucum_maps.source_concept_id::integer as dose_unit_concept_id,
+	coalesce(unit.concept_id,0) as dose_unit_concept_id,
 	dispense_dose_disp_unit as dose_unit_source_value,
 	coalesce(ndc_map.concept_id_2,0) drug_concept_id,
 	null as drug_exposure_end_date,
@@ -45,7 +45,6 @@ select
 	null as drug_exposure_order_datetime,
 	dispense_date::date as drug_exposure_start_date,
 	dispense_date::timestamp as drug_exposure_start_datetime,
-	-- coalesce(ndc.concept_id,0) as drug_type_concept_id
 	NDC as drug_source_value,
 	38000175 as drug_type_concept_id,
 	dispense_dose_disp::varchar as eff_drug_dose_source_value,
@@ -56,7 +55,7 @@ select
 	null as provider_id,
 	dispense_amt as quantity,
 	null as refills,
-	voc2.concept_id as route_concept_id,
+	coalesce(route.concept_id,0) as route_concept_id,
 	dispense_route as route_source_value,
 	null as sig,
 	null as stop_reason,
@@ -64,16 +63,33 @@ select
 from nationwide_pcornet.dispensing disp
 inner join nationwide_pedsnet.person person 
       on disp.patid = person.person_source_value
-left join vocabulary.concept ndc on disp.ndc=ndc.concept_code and ndc.vocabulary_id='NDC' and ndc.invalid_reason is null
-left join vocabulary.concept_relationship ndc_map on ndc.concept_id=ndc_map.concept_id_1 and ndc_map.relationship_id='Maps to'
+left join vocabulary.concept ndc 
+	on disp.ndc=ndc.concept_code and ndc.vocabulary_id='NDC' and ndc.invalid_reason is null
+left join vocabulary.concept_relationship ndc_map 
+	on ndc.concept_id=ndc_map.concept_id_1 and ndc_map.relationship_id='Maps to'
 left join pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
 	on disp.dispense_dose_disp_unit = ucum_maps.target_concept and ucum_maps.source_concept_class = 'Dose unit'
-inner join vocabulary.concept voc1 on ucum_maps.source_concept_id = CAST(voc1.concept_id as varchar) and voc1.vocabulary_id = 'UCUM' and voc1.standard_concept = 'S'
-left join pcornet_maps.pedsnet_pcornet_valueset_map as route_maps
-	on disp.dispense_route = route_maps.target_concept and route_maps.source_concept_class = 'Route'
-inner join vocabulary.concept voc2 on route_maps.source_concept_id = CAST(voc2.concept_id as varchar) and voc2.domain_id = 'Route'
-
-;
+left join 
+	(select concept_id
+	from vocabulary.concept
+	where vocabulary_id = 'UCUM' and standard_concept = 'S'
+	) as unit
+	on ucum_maps.source_concept_id = unit.concept_id::varchar
+left join 
+	(select target_concept, source_concept_id, concept_id
+	 from
+		(select target_concept, source_concept_id
+		from pcornet_maps.pedsnet_pcornet_valueset_map
+		where source_concept_class = 'Route') as route_maps
+		left join (
+			select concept_id, vocabulary_id
+			from vocabulary.concept
+			where domain_id = 'Route' and standard_concept = 'S' 
+		) as voc2
+		on route_maps.source_concept_id = voc2.concept_id::varchar
+		where concept_id is not null and vocabulary_id = 'SNOMED'
+	) as route 
+	on disp.dispense_route = route.target_concept
 
 commit;
 
@@ -116,12 +132,12 @@ select
         when rx_dispense_as_written='OT' then 44814649 -- Other
         when rx_dispense_as_written='UN' then 44814653 -- Unknown
 		end as dispense_as_written_concept_id,
-	0 as dose_unit_concept_id,
+x	0 as dose_unit_concept_id,
 	rx_dose_ordered_unit as dose_unit_source_value,
 	coalesce(rxnorm.concept_id,0) as drug_concept_id,
 	rx_end_date::date as drug_exposure_end_date,
 	rx_end_date::timestamp as drug_exposure_end_datetime,
-	nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
+	-- nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
 	rx_order_date::date as drug_exposure_order_date,
 	(rx_order_date || ' '|| rx_order_time)::timestamp as drug_exposure_order_datetime,
 	rx_start_date::date as drug_exposure_start_date,
@@ -185,7 +201,7 @@ insert into SITE_pedsnet.drug_exposure(
 select
 	null as days_supply,
 	0 as dispense_as_written_concept_id,
-	ucum_maps.source_concept_id::integer as dose_unit_concept_id,
+	coalesce(unit.source_concept_id::integer,0) as dose_unit_concept_id,
 	medadmin_dose_admin_unit as dose_unit_source_value,
 	case
 		when medadmin_type='ND' then ndc_map.concept_id_2
@@ -209,31 +225,45 @@ select
 	null as frequency,
 	null as lot_number,
 	person.person_id as person_id,
-	-- vo.provider_id as provider_id,
-	medadmin.medadmin_providerid::bigint as provider_id,
+-- 	vo.provider_id as provider_id,
 	null as quantity,
 	null as refills,
-	voc2.concept_id as route_concept_id,
+	coalesce(route.concept_id::int,0) as route_concept_id,
 	medadmin_route as route_source_value,
 	null as sig,
-	null as stop_reason,
-	-- vo.visit_occurrence_id as visit_occurrence_id
-	medadmin.encounterid::bigint as visit_occurrence_id
+	null as stop_reason
+-- 	vo.visit_occurrence_id as visit_occurrence_id
 from colorado_pcornet.med_admin as medadmin
 inner join colorado_pedsnet.person person 
 on medadmin.patid = person.person_source_value
--- inner join colorado_pedsnet.visit_occurrence vo 
---       on med.encounterid = vo.visit_occurrence_id::varchar
+-- inner join SITE_pedsnet.visit_occurrence vo 
+--       on presc.encounterid = vo.visit_source_value
 left join vocabulary.concept ndc on medadmin.medadmin_code=ndc.concept_code and medadmin_type='ND' and ndc.vocabulary_id='NDC' and ndc.invalid_reason is null
 left join vocabulary.concept_relationship ndc_map on ndc.concept_id=ndc_map.concept_id_1 and ndc_map.relationship_id='Maps to'
 left join vocabulary.concept rxnorm on medadmin.medadmin_code = rxnorm.concept_code and medadmin_type='RX' and rxnorm.vocabulary_id='RxNorm' and rxnorm.standard_concept='S'
 left join pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
 	on medadmin.medadmin_dose_admin_unit = ucum_maps.target_concept and ucum_maps.source_concept_class = 'Dose unit'
-inner join vocabulary.concept voc1 on ucum_maps.source_concept_id = CAST(voc1.concept_id as varchar) and voc1.vocabulary_id = 'UCUM' and voc1.standard_concept = 'S'
-left join pcornet_maps.pedsnet_pcornet_valueset_map as route_maps
-	on medadmin.medadmin_route = route_maps.target_concept and route_maps.source_concept_class = 'Route'
-inner join vocabulary.concept voc2 on route_maps.source_concept_id = CAST(voc2.concept_id as varchar) and voc2.domain_id = 'Route'
-
+left join 
+	(select concept_id
+	from vocabulary.concept
+	where vocabulary_id = 'UCUM' and standard_concept = 'S'
+	) as unit
+	on ucum_maps.source_concept_id = unit.concept_id::varchar
+left join 
+	(select target_concept, source_concept_id, concept_id
+	 from
+		(select target_concept, source_concept_id
+		from pcornet_maps.pedsnet_pcornet_valueset_map
+		where source_concept_class = 'Route') as route_maps
+		left join (
+			select concept_id, vocabulary_id
+			from vocabulary.concept
+			where domain_id = 'Route' and standard_concept = 'S' 
+		) as voc2
+		on route_maps.source_concept_id = voc2.concept_id::varchar
+		where concept_id is not null and vocabulary_id = 'SNOMED'
+	) as route 
+	on medadmin.medadmin_route = route.target_concept
 
 commit;
 
