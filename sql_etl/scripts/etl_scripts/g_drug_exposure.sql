@@ -132,7 +132,7 @@ select
         when rx_dispense_as_written='OT' then 44814649 -- Other
         when rx_dispense_as_written='UN' then 44814653 -- Unknown
 		end as dispense_as_written_concept_id,
-x	0 as dose_unit_concept_id,
+	coalesce(unit.concept_id,0) as dose_unit_concept_id,
 	rx_dose_ordered_unit as dose_unit_source_value,
 	coalesce(rxnorm.concept_id,0) as drug_concept_id,
 	rx_end_date::date as drug_exposure_end_date,
@@ -143,27 +143,52 @@ x	0 as dose_unit_concept_id,
 	rx_start_date::date as drug_exposure_start_date,
 	rx_start_date::timestamp as drug_exposure_start_datetime,
 	coalesce(rxnorm.concept_id,0) as drug_source_concept_id,
-	coalesce(raw_rx_med_name,' ')|'|'||coalesce(rxnrom_cui,' ') as drug_source_value,
+	coalesce(raw_rx_med_name,' ')||'|'||coalesce(rxnorm_cui,' ') as drug_source_value,
 	38000177 as drug_type_concept_id,
 	null as eff_drug_dose_source_value,
 	rx_dose_ordered as effective_drug_dose,
 	rx_frequency as frequency,
 	null as lot_number,
 	person.person_id as person_id,
-	vo.provider_id as provider_id,
+-- 	vo.provider_id as provider_id,
 	rx_quantity as quantity,
 	rx_refills as refills,
-	0 as route_concept_id,
+	coalesce(route.concept_id,0) as route_concept_id,
 	rx_route as route_source_value,
 	null as sig,
-	null as stop_reason,
-	vo.visit_occurrence_id as visit_occurrence_id
-from SITE_pcornet.prescribing presc
-inner join SITE_pedsnet.person person 
+	null as stop_reason
+-- 	vo.visit_occurrence_id as visit_occurrence_id
+from nationwide_pcornet.prescribing presc
+inner join nationwide_pedsnet.person person 
       on presc.patid = person.person_source_value
-inner join SITE_pedsnet.visit_occurrence vo 
-      on presc.encounterid = vo.visit_source_value
-left join vocabulary.concept rxnorm as presc.rxnorm_cui=rxnorm.concept.code and vocabulary_id='RxNorm' and standard_concept='S'
+-- inner join SITE_pedsnet.visit_occurrence vo 
+--       on presc.encounterid = vo.visit_source_value
+left join vocabulary.concept as rxnorm 
+	on presc.rxnorm_cui = rxnorm.concept_code and vocabulary_id='RxNorm' and standard_concept='S'
+left join pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
+	on presc.rx_dose_form = ucum_maps.target_concept and source_concept_class in ('Dose unit', 'Rx Dose Form')
+left join 
+	(select concept_id
+	from vocabulary.concept
+	where vocabulary_id = 'UCUM' and standard_concept = 'S'
+	) as unit
+	on ucum_maps.source_concept_id = unit.concept_id::varchar
+left join 
+	(select target_concept, source_concept_id, concept_id
+	 from
+		(select 
+		 target_concept, source_concept_id
+		from pcornet_maps.pedsnet_pcornet_valueset_map
+		where source_concept_class = 'Route') as route_maps
+		left join (
+			select concept_id, vocabulary_id
+			from vocabulary.concept
+			where domain_id = 'Route' and standard_concept = 'S' 
+		) as voc2
+		on route_maps.source_concept_id = voc2.concept_id::varchar
+		where concept_id is not null and vocabulary_id = 'SNOMED'
+	) as route 
+	on presc.rx_route = route.target_concept
 ;
 
 commit;
