@@ -40,7 +40,7 @@ select
 	coalesce(ndc_map.concept_id_2,0) drug_concept_id,
 	null as drug_exposure_end_date,
 	null as drug_exposure_end_datetime,
-	-- nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
+	nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
 	null as drug_exposure_order_date,
 	null as drug_exposure_order_datetime,
 	dispense_date::date as drug_exposure_start_date,
@@ -60,8 +60,8 @@ select
 	null as sig,
 	null as stop_reason,
 	null as visit_occurrence_id
-from nationwide_pcornet.dispensing disp
-inner join nationwide_pedsnet.person person 
+from SITE_pcornet.dispensing disp
+inner join SITE_pedsnet.person person 
       on disp.patid = person.person_source_value
 left join vocabulary.concept ndc 
 	on disp.ndc=ndc.concept_code and ndc.vocabulary_id='NDC' and ndc.invalid_reason is null
@@ -137,7 +137,7 @@ select
 	coalesce(rxnorm.concept_id,0) as drug_concept_id,
 	rx_end_date::date as drug_exposure_end_date,
 	rx_end_date::timestamp as drug_exposure_end_datetime,
-	-- nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
+	nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
 	rx_order_date::date as drug_exposure_order_date,
 	(rx_order_date || ' '|| rx_order_time)::timestamp as drug_exposure_order_datetime,
 	rx_start_date::date as drug_exposure_start_date,
@@ -150,19 +150,19 @@ select
 	rx_frequency as frequency,
 	null as lot_number,
 	person.person_id as person_id,
--- 	vo.provider_id as provider_id,
+	vo.provider_id as provider_id,
 	rx_quantity as quantity,
 	rx_refills as refills,
 	coalesce(route.concept_id,0) as route_concept_id,
 	rx_route as route_source_value,
 	null as sig,
 	null as stop_reason
--- 	vo.visit_occurrence_id as visit_occurrence_id
-from nationwide_pcornet.prescribing presc
-inner join nationwide_pedsnet.person person 
-      on presc.patid = person.person_source_value
--- inner join SITE_pedsnet.visit_occurrence vo 
---       on presc.encounterid = vo.visit_source_value
+ 	vo.visit_occurrence_id as visit_occurrence_id
+from SITE_pcornet.prescribing presc
+inner join SITE_pedsnet.person person 
+    on presc.patid = person.person_source_value
+inner join SITE_pedsnet.visit_occurrence vo 
+    on presc.encounterid = vo.visit_source_value
 left join vocabulary.concept as rxnorm 
 	on presc.rxnorm_cui = rxnorm.concept_code and vocabulary_id='RxNorm' and standard_concept='S'
 left join pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
@@ -234,7 +234,7 @@ select
 		else 0 end as drug_concept_id,
 	medadmin_stop_date::date as drug_exposure_end_date,
 	(medadmin_stop_date || ' '|| medadmin_stop_time)::timestamp as drug_exposure_end_datetime,
--- 	nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
+ 	nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
 	null as drug_exposure_order_date,
 	null as drug_exposure_order_datetime,
 	medadmin_start_date as drug_exposure_start_date,
@@ -250,19 +250,19 @@ select
 	null as frequency,
 	null as lot_number,
 	person.person_id as person_id,
--- 	vo.provider_id as provider_id,
+	vo.provider_id as provider_id,
 	null as quantity,
 	null as refills,
 	coalesce(route.concept_id::int,0) as route_concept_id,
 	medadmin_route as route_source_value,
 	null as sig,
 	null as stop_reason
--- 	vo.visit_occurrence_id as visit_occurrence_id
-from colorado_pcornet.med_admin as medadmin
-inner join colorado_pedsnet.person person 
+	vo.visit_occurrence_id as visit_occurrence_id
+from SITE_pcornet.med_admin as medadmin
+inner join SITE_pedsnet.person person 
 on medadmin.patid = person.person_source_value
--- inner join SITE_pedsnet.visit_occurrence vo 
---       on presc.encounterid = vo.visit_source_value
+inner join SITE_pedsnet.visit_occurrence vo 
+      on presc.encounterid = vo.visit_source_value
 left join vocabulary.concept ndc on medadmin.medadmin_code=ndc.concept_code and medadmin_type='ND' and ndc.vocabulary_id='NDC' and ndc.invalid_reason is null
 left join vocabulary.concept_relationship ndc_map on ndc.concept_id=ndc_map.concept_id_1 and ndc_map.relationship_id='Maps to'
 left join vocabulary.concept rxnorm on medadmin.medadmin_code = rxnorm.concept_code and medadmin_type='RX' and rxnorm.vocabulary_id='RxNorm' and rxnorm.standard_concept='S'
