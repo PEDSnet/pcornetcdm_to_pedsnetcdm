@@ -226,7 +226,7 @@ insert into SITE_pedsnet.drug_exposure(
 select
 	null as days_supply,
 	0 as dispense_as_written_concept_id,
-	coalesce(unit.source_concept_id::integer,0) as dose_unit_concept_id,
+	coalesce(unit.concept_id::integer,0) as dose_unit_concept_id,
 	medadmin_dose_admin_unit as dose_unit_source_value,
 	case
 		when medadmin_type='ND' then ndc_map.concept_id_2
@@ -256,13 +256,13 @@ select
 	coalesce(route.concept_id::int,0) as route_concept_id,
 	medadmin_route as route_source_value,
 	null as sig,
-	null as stop_reason
+	null as stop_reason,
 	vo.visit_occurrence_id as visit_occurrence_id
 from SITE_pcornet.med_admin as medadmin
 inner join SITE_pedsnet.person person 
 on medadmin.patid = person.person_source_value
 inner join SITE_pedsnet.visit_occurrence vo 
-      on presc.encounterid = vo.visit_source_value
+      on medadmin.encounterid = vo.visit_source_value
 left join vocabulary.concept ndc on medadmin.medadmin_code=ndc.concept_code and medadmin_type='ND' and ndc.vocabulary_id='NDC' and ndc.invalid_reason is null
 left join vocabulary.concept_relationship ndc_map on ndc.concept_id=ndc_map.concept_id_1 and ndc_map.relationship_id='Maps to'
 left join vocabulary.concept rxnorm on medadmin.medadmin_code = rxnorm.concept_code and medadmin_type='RX' and rxnorm.vocabulary_id='RxNorm' and rxnorm.standard_concept='S'
