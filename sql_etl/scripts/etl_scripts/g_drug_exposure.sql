@@ -81,13 +81,13 @@ left join
 		(select target_concept, source_concept_id
 		from pcornet_maps.pedsnet_pcornet_valueset_map
 		where source_concept_class = 'Route') as route_maps
-		left join (
+		inner join (
 			select concept_id, vocabulary_id
 			from vocabulary.concept
 			where domain_id = 'Route' and standard_concept = 'S' 
 		) as voc2
 		on route_maps.source_concept_id = voc2.concept_id::varchar
-		where concept_id is not null and vocabulary_id = 'SNOMED'
+		where vocabulary_id = 'SNOMED'
 	) as route 
 	on disp.dispense_route = route.target_concept
 
@@ -180,13 +180,13 @@ left join
 		 target_concept, source_concept_id
 		from pcornet_maps.pedsnet_pcornet_valueset_map
 		where source_concept_class = 'Route') as route_maps
-		left join (
+		inner join (
 			select concept_id, vocabulary_id
 			from vocabulary.concept
 			where domain_id = 'Route' and standard_concept = 'S' 
 		) as voc2
 		on route_maps.source_concept_id = voc2.concept_id::varchar
-		where concept_id is not null and vocabulary_id = 'SNOMED'
+		where vocabulary_id = 'SNOMED'
 	) as route 
 	on presc.rx_route = route.target_concept
 ;
@@ -280,13 +280,13 @@ left join
 		(select target_concept, source_concept_id
 		from pcornet_maps.pedsnet_pcornet_valueset_map
 		where source_concept_class = 'Route') as route_maps
-		left join (
+		inner join (
 			select concept_id, vocabulary_id
 			from vocabulary.concept
 			where domain_id = 'Route' and standard_concept = 'S' 
 		) as voc2
 		on route_maps.source_concept_id = voc2.concept_id::varchar
-		where concept_id is not null and vocabulary_id = 'SNOMED'
+		where and vocabulary_id = 'SNOMED'
 	) as route 
 	on medadmin.medadmin_route = route.target_concept
 
