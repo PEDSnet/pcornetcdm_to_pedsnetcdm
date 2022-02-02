@@ -23,13 +23,13 @@ INSERT INTO SITE_pedsnet.observation(
      site)
 SELECT 
      44813951 AS observation_concept_id,
-     coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
-     coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
+     coalesce(enc.discharge_date,enc.admit_date)::date AS observation_date,
+     coalesce(enc.discharge_date,enc.admit_date)::timestamp AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
      0 AS observation_source_concept_id,
      'Discharge Status' AS observation_source_value,
      38000280 AS observation_type_concept_id,
-     person.person_id AS person_id,
+     vo.person_id AS person_id,
      vo.provider_id AS provider_id,
      NULL AS qualifier_concept_id,
      NULL AS qualifier_source_value,
@@ -47,7 +47,6 @@ SELECT
      vo.visit_occurrence_id AS visit_occurrence_id,           
      'SITE' as site
 FROM SITE_pcornet.encounter enc
-inner join SITE_pedsnet.person person on enc.patid=person.person_source_value
 inner join SITE_pedsnet.visit_occurrence vo 
      on enc.encounterid=vo.visit_source_value
 WHERE enc.discharge_disposition is not null;
@@ -77,13 +76,13 @@ INSERT INTO SITE_pedsnet.observation(
      site)
 SELECT 
      3040464 AS observation_concept_id,
-     coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
-     coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
+     coalesce(enc.discharge_date,enc.admit_date)::date AS observation_date,
+     coalesce(enc.discharge_date,enc.admit_date)::timestamp AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
      0 AS observation_source_concept_id,
      'DRG|'||enc.DRG AS observation_source_value,
      38000280 AS observation_type_concept_id,
-     person.person_id AS person_id,
+     vo.person_id AS person_id,
      vo.provider_id AS provider_id,
      4269228 AS qualifier_concept_id,
      'Primary' AS qualifier_source_value, -- Only primary DRG recorded in PCORnet
@@ -100,7 +99,6 @@ SELECT
      vo.visit_occurrence_id AS visit_occurrence_id,           
      'SITE' as site
 FROM SITE_pcornet.encounter enc
-inner join SITE_pedsnet.person person on enc.patid=person.person_source_value
 inner join SITE_pedsnet.visit_occurrence vo 
      on enc.encounterid=vo.visit_source_value
 left join vocabulary.concept drg on enc.drg=drg.concept_code and drg.concept_class_id = 'DRG' and valid_end_date = '30-SEP-2007' and invalid_reason = 'D' 
@@ -133,16 +131,16 @@ INSERT INTO SITE_pedsnet.observation(
      site)
 SELECT 
      4005823 AS observation_concept_id,
-     coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
-     coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
+     vt.measure_date::date AS observation_date,
+     (vt.measure_date|| ' '|| vt.measure_time)::timestamp AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
      0 AS observation_source_concept_id,
      'Tobacco|'||vt.tobacco||'|'||coalesce(vt.raw_tobacco,' '),
      38000280 AS observation_type_concept_id,
-     person.person_id AS person_id,
-     enc.providerid::bigint AS provider_id,
+     vo.person_id AS person_id,
+     vo.provider_id AS provider_id,
      0 AS qualifier_concept_id,
-     null AS qualifier_source_value, -- Only primary DRG recorded in PCORnet
+     null AS qualifier_source_value,
      NULL AS unit_concept_id,
      NULL AS unit_source_value,
      case 
@@ -160,7 +158,6 @@ SELECT
      vo.visit_occurrence_id AS visit_occurrence_id,           
      'SITE' as site
 FROM SITE_pcornet.vital vt
-inner join SITE_pedsnet.person person on vt.patid=person.person_source_value
 inner join SITE_pedsnet.visit_occurrence vo 
      on vt.encounterid=vo.visit_source_value
 WHERE vt.tobacco is not null;
@@ -186,16 +183,16 @@ INSERT INTO SITE_pedsnet.observation(
      site)
 SELECT 
      4219336 AS observation_concept_id,
-     coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
-     coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
+     vt.measure_date::date AS observation_date,
+     (vt.measure_date|| ' '|| vt.measure_time)::timestamp AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
      0 AS observation_source_concept_id,
      'Tobacco Type|'||vt.tobacco_type||'|'||coalesce(vt.raw_tobacco_type,' '),
      38000280 AS observation_type_concept_id,
-     person.person_id AS person_id,
-     vo.provider AS provider_id,
+     vo.person_id AS person_id,
+     vo.provider_id AS provider_id,
      0 AS qualifier_concept_id,
-     null AS qualifier_source_value, -- Only primary DRG recorded in PCORnet
+     null AS qualifier_source_value,
      NULL AS unit_concept_id,
      NULL AS unit_source_value,
      case 
@@ -213,7 +210,6 @@ SELECT
      vo.visit_occurrence_id AS visit_occurrence_id,           
      'SITE' as site
 FROM SITE_pcornet.vital vt
-inner join SITE_pedsnet.person person on vt.patid=person.person_source_value
 inner join SITE_pedsnet.visit_occurrence vo 
      on vt.encounterid=vo.visit_source_value
 WHERE vt.tobacco_type is not null;
@@ -242,16 +238,16 @@ INSERT INTO SITE_pedsnet.observation(
      site)
 SELECT 
      4275495 AS observation_concept_id,
-     coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
-     coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
+     vt.measure_date::date AS observation_date,
+     (vt.measure_date|| ' '|| vt.measure_time)::timestamp AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
      0 AS observation_source_concept_id,
      'Smoking|'||vt.smoking||'|'||coalesce(vt.raw_smoking,' ') AS observation_source_value,
      38000280 AS observation_type_concept_id,
-     person.person_id AS person_id,
+     vo.person_id AS person_id,
      vo.provider_id AS provider_id,
      0 AS qualifier_concept_id,
-     null AS qualifier_source_value, -- Only primary DRG recorded in PCORnet
+     null AS qualifier_source_value,
      NULL AS unit_concept_id,
      NULL AS unit_source_value,
      case 
@@ -270,7 +266,6 @@ SELECT
      vo.visit_occurrence_id AS visit_occurrence_id,           
      'SITE' as site
 FROM SITE_pcornet.vital vt
-inner join SITE_pedsnet.person person on vt.patid=person.person_source_value
 inner join SITE_pedsnet.visit_occurrence vo 
      on vt.encounterid=vo.visit_source_value
 WHERE vt.smoking is not null;
