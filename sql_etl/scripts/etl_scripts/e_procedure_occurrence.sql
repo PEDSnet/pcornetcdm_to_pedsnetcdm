@@ -1,5 +1,5 @@
 begin;
-INSERT INTO pcornet_pedsnet.procedure_occurrence (
+INSERT INTO SITE_pedsnet.procedure_occurrence (
       procedure_occurrence_id, 
       modifier_concept_id,
       modifier_source_value, 
@@ -20,13 +20,13 @@ SELECT
       0 as modifier_source_value,
       null as modifier_source_value,
       person.person_id,
-      case
+      coalesce(case
             when c_hcpcs.concept_id is not null then c_hcpcs.concept_id
             when proc.px_type='CH' then c_cpt.concept_id
             when proc.px_type='10' then c_icd9.concept_id
             when proc.px_type='09' then c_icd10.concept_id
-      else 0 
-      end as procedure_concept_id,
+            else 0 
+      end, 0) as procedure_concept_id,
       coalesce(proc.px_date,proc.admit_date) as procedure_date,
       proc.px_date::timestamp as procedure_datetime,
       case
@@ -43,7 +43,7 @@ SELECT
             else 44814650
       end AS procedure_type_concept_id,   
       vo.provider_id,
-      null as quantity,
+      null::bigint as quantity,
       vo.visit_occurrence_id,
       'SITE' as site
 FROM SITE_pcornet.procedures proc

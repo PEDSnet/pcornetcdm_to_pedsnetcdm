@@ -22,7 +22,7 @@ harvest_file = "data/harvest_data.csv"
 etl_bash = "bash_script/etl_bash.sh"
 comb_csv = "bash_script/combine_csv.sh"
 data_dir = "data"
-test_script_file = "scripts/temp/temp.sql"
+test_script_file = "scripts/etl_scripts_temp/e_observation.sql"
 test_etl_bash = "bash_script/test_etl_script.sh"
 
 
@@ -48,7 +48,10 @@ def ddl_only():
         db_name = params['database']
         pedsnet_version = config.config('pedsnet_version')
         schema_path = config.config('schema')
+        #remove _pcornet suffix from schema and add _pedsnet suffix
+        site = re.sub('_pedsnet', '', schema_path['schema'])
         schema = [(re.sub('_pcornet', '', schema_path['schema']) + """_pedsnet""")]
+        
         # endregion
 
         # region connect to the PostgreSQL server
@@ -59,27 +62,30 @@ def ddl_only():
         # endregion
 
         # region check if maps loaded
+        # check schema/table index in postgresql for mapping table
         cur.execute("""select exists (select 1 from information_schema.tables
                                                where table_schema = 'pedsnet_maps' and table_name = 'pcornet_pedsnet_valueset_map'
                                                )
                             """)
         table_exists = cur.fetchone()[0]
         if not table_exists:
+            #creates and populates mapping data (where does data file come from?)
            # load_maps()
            print('load maps')
 
         # endregion
 
+        #for all pedsnet files, 
         for schemas in schema:
-            # region check if the schema exisit
+            # region check if the schema exist
             cur.execute(
                 """select exists(select 1 from information_schema.schemata where schema_name = \'""" + schemas + """\');""")
             schema_exist = cur.fetchone()[0]
-
+            #creates schema if it is currently missing
             if not schema_exist:
-                print('% schema does not exist..... \n Creating schema ....' % schemas)
+                print('%s schema does not exist....\nCreating schema...' % schemas)
                 cur.execute(query.create_schema(schemas))
-                print('% schema created' % schemas)
+                print('%s schema created' % schemas)
                 conn.commit()
             # set the search pat to the schema
             cur.execute("SET search_path TO " + schemas + ";")
@@ -88,45 +94,56 @@ def ddl_only():
 
             # region run the DDL
             try:
-                print('\nRunning the DDL ...')
+                print('\nRunning the DDL...')
                 # set the search pat to the schema
                 cur.execute("SET search_path TO " + schemas + ";")
                 time.sleep(0.1)
+                #runs DDL link for PEDSNET postgresql table creation
                 cur.execute(query.dll(pedsnet_version))
                 conn.commit()
+                print('DDL created successfully.')
             except (Exception, psycopg2.OperationalError) as error:
+                print('DDL failed to be created.')
                 print(error)
             # endregion
 
             # region Alter tables and add site column
             try:
-                print('\nAltering table, adding {site} column ...')
+                print('\nAltering tables, adding additional column for "site" ...')
                 cur.execute("SET search_path TO " + schemas + ";")
+                #creates sql function to add SITE column for each table in schema
                 cur.execute(query.site_col())
                 cur.execute("select * from add_site_column('" + db_name + "', '" + schemas + "');")
                 conn.commit()
+                print('Table altering successful.')
             except(Exception, psycopg2.OperationalError) as error:
+                print('Table Altering Failed.')
                 print(error)
             # endregion
 
             # region permissions
             try:
-                print('\nSetting permissions')
+                print('\nSetting permissions...')
                 cur.execute("SET search_path TO " + schemas + ";")
                 time.sleep(0.1)
                 cur.execute(query.permission(schemas))
                 conn.commit()
+                print('Permissions set successfully.')
             except(Exception, psycopg2.OperationalError) as error:
+                print('Permission setting failed.')
                 print(error)
             # endregion
 
             # region Alter owner of tables
             try:
+                print('\nSetting table owner to user...')
                 cur.execute("SET search_path TO " + schemas + ";")
                 time.sleep(0.1)
                 cur.execute(query.owner(schemas))
                 conn.commit()
+                print('Table Owner set successfully.')
             except(Exception, psycopg2.OperationalError) as error:
+                print('Table owner setting failed.')
                 print(error)
             # endregion
 
@@ -184,7 +201,11 @@ def ddl_only():
                                                                     "rx_start_date_mgmt",
                                                                     "specimen_date_mgmt"), sep=",")
                     conn.commit()
+                    print('Harvest table populated successfully.')
+                else: 
+                    print('No harvest data to load into table!')
             except (Exception, psycopg2.DatabaseError) as error:
+                print('Harvest table population failed.')
                 print(error)
             # endregion
         print('\nPcornet data model set up complete ... \nClosing database connection...')
@@ -262,33 +283,44 @@ def truncate_fk():
 
 # region ETL only
 def etl_only():
+    #get schema data in form of dictionary
     schema_path = config.config('schema')
+    #if schema key value contains _pedsnet, remove _pedsnet
     schema = re.sub('_pedsnet', '', schema_path['schema'])
-
+    schema = re.sub('_pcornet', '', schema_path['schema'])
+    #for the schema in question, remove all temp ETL files, create new directory with temp files where SITE = schema
     query.get_etl_ready(schema)
     # subprocess.call("ls -la", shell=True)  stdout=subprocess.PIPE,
 
+    #obtain list of all newly created .sql files in temp directory
     filelist = glob.glob(os.path.join(etl_dir, '*.sql'))
+    #for each .sql transform file in temp folder, run command line script that executes query in postgres db
+    count = 1
+    total = len(filelist)
+    print('\nBeginning ETL Process...')
     for infile in sorted(filelist):
         args = infile
-
-        print('starting ETL \t:' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + "\n")
+        print('\nRunning ETL file '+ infile + ' (' + str(count) + '/' + str(total) + ').' )
+        print('Starting ETL file:' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+        #runs bash_script/etl_bash.sh
         proc = subprocess.Popen([etl_bash, args], stderr=subprocess.STDOUT)
         output, error = proc.communicate()
-
+        
         if output:
             with open("logs/log_file.log", "a") as logfile:
-                logfile.write("\n" + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + "\n")
+                logfile.write(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
                 logfile.write(output)
         if error:
             with open("logs/log_file.log", "a") as logfile:
-                logfile.write("\n" + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S' + "\n"))
+                logfile.write(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
                 logfile.write(error)
+        count += 1
 
     # create the upper case views
     conn = None
     try:
         # region read connection parameters
+
         params = config.config('db')
         schema_path = config.config('schema')
         # schema = schema_path['schema']+"""_3dot1_pcornet"""

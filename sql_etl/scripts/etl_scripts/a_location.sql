@@ -1,7 +1,9 @@
 begin;
+
 INSERT INTO SITE_pedsnet.location(
     location_id,
     zip,
+    location_source_value,
     site)
 select 
 	distinct
@@ -17,5 +19,5 @@ select
  INSERT INTO SITE_pedsnet.location(
     location_id,
     site)
- values(9999999,'SITE')
+ values(9999999,'SITE');
 commit;

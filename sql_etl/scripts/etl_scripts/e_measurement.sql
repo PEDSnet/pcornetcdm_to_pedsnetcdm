@@ -1,5 +1,5 @@
 /* sequence is needed as the vital need to be transpose one id multiple values */
-create sequence SITE_pedsnet.measurement_id_seq;
+create sequence if not exists SITE_pedsnet.measurement_id_seq;
 
 INSERT INTO SITE_pedsnet.measurement ( 
      measurement_id,
@@ -34,7 +34,7 @@ INSERT INTO SITE_pedsnet.measurement (
      visit_occurrence_id, 
      site)
 SELECT distinct
-     nextval('pcornet_pedsnet.measurement_id_seq')::bigint AS measurement_id,
+     nextval('SITE_pedsnet.measurement_id_seq')::bigint AS measurement_id,
      coalesce(c.concept_id,0)  as measurement_concept_id,
      coalesce(lab.result_date,lab.specimen_date) as measurement_date, 
      coalesce(lab.result_date,lab.specimen_date)::timestamp as measurement_datetime,

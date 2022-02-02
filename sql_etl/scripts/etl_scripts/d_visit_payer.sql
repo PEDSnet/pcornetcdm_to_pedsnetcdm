@@ -23,6 +23,7 @@ left join pcornet_maps.pedsnet_pcornet_valueset_map payer_map
 where payer_type_primary is not null 
 	and payer_type_primary <>'NI'
 union
+select
 	split_part(source_concept_id,'-',1) as plan_class,
 	split_part(source_concept_id,'-',2)as plan_type,
 	raw_payer_name_secondary as plan_name,
@@ -38,10 +39,11 @@ where payer_type_primary is not null
 	and payer_type_primary <>'NI'
 )
 select
-	payer_info.plan_class,
+	coalesce(payer_info.plan_class,'Other/Unknown'),
 	payer_info.plan_type,
 	payer_info.plan_name,
 	row_number() over (order by visit_occurrence_id)::bigint as visit_payer_id,
+	payer_info.visit_occurrence_id,
 	payer_info.visit_payer_type_concept_id
 from payer_info;
 

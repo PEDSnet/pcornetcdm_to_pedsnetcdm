@@ -1,6 +1,7 @@
 begin;
 INSERT INTO SITE_pedsnet.provider(
     provider_id,
+    provider_source_value,
     gender_concept_id,
     gender_source_concept_id,
     gender_source_value,
@@ -12,7 +13,7 @@ INSERT INTO SITE_pedsnet.provider(
 SELECT 
     distinct on (providerid)providerid::bigint  AS provider_id,
     prov.providerid as provider_source_value,
-    coalesce(gender_map.source_concept_id::int,,44814650) as gender_concept_id,
+    coalesce(gender_map.source_concept_id::int,44814650) as gender_concept_id,
     0 as gender_source_concept_id,
     prov.provider_sex as gender_source_value,
     prov.provider_npi as npi,

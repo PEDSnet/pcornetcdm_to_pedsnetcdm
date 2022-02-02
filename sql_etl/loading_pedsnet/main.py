@@ -5,13 +5,12 @@ import click
 import os
 from loading_pedsnet import process
 import shutil
-
+import config
 # endregion
 
 # region file names
 configfile_name = "database.ini"
 temp="scripts/temp/"
-
 # endregion
 
 @click.command()
@@ -26,6 +25,7 @@ temp="scripts/temp/"
 @click.option('--harvest', '-H', required=False, help='harvest refresh date in following formatt yyyy-mm-dd')
 @click.option('--testscript', '-ts', required=False, type=click.File('rb'), help='Run single table at a time')
 @click.option('--pedsnet_version', '-pv', default='v4.1', help='PEDSnet ETL version v3.0 \n v4.0 \n v4.1')
+
 def cli(searchpath, pwprompt, user, database, host, options, harvest, testscript, pedsnet_version):
     """This tool is used to load the data"""
 
@@ -41,6 +41,13 @@ def cli(searchpath, pwprompt, user, database, host, options, harvest, testscript
     }
     # endregion
 
+    #grabs values from .ini file if already created -> less to manually input during testing
+    if os.path.isfile(configfile_name):
+        db_params = config.config('db')
+        host = db_params['host']
+        database = db_params['database']
+        searchpath = config.config('schema')['schema']
+
     # region verify
     if not user:
         click.echo('Please provide the database username.')
@@ -51,7 +58,7 @@ def cli(searchpath, pwprompt, user, database, host, options, harvest, testscript
         password = click.prompt('Database password', hide_input=True)
 
     if not host:
-        host = click.prompt('server name', hide_input=True)
+        host = click.prompt('server name', hide_input=False)
 
     if not database:
         database = click.prompt('Database name', hide_input=False)
@@ -60,7 +67,7 @@ def cli(searchpath, pwprompt, user, database, host, options, harvest, testscript
         searchpath = click.prompt('schema name', hide_input=False)
 
     if not options:
-        options = click.prompt('Process Options: \tpipeline \n\t\tetl \n\t\ttruncate \n\t\tddl \n\t\tupdate_map \n\t\tload_maps \n')
+        options = click.prompt('Process Options: \n\n\tpipeline \n\tetl \n\ttruncate \n\tddl \n\tupdate_map \n\tload_maps \n\ttest_script\n')
 
     if not pedsnet_version:
         pedsnet_version = click.prompt('PEDSnet version', hide_input=False)

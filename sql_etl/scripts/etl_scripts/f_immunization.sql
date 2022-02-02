@@ -1,6 +1,9 @@
+create sequence if not exists SITE_pedsnet.imm_seq;
+
+
 begin;
 insert into SITE_pedsnet.immunization(
-	imm_body_site_concept_id
+	imm_body_site_concept_id,
 	imm_body_site_source_value, 
 	imm_dose_unit_concept_id, 
 	imm_dose_unit_source_value, 
@@ -75,7 +78,7 @@ inner join SITE_pedsnet.person person
 inner join SITE_pedsnet.visit_occurrence vo 
       on imm.encounterid = vo.visit_source_value
 inner join SITE_pedsnet.procedure_occurrence po
-      on imm.procedureid = po.procedure_source_value
+      on imm.proceduresid = po.procedure_source_value
 left join vocabulary.concept c_hcpcs
       on imm.vx_code=c_hcpcs.concept_code and imm.vx_code_type='CH' and c_hcpcs.vocabulary_id='HCPCS' and imm.vx_code ~ '[A-Z]'
 left join vocabulary.concept c_cpt

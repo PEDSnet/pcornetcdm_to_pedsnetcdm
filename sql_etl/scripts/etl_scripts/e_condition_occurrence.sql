@@ -10,8 +10,6 @@ INSERT INTO SITE_pedsnet.condition_occurrence(
         condition_end_date,
         condition_end_datetime,
         condition_occurrence_id,
-        condition_source_concept_id,
-        condition_source_value,
         condition_start_date,
         condition_start_datetime, 
         condition_status_concept_id,
@@ -78,8 +76,6 @@ commit;
 
 INSERT INTO SITE_pedsnet.condition_occurrence(
         condition_concept_id,
-        condition_source_concept_id,
-        condition_source_value,
         condition_occurrence_id,
         condition_source_concept_id,
         condition_source_value,

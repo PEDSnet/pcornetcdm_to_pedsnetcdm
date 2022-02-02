@@ -1,4 +1,4 @@
-create sequence SITE_pedsnet.obs_seq;
+create sequence if not exists SITE_pedsnet.obs_seq;
 
 begin;
 -- adding PEDSnet discharge status (PCORnet discharge disposition) 
@@ -25,7 +25,7 @@ SELECT
      44813951 AS observation_concept_id,
      coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
      coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
-     nextval('pcornet_pedsnet.obs_seq')::bigint AS observation_id,
+     nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
      0 AS observation_source_concept_id,
      'Discharge Status' AS observation_source_value,
      38000280 AS observation_type_concept_id,
@@ -79,7 +79,7 @@ SELECT
      3040464 AS observation_concept_id,
      coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
      coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
-     nextval('pcornet_pedsnet.obs_seq')::bigint AS observation_id,
+     nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
      0 AS observation_source_concept_id,
      'DRG|'||enc.DRG AS observation_source_value,
      38000280 AS observation_type_concept_id,
@@ -135,9 +135,9 @@ SELECT
      4005823 AS observation_concept_id,
      coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
      coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
-     nextval('pcornet_pedsnet.obs_seq')::bigint AS observation_id,
+     nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
      0 AS observation_source_concept_id,
-     'Tobacco|'||vt.tobacco||'|'||coalesce(vt.raw_tobacco,' ')
+     'Tobacco|'||vt.tobacco||'|'||coalesce(vt.raw_tobacco,' '),
      38000280 AS observation_type_concept_id,
      person.person_id AS person_id,
      enc.providerid::bigint AS provider_id,
@@ -188,9 +188,9 @@ SELECT
      4219336 AS observation_concept_id,
      coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
      coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
-     nextval('pcornet_pedsnet.obs_seq')::bigint AS observation_id,
+     nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
      0 AS observation_source_concept_id,
-     'Tobacco Type|'||vt.tobacco_type||'|'||coalesce(vt.raw_tobacco_type,' ')
+     'Tobacco Type|'||vt.tobacco_type||'|'||coalesce(vt.raw_tobacco_type,' '),
      38000280 AS observation_type_concept_id,
      person.person_id AS person_id,
      vo.provider AS provider_id,
@@ -244,7 +244,7 @@ SELECT
      4275495 AS observation_concept_id,
      coalesce(enc.discharge_date,enc.admit_date)AS observation_date,
      coalesce(enc.discharge_date,enc.admit_date) AS observation_datetime,
-     nextval('pcornet_pedsnet.obs_seq')::bigint AS observation_id,
+     nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
      0 AS observation_source_concept_id,
      'Smoking|'||vt.smoking||'|'||coalesce(vt.raw_smoking,' ') AS observation_source_value,
      38000280 AS observation_type_concept_id,

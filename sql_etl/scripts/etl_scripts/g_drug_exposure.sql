@@ -1,4 +1,4 @@
-create sequence SITE_pedsnet.drug_exposure_seq;
+create sequence if not exists SITE_pedsnet.drug_exposure_seq;
 
 begin;
 
@@ -30,7 +30,8 @@ insert into SITE_pedsnet.drug_exposure(
 	route_source_value,
 	sig,
 	stop_reason,
-	visit_occurrence_id)
+	visit_occurrence_id,
+	site)
 
 select
 	dispense_sup as days_supply,
@@ -40,11 +41,13 @@ select
 	coalesce(ndc_map.concept_id_2,0) drug_concept_id,
 	null as drug_exposure_end_date,
 	null as drug_exposure_end_datetime,
-	nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
+	nextval('SITE_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
 	null as drug_exposure_order_date,
 	null as drug_exposure_order_datetime,
 	dispense_date::date as drug_exposure_start_date,
 	dispense_date::timestamp as drug_exposure_start_datetime,
+	--placeholder
+	0 as drug_source_concept_id,
 	NDC as drug_source_value,
 	38000175 as drug_type_concept_id,
 	dispense_dose_disp::varchar as eff_drug_dose_source_value,
@@ -59,7 +62,8 @@ select
 	dispense_route as route_source_value,
 	null as sig,
 	null as stop_reason,
-	null as visit_occurrence_id
+	null as visit_occurrence_id,
+	'SITE' as site
 from SITE_pcornet.dispensing disp
 inner join SITE_pedsnet.person person 
       on disp.patid = person.person_source_value
@@ -90,7 +94,7 @@ left join
 		where vocabulary_id = 'SNOMED'
 	) as route 
 	on disp.dispense_route = route.target_concept
-
+;
 commit;
 
 insert into SITE_pedsnet.drug_exposure(
@@ -121,7 +125,8 @@ insert into SITE_pedsnet.drug_exposure(
 	route_source_value,
 	sig,
 	stop_reason,
-	visit_occurrence_id)
+	visit_occurrence_id,
+	site)
 
 select
 	rx_days_supply as days_supply,
@@ -137,7 +142,7 @@ select
 	coalesce(rxnorm.concept_id,0) as drug_concept_id,
 	rx_end_date::date as drug_exposure_end_date,
 	rx_end_date::timestamp as drug_exposure_end_datetime,
-	nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
+	nextval('SITE_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
 	rx_order_date::date as drug_exposure_order_date,
 	(rx_order_date || ' '|| rx_order_time)::timestamp as drug_exposure_order_datetime,
 	rx_start_date::date as drug_exposure_start_date,
@@ -156,8 +161,9 @@ select
 	coalesce(route.concept_id,0) as route_concept_id,
 	rx_route as route_source_value,
 	null as sig,
-	null as stop_reason
- 	vo.visit_occurrence_id as visit_occurrence_id
+	null as stop_reason,
+ 	vo.visit_occurrence_id as visit_occurrence_id,
+	'SITE' as site
 from SITE_pcornet.prescribing presc
 inner join SITE_pedsnet.person person 
     on presc.patid = person.person_source_value
@@ -221,7 +227,8 @@ insert into SITE_pedsnet.drug_exposure(
 	route_source_value,
 	sig, 
 	stop_reason, 
-	visit_occurrence_id)
+	visit_occurrence_id,
+	site)
 
 select
 	null as days_supply,
@@ -234,7 +241,7 @@ select
 		else 0 end as drug_concept_id,
 	medadmin_stop_date::date as drug_exposure_end_date,
 	(medadmin_stop_date || ' '|| medadmin_stop_time)::timestamp as drug_exposure_end_datetime,
- 	nextval('pcornet_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
+ 	nextval('SITE_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
 	null as drug_exposure_order_date,
 	null as drug_exposure_order_datetime,
 	medadmin_start_date as drug_exposure_start_date,
@@ -257,7 +264,8 @@ select
 	medadmin_route as route_source_value,
 	null as sig,
 	null as stop_reason,
-	vo.visit_occurrence_id as visit_occurrence_id
+	vo.visit_occurrence_id as visit_occurrence_id,
+	'SITE' as site
 from SITE_pcornet.med_admin as medadmin
 inner join SITE_pedsnet.person person 
 on medadmin.patid = person.person_source_value
@@ -288,7 +296,7 @@ left join
 		on route_maps.source_concept_id = voc2.concept_id::varchar
 		where and vocabulary_id = 'SNOMED'
 	) as route 
-	on medadmin.medadmin_route = route.target_concept
+	on medadmin.medadmin_route = route.target_concept;
 
 commit;
 

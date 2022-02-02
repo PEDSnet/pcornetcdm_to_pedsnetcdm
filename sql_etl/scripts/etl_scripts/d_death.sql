@@ -32,7 +32,7 @@ nextval('SITE_pedsnet.death_seq')::bigint as death_cause_id,
 d.death_date as death_date,
 (d.death_date ||' 00:00:00')::timestamp as death_datetime,
 coalesce (impu.source_concept_id::int, 44814650)  as death_impute_concept_id, 
-dt.target_concept_id as death_type_concept_id,
+coalesce(dt.target_concept_id,0) as death_type_concept_id,
 d.patid::bigint as person_id,
 'SITE' as site
 FROM SITE_pcornet.death d

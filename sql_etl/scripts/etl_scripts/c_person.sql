@@ -54,7 +54,7 @@ left join pcornet_maps.pedsnet_pcornet_valueset_map lang on source_concept_class
            and source_concept_id is not null 
 		   and lang.target_concept = demo.pat_pref_language_spoken
 left join pcornet_maps.pedsnet_pcornet_valueset_map gender_map 
-            on demo.sex=gender_maps.target_concept
+            on demo.sex=gender_map.target_concept
             and gender_map.source_concept_class='Gender'
 left join pcornet_maps.pedsnet_pcornet_valueset_map ethnicity_map 
             on demo.hispanic = ethnicity_map.target_concept
