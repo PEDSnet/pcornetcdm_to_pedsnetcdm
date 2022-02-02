@@ -48,7 +48,7 @@ select
 	dispense_date::timestamp as drug_exposure_start_datetime,
 	--placeholder
 	0 as drug_source_concept_id,
-	NDC as drug_source_value,
+	'NDC' as drug_source_value,
 	38000175 as drug_type_concept_id,
 	dispense_dose_disp::varchar as eff_drug_dose_source_value,
 	dispense_dose_disp as effective_drug_dose,
@@ -148,7 +148,7 @@ select
 	rx_start_date::date as drug_exposure_start_date,
 	rx_start_date::timestamp as drug_exposure_start_datetime,
 	coalesce(rxnorm.concept_id,0) as drug_source_concept_id,
-	coalesce(raw_rx_med_name,' ')||'|'||coalesce(rxnorm_cui,' ') as drug_source_value,
+	coalesce(left(raw_rx_med_name, 200),' ')||'|'||coalesce(rxnorm_cui,' ') as drug_source_value,
 	38000177 as drug_type_concept_id,
 	null as eff_drug_dose_source_value,
 	rx_dose_ordered as effective_drug_dose,
@@ -235,10 +235,12 @@ select
 	0 as dispense_as_written_concept_id,
 	coalesce(unit.concept_id::integer,0) as dose_unit_concept_id,
 	medadmin_dose_admin_unit as dose_unit_source_value,
-	case
-		when medadmin_type='ND' then ndc_map.concept_id_2
-		when medadmin_type='RX' then rxnorm.concept_id
-		else 0 end as drug_concept_id,
+	coalesce(
+		case
+			when medadmin_type='ND' then ndc_map.concept_id_2
+			when medadmin_type='RX' then rxnorm.concept_id
+			else 0 
+		end, 0) as drug_concept_id,
 	medadmin_stop_date::date as drug_exposure_end_date,
 	(medadmin_stop_date || ' '|| medadmin_stop_time)::timestamp as drug_exposure_end_datetime,
  	nextval('SITE_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
@@ -250,7 +252,7 @@ select
 		when medadmin_type='ND' then ndc.concept_id
 		when medadmin_type='RX' then rxnorm.concept_id
 		else 0 end as drug_source_concept_id,
-	coalesce(raw_medadmin_med_name,' ')||'|'||coalesce(medadmin_code,' ') as drug_source_value,
+	coalesce(left(raw_medadmin_med_name, 200)||'...',' ')||'|'||coalesce(medadmin_code,' ') as drug_source_value,
 	38000180 as drug_type_concept_id,
 	medadmin_dose_admin::varchar as eff_drug_dose_source_value,
 	medadmin_dose_admin as effective_drug_dose,
@@ -294,7 +296,7 @@ left join
 			where domain_id = 'Route' and standard_concept = 'S' 
 		) as voc2
 		on route_maps.source_concept_id = voc2.concept_id::varchar
-		where and vocabulary_id = 'SNOMED'
+		where vocabulary_id = 'SNOMED'
 	) as route 
 	on medadmin.medadmin_route = route.target_concept;
 
