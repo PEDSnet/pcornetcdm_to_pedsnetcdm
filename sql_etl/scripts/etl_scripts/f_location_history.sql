@@ -20,7 +20,7 @@ select
 	address_period_end::date,
 	address_period_end::timestamp,
 	person.person_id as entity_id,
-	coloc.location_id,
+	loc.location_id,
 	44814653,
 	0,
 	address_period_start::date,
