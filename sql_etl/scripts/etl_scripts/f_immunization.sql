@@ -26,7 +26,8 @@ insert into SITE_pedsnet.immunization(
 	person_id, 
 	procedure_occurrence_id, 
 	provider_id, 
-	visit_occurrence_id)
+	visit_occurrence_id,
+	site)
 select
 	0 as imm_body_site_concept_id,
 	imm.vx_body_site as imm_body_site_source_value, 
@@ -40,18 +41,20 @@ select
 	imm.vx_record_date::timestamp as imm_recorded_datetime, 
 	0 as imm_route_concept_id, 
 	imm.vx_route as imm_route_source_value, 
+	coalesce(
 		case
             when c_hcpcs.concept_id is not null then c_hcpcs.concept_id
             when imm.vx_code_type='CH' then c_cpt.concept_id
             when imm.vx_code_type='CX' then c_cvx.concept_id
             when imm.vx_code_type='RX' then c_rxnorm.concept_id
             when imm.vx_code_type='ND' then c_ndc.concept_id
-      else 0 
-	end as immunization_concept_id,
+      		else 0 
+		end, 0) as immunization_concept_id,
 	coalesce(imm.vx_admin_date,imm.vx_record_date) as immunization_date,
 	coalesce(imm.vx_admin_date,imm.vx_record_date)::timestamp as immunization_datetime,
 	imm.vx_dose as dose,
 	nextval('SITE_pedsnet.imm_seq')::bigint as immunization_id,
+	coalesce(	
 		case
             when c_hcpcs.concept_id is not null then c_hcpcs.concept_id
             when imm.vx_code_type='CH' then c_cpt.concept_id
@@ -59,7 +62,7 @@ select
             when imm.vx_code_type='RX' then c_rxnorm.concept_id
             when imm.vx_code_type='ND' then c_ndc.concept_id
       else 0 
-	end as immunization_source_concept_id, 
+	end, 0) as immunization_source_concept_id, 
 	coalesce(imm.raw_vx_name,'')||'|'||coalesce(imm.raw_vx_code,'') as immunization_source_value, 
 	case 
 		when vx_source='OD' then 2000001288
@@ -71,7 +74,8 @@ select
 	person.person_id as person_id,
 	po.procedure_occurrence_id as procedure_occurrence_id,
 	vo.provider_id as provider_id,
-	vo.visit_occurrence_id as visit_occurrence_id
+	vo.visit_occurrence_id as visit_occurrence_id,
+	'SITE' as site
 from SITE_pcornet.immunization imm
 inner join SITE_pedsnet.person person 
       on imm.patid = person.person_source_value
