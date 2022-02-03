@@ -22,7 +22,7 @@ harvest_file = "data/harvest_data.csv"
 etl_bash = "bash_script/etl_bash.sh"
 comb_csv = "bash_script/combine_csv.sh"
 data_dir = "data"
-test_script_file = "scripts/etl_scripts_temp/e_observation.sql"
+test_script_file = "scripts/etl_scripts_temp/e_condition_occurrence.sql"
 test_etl_bash = "bash_script/test_etl_script.sh"
 
 
@@ -144,68 +144,6 @@ def ddl_only():
                 print('Table Owner set successfully.')
             except(Exception, psycopg2.OperationalError) as error:
                 print('Table owner setting failed.')
-                print(error)
-            # endregion
-
-            # region Populate Harvest
-            try:
-                print('\nPopulating harvest table... ')
-                if os.path.isfile(harvest_file):
-                    f = open('data/harvest_data.csv', 'r')
-                    cur.copy_from(f, schemas + ".harvest", columns=("admit_date_mgmt",
-                                                                    "birth_date_mgmt",
-                                                                    "cdm_version",
-                                                                    "datamart_claims",
-                                                                    "datamart_ehr",
-                                                                    "datamart_name",
-                                                                    "datamart_platform",
-                                                                    "datamartid",
-                                                                    "death_date_mgmt",
-                                                                    "discharge_date_mgmt",
-                                                                    "dispense_date_mgmt",
-                                                                    "enr_end_date_mgmt",
-                                                                    "enr_start_date_mgmt",
-                                                                    "lab_order_date_mgmt",
-                                                                    "measure_date_mgmt",
-                                                                    "medadmin_start_date_mgmt",
-                                                                    "medadmin_stop_date_mgmt",
-                                                                    "network_name", "networkid",
-                                                                    "obsclin_date_mgmt",
-                                                                    "obsgen_date_mgmt",
-                                                                    "onset_date_mgmt",
-                                                                    "pro_date_mgmt",
-                                                                    "px_date_mgmt",
-                                                                    "refresh_condition_date",
-                                                                    "refresh_death_cause_date",
-                                                                    "refresh_death_date",
-                                                                    "refresh_demographic_date",
-                                                                    "refresh_diagnosis_date",
-                                                                    "refresh_dispensing_date",
-                                                                    "refresh_encounter_date",
-                                                                    "refresh_enrollment_date",
-                                                                    "refresh_lab_result_cm_date",
-                                                                    "refresh_med_admin_date",
-                                                                    "refresh_obs_clin_date",
-                                                                    "refresh_obs_gen_date",
-                                                                    "refresh_pcornet_trial_date",
-                                                                    "refresh_prescribing_date",
-                                                                    "refresh_pro_cm_date",
-                                                                    "refresh_procedures_date",
-                                                                    "refresh_provider_date",
-                                                                    "refresh_vital_date",
-                                                                    "report_date_mgmt",
-                                                                    "resolve_date_mgmt",
-                                                                    "result_date_mgmt",
-                                                                    "rx_end_date_mgmt",
-                                                                    "rx_order_date_mgmt",
-                                                                    "rx_start_date_mgmt",
-                                                                    "specimen_date_mgmt"), sep=",")
-                    conn.commit()
-                    print('Harvest table populated successfully.')
-                else: 
-                    print('No harvest data to load into table!')
-            except (Exception, psycopg2.DatabaseError) as error:
-                print('Harvest table population failed.')
                 print(error)
             # endregion
         print('\nPcornet data model set up complete ... \nClosing database connection...')
@@ -384,7 +322,10 @@ def harvest_date_refresh(date):
 # region Test the etl script
 def test_script():
     args = test_script_file
-
+    schema_path = config.config('schema')
+    schema = re.sub('_pedsnet', '', schema_path['schema'])
+    schema = re.sub('_pcornet', '', schema_path['schema'])
+    query.get_etl_ready(schema)
     print('starting ETL \t:' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + "\n")
     proc = subprocess.Popen([test_etl_bash, args], stderr=subprocess.STDOUT)
     output, error = proc.communicate()

@@ -35,9 +35,9 @@ CLI tool. The set up tool make it easy to install.
 
 	  activate the virtual environment using following command
 	
-	`virtualenv venv`
+	`python3 -m ~/filepath/to/pcornetcdm_to_pedsnetcdm/venv`
 	
-	`. venv\bin\activate`
+	`source venv\bin\activate`
 	
    install the tool
 	

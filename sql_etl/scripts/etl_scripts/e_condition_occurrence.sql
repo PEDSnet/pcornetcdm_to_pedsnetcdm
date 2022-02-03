@@ -98,6 +98,7 @@ SELECT
     else
      0
     end,44814650)::int as condition_concept_id,
+    nextval('SITE_pedsnet.cond_occ_seq')::bigint as condition_occurrence_id,
     coalesce(case
         when cond.dx_type='09' then c_icd9.concept_id
         when cond.dx_type='10' then c_icd10.concept_id
@@ -106,7 +107,6 @@ SELECT
         0
     end,44814650)::int as condition_source_concept_id,
     cond.dx as condition_source_value,
-    nextval('SITE_pedsnet.cond_occ_seq')::bigint as condition_occurrence_id,
     coalesce(cond.dx_date,cond.admit_date) as condition_start_date, 
     coalesce(cond.dx_date,cond.admit_date)::timestamp as condition_start_datetime,
     4230359 AS condition_status_concept_id,

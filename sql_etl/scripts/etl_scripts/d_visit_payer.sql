@@ -6,7 +6,8 @@ insert into SITE_pedsnet.visit_payer(
 	plan_type, 
 	visit_occurrence_id, 
 	visit_payer_id, 
-	visit_payer_type_concept_id)
+	visit_payer_type_concept_id,
+	site)
 with payer_info as (
 select
 	split_part(source_concept_id,'-',1) as plan_class,
@@ -44,7 +45,8 @@ select
 	payer_info.plan_name,
 	row_number() over (order by visit_occurrence_id)::bigint as visit_payer_id,
 	payer_info.visit_occurrence_id,
-	payer_info.visit_payer_type_concept_id
+	payer_info.visit_payer_type_concept_id,
+	'SITE' as site
 from payer_info;
 
 commit;
