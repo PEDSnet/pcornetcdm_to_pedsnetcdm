@@ -22,7 +22,7 @@ harvest_file = "data/harvest_data.csv"
 etl_bash = "bash_script/etl_bash.sh"
 comb_csv = "bash_script/combine_csv.sh"
 data_dir = "data"
-test_script_file = "scripts/etl_scripts_temp/e_condition_occurrence.sql"
+test_script_file = "scripts/etl_scripts_temp/e_observation.sql"
 test_etl_bash = "bash_script/test_etl_script.sh"
 
 

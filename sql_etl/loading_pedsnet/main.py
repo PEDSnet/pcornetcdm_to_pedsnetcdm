@@ -1,5 +1,4 @@
 # region import
-#import ConfigParser
 import configparser
 import click
 import os
@@ -71,9 +70,6 @@ def cli(searchpath, pwprompt, user, database, host, options, harvest, testscript
 
     if not pedsnet_version:
         pedsnet_version = click.prompt('PEDSnet version', hide_input=False)
-
-    if harvest:
-        process.harvest_date_refresh(harvest)
 
     if testscript:
         test_scripr_file = testscript
