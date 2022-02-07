@@ -1,7 +1,7 @@
 /* sequence is needed as the vital need to be transpose one id multiple values */
 create sequence if not exists SITE_pedsnet.measurement_id_seq;
 
-create index if not exists lab_result_cm_idx on SITE_pcornet.lab_result_cm (lab_result_cm_id);
+-- create index if not exists lab_result_cm_idx on SITE_pcornet.lab_result_cm (lab_result_cm_id);
 create index if not exists target_concept_idx on pcornet_maps.pedsnet_pcornet_valueset_map (target_concept);
 
 begin;
@@ -351,35 +351,28 @@ INSERT INTO SITE_pedsnet.measurement (
      value_source_value,
      visit_occurrence_id, 
      site)
-SELECT distinct
-     nextval('SITE_pedsnet.measurement_id_seq')::bigint AS measurement_id,
-     coalesce(c.concept_id,0)  as measurement_concept_id,
-     coalesce(lab.result_date,lab.specimen_date) as measurement_date, 
-     coalesce(lab.result_date,lab.specimen_date)::timestamp as measurement_datetime,
-     lab.lab_order_date as measurement_order_date,
-     lab.lab_order_date::timestamp as measurement_order_datetime,
-     lab.result_date as measurement_result_date, 
-     lab.result_date::timestamp as measurement_result_datetime,
-     coalesce(c.concept_id,0) as measurement_source_concept_id,
-     lab.LAB_LOINC as measuremnt_source_value,
-     44818702 AS measurement_type_concept_id,
-     coalesce(opa.source_concept_id::int, 0) as operator_concept_id,
-     person.person_id AS person_id,  
-     coalesce(priority.source_concept_id::int, 0) as priority_concept_id,
-     null as priority_source_value,
-     vo.provider_id as provider_id,
-     lab.norm_range_high::numeric as range_high,
-     coalesce(hi_mod.source_concept_id::int, 0) as range_high_operator_concept_id, 
-     null as range_high_source_value,
-     lab.norm_range_low::numeric as range_low,
-     coalesce(lo_mod.source_concept_id::int, 0) as range_low_operator_concept_id, 
-     null as range_low_source_value,
-     coalesce(spec_con.source_concept_id::int, 0) as specimen_concept_id, 
-     lab.specimen_source as specimen_source_value, 
-     coalesce(units.source_concept_id::int, 0) as unit_concept_id, 
-     raw_unit as unit_source_value, 
-     case when lower(trim(result_qual)) = 'positive' then 45884084
-          when lower(trim(result_qual)) = 'negative' then 45878583
+with lab as (
+select distinct
+	lab_result_cm_id,
+	coalesce(lab.result_date,lab.specimen_date) as measurement_date, 
+	coalesce(lab.result_date,lab.specimen_date)::timestamp as measurement_datetime,
+	lab.lab_order_date as measurement_order_date,
+	lab.lab_order_date::timestamp as measurement_order_datetime,
+	lab.result_date as measurement_result_date, 
+	lab.result_date::timestamp as measurement_result_datetime,
+	lab.LAB_LOINC as measuremnt_source_value,
+	lab.norm_range_high::numeric as range_high,
+	lab.norm_range_low::numeric as range_low,
+	lab.specimen_source as specimen_source_value, 
+	lab.result_num as value_as_number, 
+	COALESCE(NULLIF(lab.result_num, 0)::text, lab.raw_result) as value_source_value,
+	person.person_id AS person_id,
+	vo.provider_id as provider_id,
+	vo.visit_occurrence_id as visit_occurrence_id,
+	lab.raw_unit as unit_source_value, 
+	case 
+		when lower(trim(result_qual)) = 'positive' then 45884084
+	     when lower(trim(result_qual)) = 'negative' then 45878583
           when lower(trim(result_qual)) = 'pos' then 45884084
           when lower(trim(result_qual)) = 'neg' then 45878583
           when lower(trim(result_qual)) = 'presumptive positive' then 45884084
@@ -400,22 +393,90 @@ SELECT distinct
           when lower(trim(result_qual)) = 'no information' then 46237210
           else 45877393 
      end as value_as_concept_id,
-     lab.result_num as value_as_number, 
-     COALESCE(NULLIF(lab.result_num, 0)::text, lab.raw_result) as value_source_value,
-     vo.visit_occurrence_id as visit_occurrence_id,    
-     'SITE' as site
-FROM SITE_pcornet.LAB_RESULT_CM lab
-left join SITE_pcornet.encounter enc on enc.encounterid = lab.encounterid
+	lab.result_modifier,
+	lab.norm_modifier_high,
+	lab.norm_modifier_low,
+	lab.priority,
+	lab.specimen_source,
+	lab.result_unit,
+	lab.lab_loinc
+from SITE_pcornet.LAB_RESULT_CM as lab
 inner join SITE_pedsnet.person person on lab.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-     on lab.encounterid=vo.visit_source_value
+left join SITE_pedsnet.visit_occurrence vo on lab.encounterid=vo.visit_source_value
+-- where lab.result_date >= '2021-01-01'
+),
+
+map1 as (
+select distinct
+	lab_result_cm_id,
+	coalesce(opa.source_concept_id::int,0) as operator_concept_id,
+	coalesce(
+		case 
+			when hi_mod.source_concept_id = '[TBD]' then 0
+			else hi_mod.source_concept_id::int
+		end,0) as range_high_operator_concept_id, 
+	coalesce(
+		case 
+			when lo_mod.source_concept_id = '[TBD]' then 0
+			else lo_mod.source_concept_id::int
+		end,0) as range_low_operator_concept_id, 
+	coalesce(priority.source_concept_id::int,0) as priority_concept_id
+FROM lab
 left join pcornet_maps.pedsnet_pcornet_valueset_map opa on opa.target_concept = lab.result_modifier and opa.source_concept_class = 'Result modifier'
 left join pcornet_maps.pedsnet_pcornet_valueset_map hi_mod on hi_mod.target_concept = lab.norm_modifier_high and hi_mod.source_concept_class = 'Result modifier'
 left join pcornet_maps.pedsnet_pcornet_valueset_map lo_mod on lo_mod.target_concept = lab.norm_modifier_low and lo_mod.source_concept_class = 'Result modifier'
 left join pcornet_maps.pedsnet_pcornet_valueset_map priority on priority.target_concept = lab.priority and priority.source_concept_class = 'Lab priority'
-left join pcornet_maps.pedsnet_pcornet_valueset_map spec_con on spec_con.target_concept = lab.specimen_source and spec_con.source_concept_class = 'Specimen concept'
+),
+
+map2 as (
+select distinct
+	lab_result_cm_id,
+-- 	coalesce(spec_con.source_concept_id::int, 0) as specimen_concept_id, 
+	coalesce(units.source_concept_id::int, 0) as unit_concept_id, 
+	coalesce(c.concept_id,0)  as measurement_concept_id,
+	coalesce(c.concept_id,0) as measurement_source_concept_id
+FROM lab
+-- left join pcornet_maps.pedsnet_pcornet_valueset_map spec_con on spec_con.target_concept = lab.specimen_source and spec_con.source_concept_class = 'Specimen concept'
 left join pcornet_maps.pedsnet_pcornet_valueset_map units on lab.result_unit = units.target_concept and units.source_concept_class = 'Result unit'
 left join vocabulary.concept c on lab.lab_loinc=c.concept_code and c.vocabulary_id='LOINC'
-;
+)
+
+SELECT distinct
+     nextval('SITE_pedsnet.measurement_id_seq')::bigint AS measurement_id,
+     map2.measurement_concept_id  as measurement_concept_id,
+     lab.measurement_date as measurement_date, 
+     lab.measurement_datetime as measurement_datetime,
+     lab.measurement_order_date as measurement_order_date,
+     lab.measurement_order_datetime as measurement_order_datetime,
+     lab.measurement_result_date as measurement_result_date, 
+     lab.measurement_result_datetime as measurement_result_datetime,
+     map2.measurement_source_concept_id as measurement_source_concept_id,
+     lab.measuremnt_source_value as measuremnt_source_value,
+     44818702 AS measurement_type_concept_id,
+     map1.operator_concept_id as operator_concept_id,
+     lab.person_id AS person_id,  
+     map1.priority_concept_id as priority_concept_id,
+     null as priority_source_value,
+     lab.provider_id as provider_id,
+     lab.range_high as range_high,
+     map1.range_high_operator_concept_id as range_high_operator_concept_id, 
+     null as range_high_source_value,
+     lab.range_low as range_low,
+     map1.range_low_operator_concept_id as range_low_operator_concept_id, 
+     null as range_low_source_value,
+     -- temporary placeholder
+	 0 as specimen_concept_id,
+--      map2.specimen_concept_id as specimen_concept_id, 
+     lab.specimen_source_value as specimen_source_value, 
+     map2.unit_concept_id as unit_concept_id, 
+     lab.unit_source_value as unit_source_value, 
+     lab.value_as_concept_id as value_as_concept_id,
+     lab.value_as_number as value_as_number, 
+     coalesce(lab.value_source_value, 'Unknown') as value_source_value,
+     lab.visit_occurrence_id as visit_occurrence_id,    
+     'SITE' as site
+FROM lab
+inner join map1 on map1.lab_result_cm_id = lab.lab_result_cm_id
+inner join map2 on map2.lab_result_cm_id = lab.lab_result_cm_id;
 
 commit;

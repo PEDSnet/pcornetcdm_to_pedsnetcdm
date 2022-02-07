@@ -51,7 +51,7 @@ select
 		when dispense_source = 'OD' then 38000275
 		when dispense_source = 'BI' then 44786630
 		else 44814653 
-	end as as drug_source_concept_id,
+	end as drug_source_concept_id,
 	'NDC' as drug_source_value,
 	38000175 as drug_type_concept_id,
 	dispense_dose_disp::varchar as eff_drug_dose_source_value,
