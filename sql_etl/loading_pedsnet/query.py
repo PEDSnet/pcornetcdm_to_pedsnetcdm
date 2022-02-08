@@ -36,7 +36,7 @@ def create_table(schema):
 # region Schema Creation
 def create_schema(schema):
     """creates schema if not exists"""
-    command = """CREATE SCHEMA IF NOT EXISTS """ + schema + """;
+    command = """CREATE SCHEMA IF NOT EXISTS """ + schema + """ AUTHORIZATION pcor_et_user;
                  GRANT USAGE ON SCHEMA """ + schema + """ TO peds_staff;
                  GRANT ALL ON SCHEMA """ + schema + """ TO dcc_owner;
                  GRANT ALL ON SCHEMA """ + schema + """ TO loading_user;

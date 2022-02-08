@@ -10,22 +10,17 @@ import config
 import subprocess
 import glob
 import io
-
 # endregion
 
 # region file names
 configfile_name = "database.ini"
 etl_dir = "scripts/etl_scripts_temp"
-view = "scripts/view-creation/func_upper_tbl_name.sql"
 truncated = "scripts/reset_tables_scripts/trunc_fk_idx.sql"
-harvest_file = "data/harvest_data.csv"
 etl_bash = "bash_script/etl_bash.sh"
 comb_csv = "bash_script/combine_csv.sh"
 data_dir = "data"
-test_script_file = "scripts/etl_scripts_temp/e_observation.sql"
+test_script_file = "scripts/etl_scripts_temp/b_care_site.sql"
 test_etl_bash = "bash_script/test_etl_script.sh"
-
-
 # endregion
 
 # region DDL only
@@ -51,7 +46,6 @@ def ddl_only():
         #remove _pcornet suffix from schema and add _pedsnet suffix
         site = re.sub('_pedsnet', '', schema_path['schema'])
         schema = [(re.sub('_pcornet', '', schema_path['schema']) + """_pedsnet""")]
-        
         # endregion
 
         # region connect to the PostgreSQL server
@@ -146,7 +140,7 @@ def ddl_only():
                 print('Table owner setting failed.')
                 print(error)
             # endregion
-        print('\nPcornet data model set up complete ... \nClosing database connection...')
+        print('\nPEDSnet data model set up complete ... \nClosing database connection...')
         cur.close()
     except (Exception, psycopg2.OperationalError) as error:
         print(error)
@@ -157,7 +151,7 @@ def ddl_only():
     finally:
         if conn is not None:
             conn.close()
-            print('Database connection closed.')
+            print('Database connection closed. \n')
 
 
 # endregion
@@ -221,6 +215,41 @@ def truncate_fk():
 
 # region ETL only
 def etl_only():
+
+    conn = None
+    try:
+        # region read connection parameters
+        params = config.config('db')
+        support_schema = """cdmh_staging"""
+        # endregion
+
+        # region connect to the PostgreSQL server
+        print('Checking if cdmh_staging schema exists before ETL begins...')
+        conn = psycopg2.connect(**params)
+        # create a cursor
+        cur = conn.cursor()
+        # endregion
+
+        # region check if the schema exisit
+        cur.execute(
+            """select exists(select 1 from information_schema.schemata where schema_name = \'""" + support_schema + """\');""")
+        schema_exist = cur.fetchone()[0]
+
+        if not schema_exist:
+            print('%s schema does not exist and is required for the transform... \nCreating schema ....' % support_schema)
+            cur.execute(query.create_schema(support_schema))
+            print('%s schema created!\n' % support_schema)
+            conn.commit()
+        else:
+            print('cdmh_staging already exists.\n')
+        # endregion
+    except (Exception, psycopg2.OperationalError) as error:
+        print(error)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    except (Exception, psycopg2.ProgrammingError) as error:
+        print(error)
+
     #get schema data in form of dictionary
     schema_path = config.config('schema')
     #if schema key value contains _pedsnet, remove _pedsnet
@@ -254,26 +283,13 @@ def etl_only():
                 logfile.write(error)
         count += 1
 
-    # create the upper case views
-    conn = None
     try:
         # region read connection parameters
-
-        params = config.config('db')
-        schema_path = config.config('schema')
-        # schema = schema_path['schema']+"""_3dot1_pcornet"""
         schema = [(re.sub('_pedsnet', '', schema_path['schema']) + """_pcornet""")]
         # endregion
 
-        # region connect to the PostgreSQL server
-        print('Connecting to the PostgreSQL database...')
-        conn = psycopg2.connect(**params)
-        # endregion
-        cur = conn.cursor()
-        cur.execute(open(view, "r").read())
-        conn.commit()
+        print('Updating schema and table permissions...')
         cur.execute("SET search_path TO " + schema[1] + ";")
-        cur.execute("select capitalview(\'" + params[1] + "\',\'" + schema[1] + """\');""")
         conn.commit()
         for schemas in schema:
             cur.execute("SET search_path TO " + schemas + ";")
@@ -285,19 +301,21 @@ def etl_only():
             cur.execute(query.owner(schemas))
             conn.commit()
         cur.close
+        print('Schema and table permissions set successfully.')
     except (Exception, psycopg2.OperationalError) as error:
+        print('Unable to set permissions.')
         print(error)
     except (Exception, psycopg2.DatabaseError) as error:
+        print('Unable to set permissions.')
         print(error)
     except (Exception, psycopg2.ProgrammingError) as error:
+        print('Unable to set permissions.')
         print(error)
     finally:
         if conn is not None:
             conn.close()
             print('Database connection closed.')
     print('ETL is complete')
-
-
 # endregion
 
 # region Update valueset map
@@ -309,16 +327,6 @@ def update_valueset():
 
 # endregion
 
-# region Harvest date refresh
-def harvest_date_refresh(date):
-    pattern = re.compile(r'\d{4}-\d{2}-\d{2}')
-    for line in fileinput.input(harvest_file, inplace=1, backup='.bak'):
-        line = re.sub(pattern, date, line.rstrip())
-        print(line)
-
-
-# endregion
-
 # region Test the etl script
 def test_script():
     args = test_script_file
@@ -326,7 +334,7 @@ def test_script():
     schema = re.sub('_pedsnet', '', schema_path['schema'])
     schema = re.sub('_pcornet', '', schema_path['schema'])
     query.get_etl_ready(schema)
-    print('starting ETL \t:' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + "\n")
+    print('starting ETL: ' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + "\n")
     proc = subprocess.Popen([test_etl_bash, args], stderr=subprocess.STDOUT)
     output, error = proc.communicate()
 
@@ -335,7 +343,7 @@ def test_script():
     if error:
         print(error)
 
-
+    print('ETL mapping completed: ' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
 # endregion
 
 # region Loading maps
