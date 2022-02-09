@@ -22,12 +22,20 @@ INSERT INTO SITE_pedsnet.location(
     location_source_value,
     site)
 select 
-	nextval('SITE_pedsnet.loc_seq')::bigint AS location_id,
-	address_zip5 as zip,
-	address_zip9 as location_source_value,
+ 	nextval('SITE_pedsnet.loc_seq')::bigint AS location_id,
+	zip as zip,
+	zip as location_source_value,
 	'SITE' as site
- FROM SITE_pcornet.lds_address_history lds
- GROUP BY address_zip5, address_zip9;
+FROM 
+    (select 
+        case
+            when address_zip5 is not null then address_zip5
+            else address_zip9
+        end as zip
+    from seattle_pcornet.lds_address_history
+	) as lds
+where zip is not null
+GROUP BY zip;
 
  -- default location
 

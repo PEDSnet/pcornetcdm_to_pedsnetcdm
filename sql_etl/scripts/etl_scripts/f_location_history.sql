@@ -16,7 +16,7 @@ insert into SITE_pedsnet.location_history(
 	site
 )
 select
-	nextval('SITE_pedsnet.loc_hist_seq')::bigint as location_history_id,
+ 	nextval('SITE_pedsnet.loc_hist_seq')::bigint as location_history_id,
 	'Person' as domain_id,
 	address_period_end::date as end_date,
 	address_period_end::timestamp as end_datetime,
@@ -26,10 +26,19 @@ select
 	0 as relationship_type_concept_id,
 	address_period_start::date as start_date,
 	address_period_start::timestamp as start_datetime,
-	'SITE' as site
-from SITE_pcornet.lds_address_history lds
-inner join SITE_pedsnet.person person on lds.patid=person.person_source_value
-inner join SITE_pedsnet.location loc on address_zip5=loc.zip
-;
+	'seattle' as site
+from
+	(select
+	 	patid,
+	 	address_period_start,
+	 	address_period_end,
+		case
+            when address_zip5 is not null then address_zip5
+            else address_zip9
+        end as zip
+    from seattle_pcornet.lds_address_history
+	) as lds
+inner join seattle_pedsnet.person person on lds.patid=person.person_source_value
+inner join seattle_pedsnet.location loc on lds.zip = loc.zip;
 
 commit;
