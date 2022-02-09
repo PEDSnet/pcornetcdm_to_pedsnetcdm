@@ -39,13 +39,15 @@ left join SITE_pedsnet.location loc on enc.facility_location=loc.zip and enc.fac
 WHERE enc.facility_type IS NOT NULL
 ;
 
+commit;
+
 -- default care site
 
--- INSERT INTO SITE_pedsnet.care_site(
---     care_site_id,
---     location_id,
---     place_of_service_concept_id,
---     specialty_concept_id, 
---     site)
--- values(9999999,9999999,44814650,44814650,'SITE');
+INSERT INTO SITE_pedsnet.care_site(
+    care_site_id,
+    location_id,
+    place_of_service_concept_id,
+    specialty_concept_id, 
+    site)
+values(9999999,9999999,44814650,44814650,'SITE');
 commit;
