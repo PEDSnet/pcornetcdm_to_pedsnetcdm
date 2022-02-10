@@ -1,7 +1,7 @@
 /* sequence is needed as the vital need to be transpose one id multiple values */
 create sequence if not exists SITE_pedsnet.measurement_id_seq;
 
-create index if not exists lab_result_cm_idx on SITE_pcornet.lab_result_cm (lab_result_cm_id);
+-- create index if not exists lab_result_cm_idx on SITE_pcornet.lab_result_cm (lab_result_cm_id);
 
 begin;
 

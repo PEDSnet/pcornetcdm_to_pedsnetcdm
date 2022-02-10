@@ -45,9 +45,10 @@ commit;
 
 INSERT INTO SITE_pedsnet.care_site(
     care_site_id,
+    care_site_source_value,
     location_id,
     place_of_service_concept_id,
     specialty_concept_id, 
     site)
-values(9999999,9999999,44814650,44814650,'SITE');
+values(9999999,'9999999',9999999,44814650,44814650,'SITE');
 commit;
