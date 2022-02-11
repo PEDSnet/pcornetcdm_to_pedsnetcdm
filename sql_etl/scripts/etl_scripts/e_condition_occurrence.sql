@@ -50,8 +50,12 @@ SELECT
     vo.provider_id as provider_id,   
     NULL as stop_reason,    
     vo.visit_occurrence_id as visit_occurrence_id, 
-    'SITE' as site
-FROM SITE_pcornet.condition cond
+    'SITE' as site    
+FROM (
+    select *
+    from SITE_pcornet.condition
+    where encounterid is not null
+) as cond
 inner join SITE_pedsnet.person person 
     on cond.patid=person.person_source_value
 left join SITE_pedsnet.visit_occurrence vo 
