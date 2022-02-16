@@ -46,7 +46,7 @@ SELECT
     cond.raw_condition_status AS condition_status_source_value,
     2000000089 as condition_type_concept_id,
     person.person_id AS person_id,   
-    null as poa_concept_id, 
+    44814650 as poa_concept_id, 
     vo.provider_id as provider_id,   
     NULL as stop_reason,    
     vo.visit_occurrence_id as visit_occurrence_id, 
