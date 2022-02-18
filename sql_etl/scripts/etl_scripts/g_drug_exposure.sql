@@ -36,7 +36,11 @@ insert into SITE_pedsnet.drug_exposure(
 select
 	dispense_sup as days_supply,
 	0 as dispense_as_written_concept_id, 
-	coalesce(unit.concept_id,0) as dose_unit_concept_id,
+	coalesce(case 
+			when disp.dispense_dose_disp_unit = 'NI' then ucum_maps.source_concept_id::int
+			when disp.dispense_dose_disp_unit = 'OT' then ucum_maps.source_concept_id::int
+			else unit.concept_id
+		end,0) as dose_unit_concept_id,
 	dispense_dose_disp_unit as dose_unit_source_value,
 	coalesce(ndc_map.concept_id_2,0) drug_concept_id,
 	null as drug_exposure_end_date,
@@ -62,7 +66,11 @@ select
 	null as provider_id,
 	dispense_amt as quantity,
 	null as refills,
-	coalesce(route.concept_id,0) as route_concept_id,
+	coalesce(
+		case
+			when disp.dispense_route = 'OT' then 44814649
+			else route.concept_id
+		end, 0) as route_concept_id,
 	dispense_route as route_source_value,
 	null as sig,
 	null as stop_reason,
@@ -141,7 +149,12 @@ select
         when rx_dispense_as_written='OT' then 44814649 -- Other
         when rx_dispense_as_written='UN' then 44814653 -- Unknown
 		end as dispense_as_written_concept_id,
-	coalesce(unit.concept_id,0) as dose_unit_concept_id,
+	coalesce(
+		case 
+			when presc.rx_dose_ordered_unit = 'NI' then ucum_maps.source_concept_id::int
+			when presc.rx_dose_ordered_unit = 'OT' then ucum_maps.source_concept_id::int
+			else unit.concept_id
+		end, 0) as dose_unit_concept_id,
 	rx_dose_ordered_unit as dose_unit_source_value,
 	coalesce(rxnorm.concept_id,0) as drug_concept_id,
 	rx_end_date::date as drug_exposure_end_date,
@@ -162,7 +175,10 @@ select
 	vo.provider_id as provider_id,
 	rx_quantity as quantity,
 	rx_refills as refills,
-	coalesce(route.concept_id,0) as route_concept_id,
+	coalesce(case
+			when presc.rx_route = 'OT' then 44814649
+			else route.concept_id
+		end,0) as route_concept_id,
 	rx_route as route_source_value,
 	null as sig,
 	null as stop_reason,
@@ -176,7 +192,7 @@ inner join SITE_pedsnet.visit_occurrence vo
 left join vocabulary.concept as rxnorm 
 	on presc.rxnorm_cui = rxnorm.concept_code and vocabulary_id='RxNorm' and standard_concept='S'
 left join pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
-	on presc.rx_dose_form = ucum_maps.target_concept and source_concept_class in ('Dose unit', 'Rx Dose Form')
+	on presc.rx_dose_ordered_unit = ucum_maps.target_concept and source_concept_class = 'Dose unit'
 left join 
 	(select concept_id
 	from vocabulary.concept
@@ -237,7 +253,12 @@ insert into SITE_pedsnet.drug_exposure(
 select
 	null as days_supply,
 	0 as dispense_as_written_concept_id,
-	coalesce(unit.concept_id::integer,0) as dose_unit_concept_id,
+	coalesce(
+		case 
+			when medadmin.medadmin_dose_admin_unit = 'NI' then ucum_maps.source_concept_id::int
+			when medadmin.medadmin_dose_admin_unit = 'OT' then ucum_maps.source_concept_id::int
+			else unit.concept_id::int
+		end, 0) as dose_unit_concept_id,
 	medadmin_dose_admin_unit as dose_unit_source_value,
 	coalesce(
 		case
@@ -266,7 +287,11 @@ select
 	vo.provider_id as provider_id,
 	null as quantity,
 	null as refills,
-	coalesce(route.concept_id::int,0) as route_concept_id,
+	coalesce(
+		case 
+			when medadmin.medadmin_route = 'OT' then 44814649
+			else route.concept_id::int
+		end,0) as route_concept_id,
 	medadmin_route as route_source_value,
 	null as sig,
 	null as stop_reason,
