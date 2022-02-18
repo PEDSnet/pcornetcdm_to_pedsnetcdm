@@ -36,7 +36,7 @@ SELECT
             when proc.px_type='09' then c_icd10.concept_id
       else 0 
       end as procedure_source_concept_id,
-      proc.px as procedure_source_value,
+      proc.proceduresid as procedure_source_value,
       case 
             when proc.px_source = 'OD' then 38000275
             when proc.px_source ='BI' then 44786631
