@@ -18,7 +18,7 @@ SELECT distinct
      0 AS measurement_source_concept_id,
      'Height in cm (converted from inches)' AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
-     NULL AS operator_concept_id, 
+     4172703 AS operator_concept_id, 
      person.person_id  AS person_id, 
      0  as priority_concept_id, 
      null as priority_source_value, 
@@ -80,7 +80,7 @@ SELECT
      0 AS measurement_source_concept_id,
      'Weight (converted from pounds)' AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
-     NULL AS operator_concept_id, 
+     4172703 AS operator_concept_id, 
      person.person_id AS person_id, 
      0  as priority_concept_id, 
      null as priority_source_value, 
@@ -142,7 +142,7 @@ SELECT
      0 AS measurement_source_concept_id,
      v_sys.raw_systolic AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
-     NULL AS operator_concept_id, 
+     4172703 AS operator_concept_id, 
      person.person_id  AS person_id, 
      0  as priority_concept_id, 
      null as priority_source_value, 
@@ -206,7 +206,7 @@ SELECT
      coalesce(dia_con.source_concept_id::int, 3012888) AS measurement_source_concept_id,
      v_dia.raw_diastolic AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
-     NULL AS operator_concept_id, 
+     4172703 AS operator_concept_id, 
      person.person_id  AS person_id, 
      0  as priority_concept_id, 
      null as priority_source_value, 
@@ -270,7 +270,7 @@ null as measurement_result_datetime,
 0 AS measurement_source_concept_id,
 'Original BMI' AS measurement_source_value, 
 2000000033 as measurement_type_concept_id, 
-NULL AS operator_concept_id, 
+4172703 AS operator_concept_id, 
 person.person_id  AS person_id, 
 0  as priority_concept_id, 
 null as priority_source_value, 
@@ -408,7 +408,11 @@ left join SITE_pedsnet.visit_occurrence vo on lab.encounterid=vo.visit_source_va
 map1 as (
 select distinct
 	lab_result_cm_id,
-	coalesce(opa.source_concept_id::int,0) as operator_concept_id,
+	coalesce(
+          case
+               when lab.result_modifier = 'OT' then 4172703
+               else opa.source_concept_id::int 
+          end,0) as operator_concept_id,
 	coalesce(
 		case 
 			when hi_mod.source_concept_id = '[TBD]' then 0
@@ -419,8 +423,15 @@ select distinct
 			when lo_mod.source_concept_id = '[TBD]' then 0
 			else lo_mod.source_concept_id::int
 		end,0) as range_low_operator_concept_id, 
-	coalesce(priority.source_concept_id::int,0) as priority_concept_id,
-     coalesce(units.source_concept_id::int, 0) as unit_concept_id, 
+	coalesce(priority.source_concept_id::int,44814650) as priority_concept_id,
+     coalesce(
+          case 
+               when lab.result_unit = '[ppm]' then 9387
+               when lab.result_unit = '%{activity}' then 8687
+               when lab.result_unit = 'nmol/min/mL' then 44777635
+               when lab.result_unit = 'kU/L' then 8810
+               else units.source_concept_id::int
+          end, 0) as unit_concept_id, 
 	coalesce(c.concept_id,0)  as measurement_concept_id,
 	coalesce(c.concept_id,0) as measurement_source_concept_id
 FROM lab
@@ -482,13 +493,22 @@ select distinct
           when specimen_source = 'KIDNEY' then 4133742
           when specimen_source = 'OVARY' then 4027387
           when specimen_source = 'RESPIRATORY' then 4119536
+          when specimen_source = 'BLDC' then 4046834
+          when specimen_source = 'BLDV' then 4045667
+          when specimen_source = 'PPP' then 4000627
+          when specimen_source = 'RBC' then 4000622
+          when specimen_source = 'SER_PLAS' then 4000626
+          when specimen_source = 'THRT' then 4002893
+          when specimen_source = 'URINE_SED' then 4045758
+          when specimen_source = 'OT' then 44814649
      end,0) as specimen_concept_id
 FROM lab
 where specimen_source in ('SPECIMEN','BODY_FLD','TISSUE','XXX.SWAB','URINE','BLD','CVX_VAG','PLAS',
      'BONE_MARROW','SKIN','BREAST','SER','CSF','STOOL','COLON','MILK','LYMPH_NODE','THYROID','PENIS','CALCULUS',
      'LUNG','ANAL','TISS.FNA','BONE','BRONCHIAL','SALIVARY_GLAND.FNA','SALIVA','PROSTATE','RESPIRATORY.LOWER',
      'RESPIRATORY.UPPER','GENITAL','LIVER.FNA','EAR','LYMPH_NODE.FNA','EYE','ABSCESS','PLACENTA','PANCREAS','SINUS',
-     'LIVER','KIDNEY.FNA','PROSTATE.FNA','THYROID.FNA','KIDNEY','OVARY','RESPIRATORY')
+     'LIVER','KIDNEY.FNA','PROSTATE.FNA','THYROID.FNA','KIDNEY','OVARY','RESPIRATORY','BLDC','BLDV','PPP','RBC',
+     'SER_PLAS','THRT','URINE_SED','OT')
 union
 select distinct
 	lab_result_cm_id,
@@ -502,7 +522,8 @@ FROM
      'BONE_MARROW','SKIN','BREAST','SER','CSF','STOOL','COLON','MILK','LYMPH_NODE','THYROID','PENIS','CALCULUS',
      'LUNG','ANAL','TISS.FNA','BONE','BRONCHIAL','SALIVARY_GLAND.FNA','SALIVA','PROSTATE','RESPIRATORY.LOWER',
      'RESPIRATORY.UPPER','GENITAL','LIVER.FNA','EAR','LYMPH_NODE.FNA','EYE','ABSCESS','PLACENTA','PANCREAS','SINUS',
-     'LIVER','KIDNEY.FNA','PROSTATE.FNA','THYROID.FNA','KIDNEY','OVARY','RESPIRATORY')
+     'LIVER','KIDNEY.FNA','PROSTATE.FNA','THYROID.FNA','KIDNEY','OVARY','RESPIRATORY','BLDC','BLDV','PPP','RBC',
+     'SER_PLAS','THRT','URINE_SED','OT')
 	) as lab
 left join pcornet_maps.pedsnet_pcornet_valueset_map spec_con on spec_con.target_concept = lab.specimen_source 
      and spec_con.source_concept_class = 'Specimen concept'
@@ -623,9 +644,18 @@ SELECT distinct
      null as range_low_source_value, 
      null::int as specimen_concept_id, 
      null as specimen_source_value, 
-     coalesce(unit.concept_id,0) AS unit_concept_id,
+     coalesce(
+          case 
+               when clin.obsclin_result_unit = 'NI' then 444814650
+               else unit.concept_id
+          end,0) AS unit_concept_id,
      coalesce(clin.obsclin_result_unit,clin.raw_obsclin_unit) AS unit_source_value, 
-     coalesce(qual.concept_id,0) AS value_as_concept_id, 
+     coalesce(
+          case
+               when clin.obsclin_result_qual = 'NI' then 444814650
+               when clin.obsclin_result_qual = 'OT' then 44814649
+               else qual.concept_id
+          end,0) AS value_as_concept_id, 
      clin.obsclin_result_num AS value_as_number, 
      coalesce(clin.obsclin_result_text,
                  clin.obsclin_result_qual,
@@ -720,9 +750,18 @@ SELECT distinct
      null as range_low_source_value, 
      null::int as specimen_concept_id, 
      null as specimen_source_value, 
-     coalesce(unit.concept_id,0) AS unit_concept_id,
+     coalesce(
+          case 
+               when clin.obsclin_result_unit = 'NI' then 444814650
+               else unit.concept_id
+          end,0) AS unit_concept_id,
      coalesce(clin.obsclin_result_unit,clin.raw_obsclin_unit) AS unit_source_value, 
-     coalesce(qual.concept_id,0) AS value_as_concept_id, 
+     coalesce(
+          case
+               when clin.obsclin_result_qual = 'NI' then 444814650
+               when clin.obsclin_result_qual = 'OT' then 44814649
+               else qual.concept_id
+          end,0) AS value_as_concept_id, 
      clin.obsclin_result_num AS value_as_number, 
      coalesce(clin.obsclin_result_text,
                  clin.obsclin_result_qual,
