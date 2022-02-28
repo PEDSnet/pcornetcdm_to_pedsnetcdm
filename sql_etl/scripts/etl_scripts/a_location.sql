@@ -10,11 +10,11 @@ INSERT INTO SITE_pedsnet.location(
 select 
 		nextval('SITE_pedsnet.loc_seq')::bigint AS location_id,
 		facility_location as zip,
-		facilityid as location_source_value,
+		'encounter | ' || facility_location  as location_source_value,
 		'SITE' as site
  FROM SITE_pcornet.encounter enc
  WHERE enc.facility_type IS NOT NULL
- GROUP BY facility_location, facilityid;
+ GROUP BY facility_location;
 
 INSERT INTO SITE_pedsnet.location(
     location_id,
@@ -24,7 +24,7 @@ INSERT INTO SITE_pedsnet.location(
 select 
  	nextval('SITE_pedsnet.loc_seq')::bigint AS location_id,
 	zip as zip,
-	zip as location_source_value,
+	'patient history | ' || zip as location_source_value,
 	'SITE' as site
 FROM 
     (select 
@@ -32,7 +32,7 @@ FROM
             when address_zip5 is not null then address_zip5
             else address_zip9
         end as zip
-    from seattle_pcornet.lds_address_history
+    from SITE_pcornet.lds_address_history
 	) as lds
 where zip is not null
 GROUP BY zip;

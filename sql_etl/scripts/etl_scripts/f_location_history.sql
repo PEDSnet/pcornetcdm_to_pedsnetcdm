@@ -26,7 +26,7 @@ select
 	0 as relationship_type_concept_id,
 	address_period_start::date as start_date,
 	address_period_start::timestamp as start_datetime,
-	'seattle' as site
+	'SITE' as site
 from
 	(select
 	 	patid,
@@ -36,9 +36,10 @@ from
             when address_zip5 is not null then address_zip5
             else address_zip9
         end as zip
-    from seattle_pcornet.lds_address_history
+    from SITE_pcornet.lds_address_history
 	) as lds
-inner join seattle_pedsnet.person person on lds.patid=person.person_source_value
-inner join seattle_pedsnet.location loc on lds.zip = loc.zip;
+inner join SITE_pedsnet.person person on lds.patid=person.person_source_value
+inner join SITE_pedsnet.location loc on lds.zip = loc.zip 
+	and loc.location_source_value like '%patient history';
 
 commit;
