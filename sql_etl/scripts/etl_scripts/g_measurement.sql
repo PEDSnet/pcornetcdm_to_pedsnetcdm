@@ -168,8 +168,13 @@ left join SITE_pcornet.encounter enc on enc.encounterid = v_sys.encounterid
 inner join SITE_pedsnet.person person on v_sys.patid=person.person_source_value
 left join SITE_pedsnet.visit_occurrence vo 
      on v_sys.encounterid=vo.visit_source_value
-left join pcornet_maps.pedsnet_pcornet_valueset_map sys_con on sys_con.target_concept = v_sys.bp_position
-	                                                            AND sys_con.source_concept_class='BP Position'
+left join 
+     (
+          select target_concept, source_concept_id
+          from pcornet_maps.pedsnet_pcornet_valueset_map 
+          where source_concept_class='BP Position'
+          and not(concept_description like '%Diastolic%')
+     ) as sys_con on sys_con.target_concept = v_sys.bp_position
 LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_sys.vital_source
 where v_sys.systolic is not null;
 
@@ -232,8 +237,13 @@ left join SITE_pcornet.encounter enc on enc.encounterid = v_dia.encounterid
 inner join SITE_pedsnet.person person on v_dia.patid=person.person_source_value
 left join SITE_pedsnet.visit_occurrence vo 
      on v_dia.encounterid=vo.visit_source_value
-left join pcornet_maps.pedsnet_pcornet_valueset_map dia_con on dia_con.target_concept = v_dia.bp_position
-	                                                            AND dia_con.source_concept_class='BP Position'
+left join 
+     (
+          select target_concept, source_concept_id, concept_description
+          from pcornet_maps.pedsnet_pcornet_valueset_map 
+          where source_concept_class='BP Position'
+          and not(concept_description like '%Systolic%')
+     ) as dia_con on dia_con.target_concept = v_dia.bp_position
 LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_dia.vital_source
 where v_dia.diastolic is not null ;
 
@@ -350,103 +360,42 @@ INSERT INTO SITE_pedsnet.measurement (
      value_source_value,
      visit_occurrence_id, 
      site)
-with lab as (
 select distinct
-	lab_result_cm_id,
-	coalesce(lab.result_date,lab.specimen_date) as measurement_date, 
-	coalesce(lab.result_date,lab.specimen_date)::timestamp as measurement_datetime,
-	lab.lab_order_date as measurement_order_date,
-	lab.lab_order_date::timestamp as measurement_order_datetime,
-	lab.result_date as measurement_result_date, 
-	lab.result_date::timestamp as measurement_result_datetime,
-	lab.LAB_LOINC as measuremnt_source_value,
-	lab.norm_range_high::numeric as range_high,
-	lab.norm_range_low::numeric as range_low,
-	lab.specimen_source as specimen_source_value, 
-	lab.result_num as value_as_number, 
-	COALESCE(NULLIF(lab.result_num, 0)::text, lab.raw_result) as value_source_value,
-	person.person_id AS person_id,
-	vo.provider_id as provider_id,
-	vo.visit_occurrence_id as visit_occurrence_id,
-	lab.raw_unit as unit_source_value, 
-	case 
-		when lower(trim(result_qual)) = 'positive' then 45884084
-	     when lower(trim(result_qual)) = 'negative' then 45878583
-          when lower(trim(result_qual)) = 'pos' then 45884084
-          when lower(trim(result_qual)) = 'neg' then 45878583
-          when lower(trim(result_qual)) = 'presumptive positive' then 45884084
-          when lower(trim(result_qual)) = 'presumptive negative' then 45878583
-          when lower(trim(result_qual)) = 'detected' then 45884084
-          when lower(trim(result_qual)) = 'not detected' then 45878583
-          when lower(trim(result_qual)) = 'inconclusive' then 45877990
-          when lower(trim(result_qual)) = 'normal' then 45884153
-          when lower(trim(result_qual)) = 'abnormal' then 45878745
-          when lower(trim(result_qual)) = 'low' then 45881666
-          when lower(trim(result_qual)) = 'high' then 45876384
-          when lower(trim(result_qual)) = 'borderline' then 45880922
-          when lower(trim(result_qual)) = 'elevated' then 4328749  --ssh add issue number 55 - 6/26/2020 
-          when lower(trim(result_qual)) = 'undetermined' then 45880649
-          when lower(trim(result_qual)) = 'undetectable' then 45878583 
-          when lower(trim(result_qual)) = 'un' then 0
-          when lower(trim(result_qual)) = 'unknown' then 0
-          when lower(trim(result_qual)) = 'no information' then 46237210
-          else 45877393 
-     end as value_as_concept_id,
-	lab.result_modifier,
-	lab.norm_modifier_high,
-	lab.norm_modifier_low,
-	lab.priority,
-	lab.specimen_source,
-	lab.result_unit,
-	lab.lab_loinc
-from SITE_pcornet.LAB_RESULT_CM as lab
-inner join SITE_pedsnet.person person on lab.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo on lab.encounterid=vo.visit_source_value
--- where lab.result_date >= '2021-01-01'
-),
-
-map1 as (
-select distinct
-	lab_result_cm_id,
-	coalesce(
+     nextval('SITE_pedsnet.measurement_id_seq')::bigint AS measurement_id,
+     coalesce(c.concept_id,0)  as measurement_concept_id,
+     coalesce(lab.result_date,lab.specimen_date) as measurement_date, 
+     coalesce(lab.result_date,lab.specimen_date)::timestamp as measurement_datetime,
+     lab.lab_order_date as measurement_order_date,
+     lab.lab_order_date::timestamp as measurement_order_datetime,
+     lab.result_date as measurement_result_date, 
+     lab.result_date::timestamp as measurement_result_datetime,
+     coalesce(c.concept_id,0) as measurement_source_concept_id,
+     lab.LAB_LOINC as measuremnt_source_value,
+     44818702 AS measurement_type_concept_id,
+     coalesce(
           case
                when lab.result_modifier = 'OT' then 4172703
                else opa.source_concept_id::int 
           end,0) as operator_concept_id,
-	coalesce(
+     person.person_id AS person_id,  
+     coalesce(priority.source_concept_id::int,44814650) as priority_concept_id,
+     null as priority_source_value,
+     vo.provider_id as provider_id,
+     lab.norm_range_high::numeric as range_high,
+     coalesce(
 		case 
 			when hi_mod.source_concept_id = '[TBD]' then 0
 			else hi_mod.source_concept_id::int
 		end,0) as range_high_operator_concept_id, 
-	coalesce(
+     null as range_high_source_value,
+     lab.norm_range_low::numeric as range_low,
+     coalesce(
 		case 
 			when lo_mod.source_concept_id = '[TBD]' then 0
 			else lo_mod.source_concept_id::int
 		end,0) as range_low_operator_concept_id, 
-	coalesce(priority.source_concept_id::int,44814650) as priority_concept_id,
-     coalesce(
-          case 
-               when lab.result_unit = '[ppm]' then 9387
-               when lab.result_unit = '%{activity}' then 8687
-               when lab.result_unit = 'nmol/min/mL' then 44777635
-               when lab.result_unit = 'kU/L' then 8810
-               else units.source_concept_id::int
-          end, 0) as unit_concept_id, 
-	coalesce(c.concept_id,0)  as measurement_concept_id,
-	coalesce(c.concept_id,0) as measurement_source_concept_id
-FROM lab
-left join pcornet_maps.pedsnet_pcornet_valueset_map opa on opa.target_concept = lab.result_modifier and opa.source_concept_class = 'Result modifier'
-left join pcornet_maps.pedsnet_pcornet_valueset_map hi_mod on hi_mod.target_concept = lab.norm_modifier_high and hi_mod.source_concept_class = 'Result modifier'
-left join pcornet_maps.pedsnet_pcornet_valueset_map lo_mod on lo_mod.target_concept = lab.norm_modifier_low and lo_mod.source_concept_class = 'Result modifier'
-left join pcornet_maps.pedsnet_pcornet_valueset_map priority on priority.target_concept = lab.priority and priority.source_concept_class = 'Lab priority'
-left join pcornet_maps.pedsnet_pcornet_valueset_map units on lab.result_unit = units.target_concept and units.source_concept_class = 'Result unit'
-left join vocabulary.concept c on lab.lab_loinc=c.concept_code and c.vocabulary_id='LOINC'
-),
-
-map2 as (
-select distinct
-	lab_result_cm_id,
- 	coalesce(case
+     null as range_low_source_value,
+     coalesce(case
           when specimen_source = 'SPECIMEN' then 4048506
           when specimen_source = 'BODY_FLD' then 4204181
           when specimen_source = 'TISSUE' then 4002890
@@ -501,69 +450,150 @@ select distinct
           when specimen_source = 'THRT' then 4002893
           when specimen_source = 'URINE_SED' then 4045758
           when specimen_source = 'OT' then 44814649
-     end,0) as specimen_concept_id
-FROM lab
-where specimen_source in ('SPECIMEN','BODY_FLD','TISSUE','XXX.SWAB','URINE','BLD','CVX_VAG','PLAS',
-     'BONE_MARROW','SKIN','BREAST','SER','CSF','STOOL','COLON','MILK','LYMPH_NODE','THYROID','PENIS','CALCULUS',
-     'LUNG','ANAL','TISS.FNA','BONE','BRONCHIAL','SALIVARY_GLAND.FNA','SALIVA','PROSTATE','RESPIRATORY.LOWER',
-     'RESPIRATORY.UPPER','GENITAL','LIVER.FNA','EAR','LYMPH_NODE.FNA','EYE','ABSCESS','PLACENTA','PANCREAS','SINUS',
-     'LIVER','KIDNEY.FNA','PROSTATE.FNA','THYROID.FNA','KIDNEY','OVARY','RESPIRATORY','BLDC','BLDV','PPP','RBC',
-     'SER_PLAS','THRT','URINE_SED','OT')
-union
-select distinct
-	lab_result_cm_id,
-	coalesce(spec_con.source_concept_id::int, 0) as specimen_concept_id
-FROM 
-	(select 
-	 	lab_result_cm_id,
-	 	specimen_source
-	 from lab
-	 where specimen_source not in ('SPECIMEN','BODY_FLD','TISSUE','XXX.SWAB','URINE','BLD','CVX_VAG','PLAS',
-     'BONE_MARROW','SKIN','BREAST','SER','CSF','STOOL','COLON','MILK','LYMPH_NODE','THYROID','PENIS','CALCULUS',
-     'LUNG','ANAL','TISS.FNA','BONE','BRONCHIAL','SALIVARY_GLAND.FNA','SALIVA','PROSTATE','RESPIRATORY.LOWER',
-     'RESPIRATORY.UPPER','GENITAL','LIVER.FNA','EAR','LYMPH_NODE.FNA','EYE','ABSCESS','PLACENTA','PANCREAS','SINUS',
-     'LIVER','KIDNEY.FNA','PROSTATE.FNA','THYROID.FNA','KIDNEY','OVARY','RESPIRATORY','BLDC','BLDV','PPP','RBC',
-     'SER_PLAS','THRT','URINE_SED','OT')
-	) as lab
-left join pcornet_maps.pedsnet_pcornet_valueset_map spec_con on spec_con.target_concept = lab.specimen_source 
-     and spec_con.source_concept_class = 'Specimen concept'
-)
-
-SELECT distinct
-     nextval('SITE_pedsnet.measurement_id_seq')::bigint AS measurement_id,
-     map1.measurement_concept_id  as measurement_concept_id,
-     lab.measurement_date as measurement_date, 
-     lab.measurement_datetime as measurement_datetime,
-     lab.measurement_order_date as measurement_order_date,
-     lab.measurement_order_datetime as measurement_order_datetime,
-     lab.measurement_result_date as measurement_result_date, 
-     lab.measurement_result_datetime as measurement_result_datetime,
-     map1.measurement_source_concept_id as measurement_source_concept_id,
-     lab.measuremnt_source_value as measuremnt_source_value,
-     44818702 AS measurement_type_concept_id,
-     map1.operator_concept_id as operator_concept_id,
-     lab.person_id AS person_id,  
-     map1.priority_concept_id as priority_concept_id,
-     null as priority_source_value,
-     lab.provider_id as provider_id,
-     lab.range_high as range_high,
-     map1.range_high_operator_concept_id as range_high_operator_concept_id, 
-     null as range_high_source_value,
-     lab.range_low as range_low,
-     map1.range_low_operator_concept_id as range_low_operator_concept_id, 
-     null as range_low_source_value,
-     map2.specimen_concept_id as specimen_concept_id, 
-     lab.specimen_source_value as specimen_source_value, 
-     map1.unit_concept_id as unit_concept_id, 
-     lab.unit_source_value as unit_source_value, 
-     lab.value_as_concept_id as value_as_concept_id,
-     lab.value_as_number as value_as_number, 
-     coalesce(lab.value_source_value, 'Unknown') as value_source_value,
-     lab.visit_occurrence_id as visit_occurrence_id,    
+     end,spec_con.source_concept_id::int,0) as specimen_concept_id, 
+     lab.specimen_source as specimen_source_value, 
+     coalesce(
+          case 
+               when lab.result_unit = '[ppm]' then 9387
+               when lab.result_unit = '%{activity}' then 8687
+               when lab.result_unit = 'nmol/min/mL' then 44777635
+               when lab.result_unit = 'kU/L' then 8810
+               else units.source_concept_id::int
+          end, 0) as unit_concept_id, 
+     lab.raw_unit as unit_source_value, 
+     case 
+		when lower(trim(result_qual)) = 'positive' then 45884084
+	     when lower(trim(result_qual)) = 'negative' then 45878583
+          when lower(trim(result_qual)) = 'pos' then 45884084
+          when lower(trim(result_qual)) = 'neg' then 45878583
+          when lower(trim(result_qual)) = 'presumptive positive' then 45884084
+          when lower(trim(result_qual)) = 'presumptive negative' then 45878583
+          when lower(trim(result_qual)) = 'detected' then 45884084
+          when lower(trim(result_qual)) = 'not detected' then 45878583
+          when lower(trim(result_qual)) = 'inconclusive' then 45877990
+          when lower(trim(result_qual)) = 'normal' then 45884153
+          when lower(trim(result_qual)) = 'abnormal' then 45878745
+          when lower(trim(result_qual)) = 'low' then 45881666
+          when lower(trim(result_qual)) = 'high' then 45876384
+          when lower(trim(result_qual)) = 'borderline' then 45880922
+          when lower(trim(result_qual)) = 'elevated' then 4328749  --ssh add issue number 55 - 6/26/2020 
+          when lower(trim(result_qual)) = 'undetermined' then 45880649
+          when lower(trim(result_qual)) = 'undetectable' then 45878583 
+          when lower(trim(result_qual)) = 'un' then 0
+          when lower(trim(result_qual)) = 'unknown' then 0
+          when lower(trim(result_qual)) = 'no information' then 46237210
+          else 45877393 
+     end as value_as_concept_id,
+     lab.result_num as value_as_number, 
+     COALESCE(NULLIF(lab.result_num, 0)::text, lab.raw_result, 'Unknown') as value_source_value,
+     vo.visit_occurrence_id as visit_occurrence_id,    
      'SITE' as site
-FROM lab
-inner join map1 on map1.lab_result_cm_id = lab.lab_result_cm_id
-inner join map2 on map2.lab_result_cm_id = lab.lab_result_cm_id;
+from SITE_pcornet.LAB_RESULT_CM as lab
+inner join SITE_pedsnet.person person on lab.patid=person.person_source_value
+left join SITE_pedsnet.visit_occurrence vo on lab.encounterid=vo.visit_source_value
+left join 
+     (
+          select target_concept, source_concept_id
+          from pcornet_maps.pedsnet_pcornet_valueset_map 
+          where source_concept_class = 'Result modifier'
+          and not (target_concept = 'OT' and source_concept_id = '0')
+     ) as opa on opa.target_concept = lab.result_modifier
+left join 
+     (
+          select target_concept, source_concept_id
+          from pcornet_maps.pedsnet_pcornet_valueset_map 
+          where source_concept_class = 'Result modifier'
+          and not (target_concept = 'OT' and source_concept_id = '0')
+     ) as hi_mod on hi_mod.target_concept = lab.result_modifier
+left join 
+     (
+          select target_concept, source_concept_id
+          from pcornet_maps.pedsnet_pcornet_valueset_map 
+          where source_concept_class = 'Result modifier'
+          and not (target_concept = 'OT' and source_concept_id = '0')
+     ) as lo_mod on lo_mod.target_concept = lab.result_modifier
+	left join 
+     (
+          select target_concept, source_concept_id
+          from pcornet_maps.pedsnet_pcornet_valueset_map
+          where source_concept_class = 'Result unit'
+          and not (target_concept = '10*3/uL' and pcornet_name is null)
+          and not (target_concept = '10*6/uL' and pcornet_name is null)
+          and not (target_concept = 'a' and concept_description = 'y | year')
+          and not (target_concept = '[APL''U]/mL' and pcornet_name is null)
+          and not (target_concept = '{breaths}/min' and concept_description = 'breaths/min')
+          and not (target_concept = '{cells}/[HPF]' and concept_description <> 'cells per high power field')
+          and not (target_concept = '{cells}/uL' and concept_description = 'cells/cumm')
+          and not (target_concept = '[GPL''U]/mL' and pcornet_name is null)
+          and not (target_concept = '{index_val}' and concept_description <> 'index value')
+          and not (target_concept = '[IU]/g{Hb}' and pcornet_name is null)
+          and not (target_concept = 'k[IU]/L' and concept_description = 'kilo-international unit per liter')
+          and not (target_concept = 'meq/L' and pcornet_name is null)
+          and not (target_concept = 'mmol/mol{creat}' and concept_description = 'mmol/mol cr')
+          and not (target_concept = '[MPL''U]/mL' and pcornet_name is null)
+          and not (target_concept = 'NI' and source_concept_id = '0')
+          and not (target_concept = '%{normal}' and concept_description = 'NEG>CULTURE')
+          and not (target_concept = '[pH]' and pcornet_name is null)
+          and not (target_concept = '{ratio}' and pcornet_name is null)
+          and not (target_concept = 'ug{FEU}/mL' and pcornet_name is null)
+          and not (target_concept = 'U/g{Hb}' and pcornet_name is null) 
+          and not (target_concept = '/uL' and concept_description = '/cumm')
+          and not (target_concept = 'U/mL' and pcornet_name is null)
+     ) as units on lab.result_unit = units.target_concept
+left join pcornet_maps.pedsnet_pcornet_valueset_map priority on priority.target_concept = lab.priority and priority.source_concept_class = 'Lab priority'
+left join vocabulary.concept c on lab.lab_loinc=c.concept_code and c.vocabulary_id='LOINC'
+left join  
+     (
+          select target_concept, source_concept_id
+          from pcornet_maps.pedsnet_pcornet_valueset_map
+          where source_concept_class = 'Specimen concept'
+          and not(target_concept = 'ABSCESS' and source_concept_id <> '4001183')
+          and not(target_concept = 'ANAL' and source_concept_id <> '4002895')
+          and not(target_concept = 'BLD' and source_concept_id <> '4001225')
+          and not(target_concept = 'BODY_FLD' and source_concept_id <> '4204181')
+          and not(target_concept = 'BONE' and source_concept_id <> '4328578')
+          and not(target_concept = 'BONE_MARROW' and source_concept_id <> '4000623')
+          and not(target_concept = 'BREAST' and source_concept_id <> '4132242')
+          and not(target_concept = 'BRONCHIAL' and source_concept_id <> '4001187')
+          and not(target_concept = 'CALCULUS' and source_concept_id <> '4001065')
+          and not(target_concept = 'COLON' and source_concept_id <> '4002892')
+          and not(target_concept = 'CSF' and source_concept_id <> '4124259')
+          and not(target_concept = 'CVX_VAG' and source_concept_id <> '45765695')
+          and not(target_concept = 'EAR' and source_concept_id <> '4204951')
+          and not(target_concept = 'EYE' and source_concept_id <> '4001190')
+          and not(target_concept = 'GENITAL' and source_concept_id <> '4001063')
+          and not(target_concept = 'KIDNEY' and source_concept_id <> '4133742')
+          and not(target_concept = 'KIDNEY.FNA' and source_concept_id <> '4048981')
+          and not(target_concept = 'LIVER' and source_concept_id <> '4002224')
+          and not(target_concept = 'LIVER.FNA' and source_concept_id <> '4335802')
+          and not(target_concept = 'LUNG' and source_concept_id <> '4133172')
+          and not(target_concept = 'LYMPH_NODE' and source_concept_id <> '4124291')
+          and not(target_concept = 'LYMPH_NODE.FNA' and source_concept_id <> '4333886')
+          and not(target_concept = 'MILK' and source_concept_id <> '4001058')
+          and not(target_concept = 'OVARY' and source_concept_id <> '4027387')
+          and not(target_concept = 'PANCREAS' and source_concept_id <> '4133175')
+          and not(target_concept = 'PENIS' and source_concept_id <> '4002896')
+          and not(target_concept = 'PLACENTA' and source_concept_id <> '4001192')
+          and not(target_concept = 'PLAS' and source_concept_id <> '4000626')
+          and not(target_concept = 'PROSTATE' and source_concept_id <> '4001186')
+          and not(target_concept = 'PROSTATE.FNA' and source_concept_id <> '40480935')
+          and not(target_concept = 'RESPIRATORY' and source_concept_id <> '4119536')
+          and not(target_concept = 'RESPIRATORY.LOWER' and source_concept_id <> '4119538')
+          and not(target_concept = 'RESPIRATORY.UPPER' and source_concept_id <> '4119537')
+          and not(target_concept = 'SALIVA' and source_concept_id <> '4001062')
+          and not(target_concept = 'SALIVARY_GLAND.FNA' and source_concept_id <> '4265164')
+          and not(target_concept = 'SER' and source_concept_id <> '4001181')
+          and not(target_concept = 'SINUS' and source_concept_id <> '4332520')
+          and not(target_concept = 'SKIN' and source_concept_id <> '43531265')
+          and not(target_concept = 'SPECIMEN' and source_concept_id <> '4048506')
+          and not(target_concept = 'STOOL' and source_concept_id <> '4002879')
+          and not(target_concept = 'THYROID' and source_concept_id <> '4164619')
+          and not(target_concept = 'THYROID.FNA' and source_concept_id <> '4204318')
+          and not(target_concept = 'TISS.FNA' and source_concept_id <> '4046275')
+          and not(target_concept = 'TISSUE' and source_concept_id <> '4002890')
+          and not(target_concept = 'URINE' and source_concept_id <> '4046280')
+          and not(target_concept = 'XXX.SWAB' and source_concept_id <> '4120698')
+     ) as spec_con on spec_con.target_concept = lab.specimen_source; 
 
 commit;
 
