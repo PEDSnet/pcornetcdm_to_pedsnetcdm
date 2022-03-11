@@ -2,6 +2,7 @@
 CREATE SEQUENCE if not exists SITE_pedsnet.cond_occ_seq;
 
 begin;
+
 -- problem_list
 INSERT INTO SITE_pedsnet.condition_occurrence(
         condition_concept_id,

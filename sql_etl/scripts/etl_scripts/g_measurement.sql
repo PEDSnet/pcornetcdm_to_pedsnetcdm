@@ -1,7 +1,7 @@
-/* sequence is needed as the vital need to be transpose one id multiple values */
+-- /* sequence is needed as the vital need to be transpose one id multiple values */
 create sequence if not exists SITE_pedsnet.measurement_id_seq;
 
--- create index if not exists lab_result_cm_idx on SITE_pcornet.lab_result_cm (lab_result_cm_id);
+-- -- create index if not exists lab_result_cm_idx on SITE_pcornet.lab_result_cm (lab_result_cm_id);
 
 begin;
 
@@ -327,7 +327,7 @@ visit_occurrence_id, site
 from SITE_pedsnet.meas_vital_bmi;
 
 commit;
-
+-- pulling lab data from lab_result_cm
 INSERT INTO SITE_pedsnet.measurement ( 
      measurement_id,
      measurement_concept_id, 
@@ -370,7 +370,7 @@ select distinct
      lab.result_date as measurement_result_date, 
      lab.result_date::timestamp as measurement_result_datetime,
      coalesce(c.concept_id,0) as measurement_source_concept_id,
-     lab.LAB_LOINC as measuremnt_source_value,
+     lab.LAB_LOINC as measurement_source_value,
      44818702 AS measurement_type_concept_id,
      coalesce(
           case
@@ -517,6 +517,7 @@ left join
           select target_concept, source_concept_id
           from pcornet_maps.pedsnet_pcornet_valueset_map
           where source_concept_class = 'Result unit'
+		  and source_concept_id <> 'null'
           and not (target_concept = '10*3/uL' and pcornet_name is null)
           and not (target_concept = '10*6/uL' and pcornet_name is null)
           and not (target_concept = 'a' and concept_description = 'y | year')
@@ -593,10 +594,11 @@ left join
           and not(target_concept = 'TISSUE' and source_concept_id <> '4002890')
           and not(target_concept = 'URINE' and source_concept_id <> '4046280')
           and not(target_concept = 'XXX.SWAB' and source_concept_id <> '4120698')
-     ) as spec_con on spec_con.target_concept = lab.specimen_source; 
+     ) as spec_con on spec_con.target_concept = lab.specimen_source;
 
 commit;
 
+ -- pulling LOINC data from obs_clin
 INSERT INTO SITE_pedsnet.measurement ( 
      measurement_id,
      measurement_concept_id, 
@@ -703,6 +705,7 @@ where obsclin_type='LC';
 
 commit;
 
+ -- pulling SNOMED data from obs_clin
 INSERT INTO SITE_pedsnet.measurement ( 
      measurement_id,
      measurement_concept_id, 

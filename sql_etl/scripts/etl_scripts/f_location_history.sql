@@ -40,6 +40,6 @@ from
 	) as lds
 inner join SITE_pedsnet.person person on lds.patid=person.person_source_value
 inner join SITE_pedsnet.location loc on lds.zip = loc.zip 
-	and loc.location_source_value like '%patient history';
+	and loc.location_source_value like '%patient history%';
 
 commit;

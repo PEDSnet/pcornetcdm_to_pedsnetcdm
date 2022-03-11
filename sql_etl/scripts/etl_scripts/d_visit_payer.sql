@@ -25,7 +25,7 @@ left join pcornet_maps.pedsnet_pcornet_valueset_map payer_map
 	on enc.payer_type_primary=payer_map.target_concept
 	and payer_map.source_concept_class='Payer'
 where payer_type_primary is not null 
-	and payer_type_primary <>'NI'
+	and payer_type_primary <> 'NI'
 	and payer_type_primary <> '23'
 union
 select
