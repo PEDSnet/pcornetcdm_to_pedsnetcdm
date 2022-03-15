@@ -10,6 +10,7 @@ def config(info):
     # get the section, sefault to postgresql
     if info == 'db':
         db = {}
+        #check .ini files for section input, if true, returns credential info in form of a dictionary
         if parser.has_section('postgresql'):
             params = parser.items('postgresql')
             for param in params:

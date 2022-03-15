@@ -29,7 +29,7 @@ SELECT
 	person.person_id   AS person_id,
 	NULL AS preceding_visit_occurrence_id,
 	enc.providerid::bigint AS provider_id,
-	typ.source_concept_id AS visit_concept_id,
+	coalesce(typ.source_concept_id::bigint,0) AS visit_concept_id,
 	coalesce(enc.discharge_date, enc.admit_date) AS visit_end_date,
 	coalesce(enc.discharge_date, enc.admit_date)::timestamp AS visit_end_datetime,
 	0 AS visit_source_concept_id,
@@ -40,8 +40,8 @@ SELECT
 	'SITE' as site
 FROM SITE_pcornet.encounter enc
 inner join SITE_pedsnet.person person on enc.patid=person.person_source_value
-LEFT JOIN cdmh_staging.p2o_admitting_source_xwalk vsrc ON vx.cdm_tbl = 'ENCOUNTER'
-                                                       AND vx.cdm_name = 'PCORnet'
+LEFT JOIN cdmh_staging.p2o_admitting_source_xwalk vsrc ON vsrc.cdm_tbl = 'ENCOUNTER'
+                                                       AND vsrc.cdm_source = 'PCORnet'
                                                         AND vsrc.src_admitting_source_type = enc.admitting_source
 LEFT JOIN cdmh_staging.p2o_discharge_status_xwalk  disp ON disp.cdm_tbl = 'ENCOUNTER'
                                                     AND disp.cdm_source = 'PCORnet'

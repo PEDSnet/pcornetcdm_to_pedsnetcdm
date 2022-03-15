@@ -2,6 +2,7 @@
 CREATE SEQUENCE if not exists SITE_pedsnet.cond_occ_seq;
 
 begin;
+
 -- problem_list
 INSERT INTO SITE_pedsnet.condition_occurrence(
         condition_concept_id,
@@ -10,8 +11,6 @@ INSERT INTO SITE_pedsnet.condition_occurrence(
         condition_end_date,
         condition_end_datetime,
         condition_occurrence_id,
-        condition_source_concept_id,
-        condition_source_value,
         condition_start_date,
         condition_start_datetime, 
         condition_status_concept_id,
@@ -48,12 +47,16 @@ SELECT
     cond.raw_condition_status AS condition_status_source_value,
     2000000089 as condition_type_concept_id,
     person.person_id AS person_id,   
-    null as poa_concept_id, 
+    44814650 as poa_concept_id, 
     vo.provider_id as provider_id,   
     NULL as stop_reason,    
     vo.visit_occurrence_id as visit_occurrence_id, 
-    'SITE' as site
-FROM SITE_pcornet.condition cond
+    'SITE' as site    
+FROM (
+    select *
+    from SITE_pcornet.condition
+    where encounterid is not null
+) as cond
 inner join SITE_pedsnet.person person 
     on cond.patid=person.person_source_value
 left join SITE_pedsnet.visit_occurrence vo 
@@ -78,8 +81,6 @@ commit;
 
 INSERT INTO SITE_pedsnet.condition_occurrence(
         condition_concept_id,
-        condition_source_concept_id,
-        condition_source_value,
         condition_occurrence_id,
         condition_source_concept_id,
         condition_source_value,
@@ -102,6 +103,7 @@ SELECT
     else
      0
     end,44814650)::int as condition_concept_id,
+    nextval('SITE_pedsnet.cond_occ_seq')::bigint as condition_occurrence_id,
     coalesce(case
         when cond.dx_type='09' then c_icd9.concept_id
         when cond.dx_type='10' then c_icd10.concept_id
@@ -110,7 +112,6 @@ SELECT
         0
     end,44814650)::int as condition_source_concept_id,
     cond.dx as condition_source_value,
-    nextval('SITE_pedsnet.cond_occ_seq')::bigint as condition_occurrence_id,
     coalesce(cond.dx_date,cond.admit_date) as condition_start_date, 
     coalesce(cond.dx_date,cond.admit_date)::timestamp as condition_start_datetime,
     4230359 AS condition_status_concept_id,

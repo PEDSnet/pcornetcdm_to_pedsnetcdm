@@ -5,7 +5,6 @@ import requests
 import re
 import glob
 import fileinput
-
 # endregion
 
 # region filenames
@@ -32,8 +31,6 @@ def create_table(schema):
     with open(create_table_script, 'r') as valueset_file:
         commands = valueset_file.read()
     return commands
-
-
 # endregion
 
 # region Schema Creation
@@ -45,8 +42,9 @@ def create_schema(schema):
                  GRANT ALL ON SCHEMA """ + schema + """ TO loading_user;
                  """
     return command
-
-
+# First line of query was originally 
+# "CREATE SCHEMA IF NOT EXISTS (Insert Schema) AUTHORIZATION pcornet_user"
+#removed AUTHORIZATION pcornet_user as the permission was throwing errors
 # endregion
 
 # region create DDL
@@ -61,8 +59,6 @@ def dll(pedsnet_version):
         return dll_script
     except (Exception, requests.ConnectionError) as e:
         print(e)
-
-
 # endregion
 
 # region Alter site column
@@ -75,8 +71,6 @@ def site_col():
     with open(site_col_file, 'r') as site_file:
         alter_site_col = site_file.read()
     return alter_site_col
-
-
 # endregion
 
 # region Set the privileges
@@ -88,8 +82,6 @@ def permission(schema):
     with open(privileges, 'r') as perm_file:
         privilege = perm_file.read()
     return privilege
-
-
 # endregion
 
 # region Alter table owner
@@ -98,16 +90,12 @@ def owner(schema):
     with open(alt_owner_file, 'r') as owner_file:
         alter_owner = owner_file.read()
     return alter_owner + "select alter_tbl_owner_loading('" + schema + "')"
-
-
 # endregion
 
 # region Truncate All tables in schema and remove FK's
 def truncateqry(schema):
     command = """SELECT truncate_schema('""" + schema + """');"""
     return command
-
-
 # endregion
 
 # region ETL Scripts Modify
