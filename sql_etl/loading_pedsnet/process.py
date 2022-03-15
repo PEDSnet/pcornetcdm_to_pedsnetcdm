@@ -19,7 +19,7 @@ truncated = "scripts/reset_tables_scripts/trunc_fk_idx.sql"
 etl_bash = "bash_script/etl_bash.sh"
 comb_csv = "bash_script/combine_csv.sh"
 data_dir = "data"
-test_script_file = "scripts/etl_scripts_temp/b_care_site.sql"
+test_script_file = "scripts/etl_scripts_temp/f_location_history.sql"
 test_etl_bash = "bash_script/test_etl_script.sh"
 # endregion
 

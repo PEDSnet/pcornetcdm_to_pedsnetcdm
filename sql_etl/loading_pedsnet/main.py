@@ -21,11 +21,10 @@ temp="scripts/temp/"
               help='Database in wich the mapping file to be loaded ex. pedsnet_dcc_vxx')
 @click.option('--host', '-h', default=False, help='The Server name ex. dev01')
 @click.option('--options', '-o', default=False, help='pipeline \ntruncate \netl \nddl \nupdate_valueset \n load_maps')
-@click.option('--harvest', '-H', required=False, help='harvest refresh date in following formatt yyyy-mm-dd')
 @click.option('--testscript', '-ts', required=False, type=click.File('rb'), help='Run single table at a time')
 @click.option('--pedsnet_version', '-pv', default='v4.1', help='PEDSnet ETL version v3.0 \n v4.0 \n v4.1')
 
-def cli(searchpath, pwprompt, user, database, host, options, harvest, testscript, pedsnet_version):
+def cli(searchpath, pwprompt, user, database, host, options, testscript, pedsnet_version):
     """This tool is used to load the data"""
 
     # region Option map
@@ -41,11 +40,12 @@ def cli(searchpath, pwprompt, user, database, host, options, harvest, testscript
     # endregion
 
     #grabs values from .ini file if already created -> less to manually input during testing
-    if os.path.isfile(configfile_name):
-        db_params = config.config('db')
-        host = db_params['host']
-        database = db_params['database']
-        searchpath = config.config('schema')['schema']
+    # if os.path.isfile(configfile_name):
+    #     db_params = config.config('db')
+    #     host = db_params['host']
+    #     database = db_params['database']
+    #     searchpath = config.config('schema')['schema']
+
 
     # region verify
     if not user:
