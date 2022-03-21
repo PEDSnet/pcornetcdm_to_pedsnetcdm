@@ -6,7 +6,9 @@ INSERT INTO SITE_pedsnet.procedure_occurrence (
       person_id, 
       procedure_concept_id, 
       procedure_date, 
-      procedure_datetime,  
+      procedure_end_date,
+      procedure_datetime, 
+      procedure_end_datetime, 
       procedure_source_concept_id, 
       procedure_source_value, 
       procedure_type_concept_id, 
@@ -28,7 +30,9 @@ SELECT
             else 0 
       end, 0) as procedure_concept_id,
       coalesce(proc.px_date,proc.admit_date) as procedure_date,
+      null::date as procedure_end_date,
       proc.px_date::timestamp as procedure_datetime,
+      null::timestamp as procedure_end_datetime,
       case
             when c_hcpcs.concept_id is not null then c_hcpcs.concept_id
             when proc.px_type='CH' then c_cpt.concept_id

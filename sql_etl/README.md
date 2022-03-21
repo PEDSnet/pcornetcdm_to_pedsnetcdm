@@ -1,7 +1,8 @@
 # `sql_etl`
 
-sql_etl is a python based CLI too that is used to automate the process of creating the DDL for PCORnet ETL.
+sql_etl is a python based CLI too that is used to automate the process of creating the DDL for PEDSnet from a PCORnet CDM.
 
+Please refer to PDF for additional documentation
 
 # Dependancies
 
@@ -35,11 +36,11 @@ CLI tool. The set up tool make it easy to install.
 
 	  activate the virtual environment using following command
 	
-	`python3 -m ~/filepath/to/pcornetcdm_to_pedsnetcdm/venv`
+	`python3 -m venv venv`
 	
-	`source venv\bin\activate`
+	`source venv/bin/activate`
 	
-   install the tool
+   install required packages
 	
 	 `pip install -r requirements.txt`
 	 
@@ -52,21 +53,10 @@ CLI tool. The set up tool make it easy to install.
 	 
 	 option :
 	  1. pipeline&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp; Run the full PCORnet pipeline
-	  2. ddl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp; Only the DDL or initial setup for the PEDSnet to PCORnet CDM
-	  3. etl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp; Runs only the ETL on the PEDSnet data.
-	  4. truncate&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Re-run of the ETL use this option to truncate all tables and remove Foregin Key constraints
-	  5. update_map -&nbsp; Adding or updating new values in the concept map table.
+	  2. ddl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp; Only the DDL or initial setup for the PCORnet to PEDSNet CDM
+	  3. etl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp; Runs only the ETL on the PCORnet data
+	  4. load_mapping_table -&nbsp; populate the concept map table.
    
-   where the dbname is the name of the database which contains the PEDSnet schema that we want to Transform.
-         schemaname is the name of the schema that is to be transformed
-         
-   Example
-        
-        loading_pedsnet -u sam -h host.com -d database_v27 -s dcc_pcornet -o ddl -pv v4.0
-        
-   To know more information of the tool
-        
-        loading_pedsnet --help
         
 # Known issue
 This tool as of now only work for PostgreSQL database. We are planning to make it compatible and more generic.
