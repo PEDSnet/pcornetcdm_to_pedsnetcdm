@@ -54,14 +54,14 @@ measurement_order_date, measurement_order_datetime, measurement_result_date, mea
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high, range_high_operator_concept_id, 
 range_high_source_value, range_low, range_low_operator_concept_id, range_low_source_value, specimen_concept_id, 
-specimen_source_value, unit_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
+specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
 visit_occurrence_id, site)
 select measurement_concept_id, measurement_date, measurement_datetime, nextval('SITE_pedsnet.measurement_id_seq') as measurement_id, 
 measurement_order_date::date, measurement_order_datetime::timestamp, measurement_result_date::date, measurement_result_datetime::timestamp, 
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id::int, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high::numeric, range_high_operator_concept_id::int, 
 range_high_source_value, range_low::numeric, range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
-specimen_source_value, unit_concept_id,unit_source_value, value_as_concept_id::int, value_as_number, value_source_value,
+specimen_source_value, unit_concept_id,unit_source_concept_id, unit_source_value, value_as_concept_id::int, value_as_number, value_source_value,
 visit_occurrence_id, site
 from SITE_pedsnet.meas_vital_ht;
 
@@ -116,14 +116,14 @@ measurement_order_date, measurement_order_datetime, measurement_result_date, mea
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high, range_high_operator_concept_id, 
 range_high_source_value, range_low, range_low_operator_concept_id, range_low_source_value, specimen_concept_id, 
-specimen_source_value, unit_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
+specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
 visit_occurrence_id, site)
 select measurement_concept_id, measurement_date, measurement_datetime, nextval('SITE_pedsnet.measurement_id_seq') as measurement_id, 
 measurement_order_date::date, measurement_order_datetime::timestamp, measurement_result_date::date, measurement_result_datetime::timestamp, 
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id::int, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high::numeric, range_high_operator_concept_id::int, 
 range_high_source_value, range_low::numeric, range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
-specimen_source_value, unit_concept_id, unit_source_value, value_as_concept_id::int, value_as_number, value_source_value,
+specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id::int, value_as_number, value_source_value,
 visit_occurrence_id, site
 from SITE_pedsnet.meas_vital_wt;
 
@@ -185,14 +185,14 @@ measurement_order_date, measurement_order_datetime, measurement_result_date, mea
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high, range_high_operator_concept_id, 
 range_high_source_value, range_low, range_low_operator_concept_id, range_low_source_value, specimen_concept_id, 
-specimen_source_value, unit_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
+specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
 visit_occurrence_id, site)
 select measurement_concept_id, measurement_date, measurement_datetime, nextval('SITE_pedsnet.measurement_id_seq') as measurement_id, 
 measurement_order_date::date, measurement_order_datetime::timestamp, measurement_result_date::date, measurement_result_datetime::timestamp, 
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id::int, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high::numeric, range_high_operator_concept_id::int, 
 range_high_source_value, range_low::numeric, range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
-specimen_source_value, unit_concept_id, unit_source_value, value_as_concept_id::int, value_as_number, value_source_value,
+specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id::int, value_as_number, value_source_value,
 visit_occurrence_id, site
 from SITE_pedsnet.meas_vital_sys;
 
@@ -254,14 +254,14 @@ measurement_order_date, measurement_order_datetime, measurement_result_date, mea
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high, range_high_operator_concept_id, 
 range_high_source_value, range_low, range_low_operator_concept_id, range_low_source_value, specimen_concept_id, 
-specimen_source_value, unit_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
+specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
 visit_occurrence_id, site)
 select measurement_concept_id, measurement_date, measurement_datetime, nextval('SITE_pedsnet.measurement_id_seq') as measurement_id, 
 measurement_order_date::date, measurement_order_datetime::timestamp, measurement_result_date::date, measurement_result_datetime::timestamp, 
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id::int, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high::numeric, range_high_operator_concept_id::int, 
 range_high_source_value, range_low::numeric, range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
-specimen_source_value, unit_concept_id, unit_source_value, value_as_concept_id::int, value_as_number, value_source_value,
+specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id::int, value_as_number, value_source_value,
 visit_occurrence_id, site
 from SITE_pedsnet.meas_vital_dia;
 
@@ -294,6 +294,7 @@ null as range_low_source_value,
 null as specimen_concept_id, 
 null as specimen_source_value, 
 null AS unit_concept_id, 
+null as unit_source_concept_id,
 null AS unit_source_value, 
 NULL AS value_as_concept_id, 
 v_bmi.original_bmi AS value_as_number, 
@@ -315,14 +316,14 @@ measurement_order_date, measurement_order_datetime, measurement_result_date, mea
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high, range_high_operator_concept_id, 
 range_high_source_value, range_low, range_low_operator_concept_id, range_low_source_value, specimen_concept_id, 
-specimen_source_value, unit_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
+specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
 visit_occurrence_id, site)
 select measurement_concept_id, measurement_date, measurement_datetime, nextval('SITE_pedsnet.measurement_id_seq') as measurement_id, 
 measurement_order_date::date, measurement_order_datetime::timestamp, measurement_result_date::date, measurement_result_datetime::timestamp, 
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id::int, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high::numeric, range_high_operator_concept_id::int, 
 range_high_source_value, range_low::numeric, range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
-specimen_source_value, unit_concept_id::bigint, unit_source_value, value_as_concept_id::int, value_as_number, value_source_value,
+specimen_source_value, unit_concept_id::bigint, unit_source_concept_id::bigint, unit_source_value, value_as_concept_id::int, value_as_number, value_source_value,
 visit_occurrence_id, site
 from SITE_pedsnet.meas_vital_bmi;
 
@@ -353,7 +354,8 @@ INSERT INTO SITE_pedsnet.measurement (
      range_low_source_value, 
      specimen_concept_id, 
      specimen_source_value, 
-     unit_concept_id, 
+     unit_concept_id,
+     unit_source_concept_id,
      unit_source_value, 
      value_as_concept_id, 
      value_as_number, 
@@ -459,7 +461,15 @@ select distinct
                when lab.result_unit = 'nmol/min/mL' then 44777635
                when lab.result_unit = 'kU/L' then 8810
                else units.source_concept_id::int
-          end, 0) as unit_concept_id, 
+          end, 0) as unit_concept_id,
+     coalesce(
+          case 
+               when lab.result_unit = '[ppm]' then 9387
+               when lab.result_unit = '%{activity}' then 8687
+               when lab.result_unit = 'nmol/min/mL' then 44777635
+               when lab.result_unit = 'kU/L' then 8810
+               else units.source_concept_id::int
+          end, 0) as unit_source_concept_id,  
      lab.raw_unit as unit_source_value, 
      case 
 		when lower(trim(result_qual)) = 'positive' then 45884084
@@ -625,6 +635,7 @@ INSERT INTO SITE_pedsnet.measurement (
      specimen_concept_id, 
      specimen_source_value, 
      unit_concept_id,
+     unit_source_concept_id,
      unit_source_value, 
      value_as_concept_id, 
      value_as_number, 
@@ -681,6 +692,11 @@ SELECT distinct
                when clin.obsclin_result_unit = 'NI' then 444814650
                else unit.concept_id
           end,0) AS unit_concept_id,
+     coalesce(
+          case 
+               when clin.obsclin_result_unit = 'NI' then 444814650
+               else unit.concept_id
+          end,0) AS unit_source_concept_id,
      coalesce(clin.obsclin_result_unit,clin.raw_obsclin_unit) AS unit_source_value, 
      coalesce(
           case
@@ -732,6 +748,7 @@ INSERT INTO SITE_pedsnet.measurement (
      specimen_concept_id, 
      specimen_source_value, 
      unit_concept_id,
+     unit_source_concept_id,
      unit_source_value, 
      value_as_concept_id, 
      value_as_number, 
@@ -788,6 +805,11 @@ SELECT distinct
                when clin.obsclin_result_unit = 'NI' then 444814650
                else unit.concept_id
           end,0) AS unit_concept_id,
+     coalesce(
+          case 
+               when clin.obsclin_result_unit = 'NI' then 444814650
+               else unit.concept_id
+          end,0) AS unit_source_concept_id,
      coalesce(clin.obsclin_result_unit,clin.raw_obsclin_unit) AS unit_source_value, 
      coalesce(
           case

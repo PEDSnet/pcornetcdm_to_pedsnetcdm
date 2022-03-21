@@ -54,7 +54,7 @@ def dll(pedsnet_version):
         if pedsnet_version:
             dll_url = "http://data-models-sqlalchemy.research.chop.edu/pedsnet/" + pedsnet_version.strip('v') + ".0/ddl/postgresql/tables/"
         else:
-           dll_url = 'https://data-models-sqlalchemy.research.chop.edu/pedsnet/4.0.0/ddl/postgresql/tables/'
+           dll_url = 'https://data-models-sqlalchemy.research.chop.edu/pedsnet/4.5.0/ddl/postgresql/tables/'
         dll_script = requests.get(dll_url).text
         return dll_script
     except (Exception, requests.ConnectionError) as e:

@@ -22,7 +22,7 @@ temp="scripts/temp/"
 @click.option('--host', '-h', default=False, help='The Server name ex. dev01')
 @click.option('--options', '-o', default=False, help='pipeline \ntruncate \netl \nddl \nupdate_valueset \n load_maps')
 @click.option('--testscript', '-ts', required=False, type=click.File('rb'), help='Run single table at a time')
-@click.option('--pedsnet_version', '-pv', default='v4.1', help='PEDSnet ETL version v3.0 \n v4.0 \n v4.1')
+@click.option('--pedsnet_version', '-pv', default='v4.5', help='PEDSnet ETL version v3.0 \n v4.0 \n v4.1')
 
 def cli(searchpath, pwprompt, user, database, host, options, testscript, pedsnet_version):
     """This tool is used to load the data"""
@@ -39,7 +39,7 @@ def cli(searchpath, pwprompt, user, database, host, options, testscript, pedsnet
     }
     # endregion
 
-    #grabs values from .ini file if already created -> less to manually input during testing
+    # grabs values from .ini file if already created -> less to manually input during testing
     # if os.path.isfile(configfile_name):
     #     db_params = config.config('db')
     #     host = db_params['host']

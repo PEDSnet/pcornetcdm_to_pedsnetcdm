@@ -18,7 +18,8 @@ INSERT INTO SITE_pedsnet.observation(
      unit_source_value, 
      value_as_concept_id, 
      value_as_number, 
-     value_as_string, 
+     value_as_string,
+     value_source_value, 
      visit_occurrence_id, 
      site)
 SELECT 
@@ -44,6 +45,7 @@ SELECT
      end as value_as_concept_id,           
      NULL AS value_as_number,
      NULL AS value_as_string,
+     enc.discharge_disposition as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id,           
      'SITE' as site
 FROM SITE_pcornet.encounter enc
@@ -71,7 +73,8 @@ INSERT INTO SITE_pedsnet.observation(
      unit_source_value, 
      value_as_concept_id, 
      value_as_number, 
-     value_as_string, 
+     value_as_string,
+     value_source_value, 
      visit_occurrence_id, 
      site)
 SELECT 
@@ -96,6 +99,12 @@ SELECT
          end as value_as_concept_id,           
      NULL AS value_as_number,
      NULL AS value_as_string,
+     case 
+          when coalesce(enc.discharge_date,enc.admit_date)::date < '01-OCT-2007'
+          then 
+               drg.concept_id 
+               else msdrg.concept_id
+         end::varchar as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id,           
      'SITE' as site
 FROM SITE_pcornet.encounter enc
@@ -127,6 +136,7 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_concept_id, 
      value_as_number, 
      value_as_string, 
+     value_source_value,
      visit_occurrence_id, 
      site)
 SELECT 
@@ -155,6 +165,7 @@ SELECT
          end as value_as_concept_id,           
      NULL AS value_as_number,
      NULL AS value_as_string,
+     tobacco as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id,           
      'SITE' as site
 FROM SITE_pcornet.vital vt
@@ -179,6 +190,7 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_concept_id, 
      value_as_number, 
      value_as_string, 
+     value_source_value,
      visit_occurrence_id, 
      site)
 SELECT 
@@ -207,6 +219,7 @@ SELECT
          end as value_as_concept_id,           
      NULL AS value_as_number,
      NULL AS value_as_string,
+     tobacco_type as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id,           
      'SITE' as site
 FROM SITE_pcornet.vital vt
@@ -233,7 +246,8 @@ INSERT INTO SITE_pedsnet.observation(
      unit_source_value, 
      value_as_concept_id, 
      value_as_number, 
-     value_as_string, 
+     value_as_string,
+     value_source_value,
      visit_occurrence_id, 
      site)
 SELECT 
@@ -263,6 +277,7 @@ SELECT
          end as value_as_concept_id,           
      NULL AS value_as_number,
      NULL AS value_as_string,
+     smoking as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id,           
      'SITE' as site
 FROM SITE_pcornet.vital vt
