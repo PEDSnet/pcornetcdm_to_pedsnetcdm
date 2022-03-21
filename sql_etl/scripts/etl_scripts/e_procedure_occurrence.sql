@@ -30,9 +30,9 @@ SELECT
             else 0 
       end, 0) as procedure_concept_id,
       coalesce(proc.px_date,proc.admit_date) as procedure_date,
-      null as procedure_end_date,
+      null::date as procedure_end_date,
       proc.px_date::timestamp as procedure_datetime,
-      null as procedure_end_datetime,
+      null::timestamp as procedure_end_datetime,
       case
             when c_hcpcs.concept_id is not null then c_hcpcs.concept_id
             when proc.px_type='CH' then c_cpt.concept_id
