@@ -4,7 +4,7 @@ declare
 	select_row record;
 begin
 for select_row in
-	select 'alter table '|| _schema || '.' || tablename ||' owner to loading_user;' as query
+	select 'alter table '|| _schema || '.' || tablename ||' owner to insert_table_owner;' as query
     from pg_tables
     where schemaname = _schema
     loop
