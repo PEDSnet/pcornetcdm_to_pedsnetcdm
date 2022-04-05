@@ -514,14 +514,14 @@ left join
           from pcornet_maps.pedsnet_pcornet_valueset_map 
           where source_concept_class = 'Result modifier'
           and not (target_concept = 'OT' and source_concept_id = '0')
-     ) as hi_mod on hi_mod.target_concept = lab.result_modifier
+     ) as hi_mod on hi_mod.target_concept = lab.NORM_MODIFIER_HIGH
 left join 
      (
           select target_concept, source_concept_id
           from pcornet_maps.pedsnet_pcornet_valueset_map 
           where source_concept_class = 'Result modifier'
           and not (target_concept = 'OT' and source_concept_id = '0')
-     ) as lo_mod on lo_mod.target_concept = lab.result_modifier
+     ) as lo_mod on lo_mod.target_concept = lab.NORM_MODIFIER_LOW
 	left join 
      (
           select target_concept, source_concept_id
