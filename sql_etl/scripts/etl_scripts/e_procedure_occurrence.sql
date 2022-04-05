@@ -19,7 +19,7 @@ INSERT INTO SITE_pedsnet.procedure_occurrence (
 SELECT 
       distinct 
       row_number() over (order by proc.proceduresid)::bigint AS PROCEDURE_OCCURRENCE_ID,
-      0 as modifier_source_value,
+      0 as modifier_concept_id,
       null as modifier_source_value,
       person.person_id,
       coalesce(case
