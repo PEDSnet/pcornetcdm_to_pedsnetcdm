@@ -61,6 +61,48 @@ def dll(pedsnet_version):
         print(e)
 # endregion
 
+def indexes(pedsnet_version):
+    """Creates dll for PEDSnet"""
+    try:
+        if pedsnet_version:
+            index_url = "http://data-models-sqlalchemy.research.chop.edu/pedsnet/" + pedsnet_version.strip('v') + ".0/ddl/postgresql/indexes/"
+        else:
+           index_url = 'https://data-models-sqlalchemy.research.chop.edu/pedsnet/4.5.0/ddl/postgresql/indexes/'
+        
+        #add 'IF NOT EXISTS' to index script
+        index_script = requests.get(index_url).text
+        lines = index_script.split('\n')
+        for x in range(len(lines)):
+            line = lines[x]
+            i = line.find("CREATE INDEX")
+            if(i >= 0):
+                lines[x] = line[:i + len("CREATE INDEX")] + ' IF NOT EXISTS' + line[i + len("CREATE INDEX"):]
+        index_modified_script = '\n'.join(lines)
+        return index_modified_script
+    except (Exception, requests.ConnectionError) as e:
+        print(e)
+
+def constraints(pedsnet_version):
+    """Creates dll for PEDSnet"""
+    try:
+        if pedsnet_version:
+            constraint_url = "http://data-models-sqlalchemy.research.chop.edu/pedsnet/" + pedsnet_version.strip('v') + ".0/ddl/postgresql/constraints/"
+        else:
+           constraint_url = 'https://data-models-sqlalchemy.research.chop.edu/pedsnet/4.5.0/ddl/postgresql/constraints/'
+        
+        #add 'IF NOT EXISTS' to constraint script
+        constraint_script = requests.get(constraint_url).text
+        lines = constraint_script.split('\n')
+        for x in range(len(lines)):
+            line = lines[x]
+            i = line.find("REFERENCES concept")
+            if(i >= 0):
+                lines[x] = line[:i + len("REFERENCES")] + ' vocabulary.' + line[i + len("REFERENCES "):]
+                constraint_modified_script = '\n'.join(lines)
+        return constraint_modified_script
+    except (Exception, requests.ConnectionError) as e:
+        print(e)
+
 # region Alter site column
 def site_col():
     """This function alters the table and creates the site columns"""

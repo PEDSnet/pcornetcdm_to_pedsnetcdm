@@ -151,8 +151,71 @@ def ddl_only():
             conn.close()
             print('Database connection closed. \n')
 
+def indexes_only():
+    params = config.config('db')
+    db_name = params['database']
+    pedsnet_version = config.config('pedsnet_version')
+    schema_path = config.config('schema')
+        
+    #remove _pcornet suffix from schema and add _pedsnet suffix
+    site = re.sub('_pedsnet', '', schema_path['schema'])
+    schema = [(re.sub('_pcornet', '', schema_path['schema']) + """_pedsnet""")]
 
-# endregion
+    for schemas in schema:
+        print('Connecting to the PostgreSQL database...')
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        cur.execute("SET search_path TO " + schemas + ";")
+        time.sleep(0.1)
+
+        #runs DDL link for PEDSNET postgresql index creation
+        print('Applying indexes to PEDSnet tables...')
+        try:
+            test = query.indexes(pedsnet_version)
+            print(test)
+            cur.execute(test)
+            conn.commit()
+            print('Indexes applied to DDL successfully.')
+        except (Exception, psycopg2.OperationalError) as error:
+            print('Indexes failed to be applied.')
+            print(error)
+    
+    if conn is not None:
+        conn.close()
+        print('Database connection closed. \n')
+
+def constraints_only():
+    params = config.config('db')
+    db_name = params['database']
+    pedsnet_version = config.config('pedsnet_version')
+    schema_path = config.config('schema')
+        
+    #remove _pcornet suffix from schema and add _pedsnet suffix
+    site = re.sub('_pedsnet', '', schema_path['schema'])
+    schema = [(re.sub('_pcornet', '', schema_path['schema']) + """_pedsnet""")]
+
+    for schemas in schema:
+        print('Connecting to the PostgreSQL database...')
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        cur.execute("SET search_path TO " + schemas + ";")
+        time.sleep(0.1)
+
+        #runs DDL link for PEDSNET postgresql foreign key constraint creation
+        print('Applying foreign key constraints to PEDSnet tables...')
+        try:
+            # print(query.constraints(pedsnet_version))
+            cur.execute(query.constraints(pedsnet_version))
+            conn.commit()
+            print('FK constraints applied to DDL successfully.')
+        except (Exception, psycopg2.OperationalError) as error:
+            print('FK constraints failed to be applied.')
+            print(error)
+    
+    if conn is not None:
+        conn.close()
+        print('Database connection closed. \n')
+
 
 # region Full  Pipeline
 def pipeline_full():

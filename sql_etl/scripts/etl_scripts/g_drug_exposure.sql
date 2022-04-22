@@ -145,7 +145,7 @@ select
 	case 
 		when rx_dispense_as_written='Y' then 4188539 -- Yes
 		when rx_dispense_as_written='N' then 4188540 -- No
-		when rx_dispense_as_written='NI' then 444814650 -- No Information
+		when rx_dispense_as_written='NI' then 44814650 -- No Information
         when rx_dispense_as_written='OT' then 44814649 -- Other
         when rx_dispense_as_written='UN' then 44814653 -- Unknown
 		end as dispense_as_written_concept_id,

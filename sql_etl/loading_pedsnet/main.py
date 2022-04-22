@@ -7,10 +7,8 @@ import shutil
 import config
 # endregion
 
-# region file names
 configfile_name = "database.ini"
 temp="scripts/temp/"
-# endregion
 
 @click.command()
 @click.option('--pwprompt', '-p', is_flag=True, default=False,
@@ -20,14 +18,13 @@ temp="scripts/temp/"
 @click.option('--database', '-d', default=False,
               help='Database in wich the mapping file to be loaded ex. pedsnet_dcc_vxx')
 @click.option('--host', '-h', default=False, help='The Server name ex. dev01')
-@click.option('--options', '-o', default=False, help='pipeline \netl \nddl \n load_mapping_table')
+@click.option('--options', '-o', default=False, help='pipeline \netl \nddl \nload_mapping_table \nindexes \nfk_constraints \ntest_script')
 @click.option('--testscript', '-ts', required=False, type=click.File('rb'), help='Run single table at a time')
 @click.option('--pedsnet_version', '-pv', default='v4.5', help='PEDSnet ETL version v3.0 \n v4.0 \n v4.1')
 
 def cli(searchpath, pwprompt, user, database, host, options, testscript, pedsnet_version):
     """This tool is used to load the data"""
 
-    # region Option map
     option_map = {
         'pipeline': process.pipeline_full,
         'etl': process.etl_only,
@@ -35,10 +32,10 @@ def cli(searchpath, pwprompt, user, database, host, options, testscript, pedsnet
         'ddl': process.ddl_only,
         # 'update_map': process.update_valueset,
         'load_mapping_table': process.load_maps,
-        'test_script': process.test_script,
-        
+        'indexes': process.indexes_only,
+        'fk_constraints': process.constraints_only,
+        'test_script': process.test_script
     }
-    # endregion
 
     # grabs values from .ini file if already created -> less to manually input during testing
     if os.path.isfile(configfile_name):
@@ -67,7 +64,7 @@ def cli(searchpath, pwprompt, user, database, host, options, testscript, pedsnet
         searchpath = click.prompt('schema name', hide_input=False)
 
     if not options:
-        options = click.prompt('Process Options: \n\n\tpipeline \n\tetl \n\tddl \n\tload_mapping_table \n\ttest_script\n\n')
+        options = click.prompt('Process Options: \n\n\tpipeline \n\tetl \n\tddl \n\tload_mapping_table \n\tindexes \n\tfk_constraints \n\ttest_script\n\n')
 
     if not pedsnet_version:
         pedsnet_version = click.prompt('PEDSnet version', hide_input=False)

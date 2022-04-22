@@ -35,7 +35,7 @@ select
     address_state as state,
 	zip as zip,
 	'patient history | ' || zip as location_source_value,
-    148838 as country_concept_id,
+    42046186 as country_concept_id,
     'United States' as country_source_value,
 	'SITE' as site
 FROM 

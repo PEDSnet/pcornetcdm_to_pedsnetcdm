@@ -689,18 +689,18 @@ SELECT distinct
      null as specimen_source_value, 
      coalesce(
           case 
-               when clin.obsclin_result_unit = 'NI' then 444814650
+               when clin.obsclin_result_unit = 'NI' then 44814650
                else unit.concept_id
           end,0) AS unit_concept_id,
      coalesce(
           case 
-               when clin.obsclin_result_unit = 'NI' then 444814650
+               when clin.obsclin_result_unit = 'NI' then 44814650
                else unit.concept_id
           end,0) AS unit_source_concept_id,
      coalesce(clin.obsclin_result_unit,clin.raw_obsclin_unit) AS unit_source_value, 
      coalesce(
           case
-               when clin.obsclin_result_qual = 'NI' then 444814650
+               when clin.obsclin_result_qual = 'NI' then 44814650
                when clin.obsclin_result_qual = 'OT' then 44814649
                else qual.concept_id
           end,0) AS value_as_concept_id, 
@@ -802,18 +802,18 @@ SELECT distinct
      null as specimen_source_value, 
      coalesce(
           case 
-               when clin.obsclin_result_unit = 'NI' then 444814650
+               when clin.obsclin_result_unit = 'NI' then 44814650
                else unit.concept_id
           end,0) AS unit_concept_id,
      coalesce(
           case 
-               when clin.obsclin_result_unit = 'NI' then 444814650
+               when clin.obsclin_result_unit = 'NI' then 44814650
                else unit.concept_id
           end,0) AS unit_source_concept_id,
      coalesce(clin.obsclin_result_unit,clin.raw_obsclin_unit) AS unit_source_value, 
      coalesce(
           case
-               when clin.obsclin_result_qual = 'NI' then 444814650
+               when clin.obsclin_result_qual = 'NI' then 44814650
                when clin.obsclin_result_qual = 'OT' then 44814649
                else qual.concept_id
           end,0) AS value_as_concept_id, 
