@@ -39,6 +39,7 @@ SELECT
 	44818518 AS visit_type_concept_id,
 	'SITE' as site
 FROM SITE_pcornet.encounter enc
+inner join SITE_pedsnet.care_site cs on enc.care_site_id = cs.care_site_id
 inner join SITE_pedsnet.person person on enc.patid=person.person_source_value
 LEFT JOIN cdmh_staging.p2o_admitting_source_xwalk vsrc ON vsrc.cdm_tbl = 'ENCOUNTER'
                                                        AND vsrc.cdm_source = 'PCORnet'
