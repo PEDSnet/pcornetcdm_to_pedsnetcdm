@@ -19,44 +19,52 @@ insert into SITE_pedsnet.person (
     location_id, 
     person_source_value, 
     pn_gestational_age, 
-    provider_id, 
+    provider_id,
     race_concept_id, 
     race_source_concept_id, 
-    race_source_value, 
-    site)
+    race_source_value)
 SELECT 
-    distinct on (demo.patid) demo.patid::bigint AS person_id, 
+    distinct on (demo.patid) demo.patid AS person_id, 
     demo.birth_date::date as birth_date,
     (demo.birth_date || ' 00:00:00')::timestamp as birth_datetime,
-    9999999::bigint AS care_site_id,
-    extract(day from demo.birth_date) AS day_of_birth,
-    extract(month from birth_date) AS month_of_birth,
-    extract(year from birth_date) AS year_of_birth,
+    9999999 AS care_site_id,
+    extract(day from demo.birth_date::date) AS day_of_birth,
+    extract(month from birth_date::date) AS month_of_birth,
+    extract(year from birth_date::date) AS year_of_birth,
     case 
-      when ethnicity_map.target_concept = 'OT' then 44814649
-      else
-        coalesce(ethnicity_map.source_concept_id::int, 44814650) 
+        when ethnicity_map.target_concept = 'OT' then 44814649
+	when ethnicity_map.source_concept_id !~ '^[0-9]+$' then 44814650
+        else
+          coalesce(ethnicity_map.source_concept_id::int, 44814650) 
     end AS ethnicity_concept_id,
     44814650 AS ethnicity_source_concept_id,
-    demo.raw_hispanic AS ethnicity_source_value, 
+    demo.raw_hispanic AS ethnicity_source_value,
     case 
-      when gender_map.target_concept = 'OT' then 44814649
-      else
-        coalesce(gender_map.source_concept_id::int,44814650) 
+        when gender_map.target_concept = 'OT' then 44814649
+        when gender_map.source_concept_id !~ '^[0-9]+$' then 44814650
+        else
+            coalesce(gender_map.source_concept_id::int,44814650) 
     end AS gender_concept_id,
     44814650 as gender_source_concept_id,
     demo.raw_sex AS gender_source_value,
-    coalesce(lang.source_concept_id::int, 44814650) as language_concept_id,
+    case
+        when lang.source_concept_id !~ '^[0-9]+$' then 44814650
+	else
+            coalesce(lang.source_concept_id::int, 44814650)
+    end	as language_concept_id,
     44814650 as language_source_concept_id,
     raw_pat_pref_language_spoken as language_source_value,
-    9999999::bigint AS location_id,
+    9999999 AS location_id,
     demo.patid AS person_source_value, 
     null as pn_gestational_age, 
-    ppp.provider_id AS provider_id, 
-    coalesce(race_map.source_concept_id::int,44814650) race_concept_id,
+    ppp.provider_id AS provider_id,
+    case
+        when race_map.source_concept_id !~ '^[0-9]+$' then 44814650
+	else
+    	    coalesce(race_map.source_concept_id::int,44814650)
+        end as race_concept_id,
     44814650 AS race_source_concept_id, 				
-    demo.raw_race AS race_source_value,
-    'SITE' as site
+    demo.raw_race AS race_source_value
 FROM SITE_pcornet.DEMOGRAPHIC demo
 left join SITE_pedsnet.person_primary_provider ppp
   on ppp.patid = demo.patid
@@ -71,6 +79,6 @@ left join pcornet_maps.pedsnet_pcornet_valueset_map ethnicity_map
   on demo.hispanic = ethnicity_map.target_concept
   and ethnicity_map.source_concept_class='Hispanic'
 left join pcornet_maps.pedsnet_pcornet_valueset_map race_map
-  on demo.race=race_map.target_concept 
+  on demo.race=race_map.target_concept
   and race_map.source_concept_class = 'Race';
 commit;

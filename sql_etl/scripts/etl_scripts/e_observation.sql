@@ -1,5 +1,14 @@
 create sequence if not exists SITE_pedsnet.obs_seq;
 
+create or replace function is_date(s varchar) returns boolean as $$
+begin
+          perform s::date;
+          return true;
+        exception when others then
+                  return false;
+end;
+$$ language plpgsql;
+
 begin;
 -- adding PEDSnet discharge status (PCORnet discharge disposition) 
 INSERT INTO SITE_pedsnet.observation(
@@ -20,13 +29,16 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_number, 
      value_as_string,
      value_source_value, 
-     visit_occurrence_id, 
-     site)
+     visit_occurrence_id)
 SELECT 
      44813951 AS observation_concept_id,
-     coalesce(enc.discharge_date,enc.admit_date)::date AS observation_date,
-     coalesce(enc.discharge_date,enc.admit_date)::timestamp AS observation_datetime,
-     nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
+     case when is_date(enc.discharge_date::varchar) then enc.discharge_date::date
+     when is_date(enc.admit_date::varchar) then enc.admit_date:: date
+     end AS observation_date,
+     case when is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
+     when is_date(enc.admit_date::varchar) then enc.admit_date:: timestamp
+     end  AS observation_datetime,
+     nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
      'Discharge Status' AS observation_source_value,
      38000280 AS observation_type_concept_id,
@@ -39,22 +51,21 @@ SELECT
      case 
           when enc.discharge_disposition='A' then 4161979 -- Alive
           when enc.discharge_disposition='E' then 4216643 -- Expired
-          when enc.discharge_disposition='NI' then 444814650 -- No Information
+          when enc.discharge_disposition='NI' then 44814650 -- No Information
           when enc.discharge_disposition='OT' then 44814649 -- Other
           when enc.discharge_disposition='UN' then 44814653 -- Unknown
      end as value_as_concept_id,           
      NULL AS value_as_number,
      NULL AS value_as_string,
      enc.discharge_disposition as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id,           
-     'SITE' as site
+     vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.encounter enc
 inner join SITE_pedsnet.visit_occurrence vo 
      on enc.encounterid=vo.visit_source_value
 WHERE enc.discharge_disposition is not null;
 
 commit;
-
+begin;
 
 -- adding DRG
 INSERT INTO SITE_pedsnet.observation(
@@ -75,13 +86,16 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_number, 
      value_as_string,
      value_source_value, 
-     visit_occurrence_id, 
-     site)
+     visit_occurrence_id)
 SELECT 
      3040464 AS observation_concept_id,
-     coalesce(enc.discharge_date,enc.admit_date)::date AS observation_date,
-     coalesce(enc.discharge_date,enc.admit_date)::timestamp AS observation_datetime,
-     nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
+     case when is_date(enc.discharge_date::varchar) then enc.discharge_date::date
+     when is_date(enc.admit_date::varchar) then enc.admit_date::date
+     end AS observation_date,
+     case when is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
+     when is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
+     end AS observation_datetime,
+     nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
      'DRG|'||enc.DRG AS observation_source_value,
      38000280 AS observation_type_concept_id,
@@ -92,7 +106,12 @@ SELECT
      NULL AS unit_concept_id,
      NULL AS unit_source_value,
      case 
-          when coalesce(enc.discharge_date,enc.admit_date)::date < '01-OCT-2007'
+          when 
+		case when is_date(enc.discharge_date::varchar)
+			then enc.discharge_date::date < '01-OCT-2007'
+		when is_date(enc.admit_date::varchar)
+			then enc.admit_date::date < '01-OCT-2007'
+		end
           then 
                drg.concept_id 
                else msdrg.concept_id
@@ -100,13 +119,17 @@ SELECT
      NULL AS value_as_number,
      NULL AS value_as_string,
      case 
-          when coalesce(enc.discharge_date,enc.admit_date)::date < '01-OCT-2007'
+          when
+	       case when is_date(enc.discharge_date::varchar)
+                        then enc.discharge_date::date < '01-OCT-2007'
+                when is_date(enc.admit_date::varchar)
+                        then enc.admit_date::date < '01-OCT-2007'
+                end
           then 
                drg.concept_id 
                else msdrg.concept_id
          end::varchar as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id,           
-     'SITE' as site
+     vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.encounter enc
 inner join SITE_pedsnet.visit_occurrence vo 
      on enc.encounterid=vo.visit_source_value
@@ -116,6 +139,7 @@ WHERE enc.DRG is not null;
 
 commit;
 
+begin;
 --add vital smoking/tobacco information
 
 
@@ -137,13 +161,12 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_number, 
      value_as_string, 
      value_source_value,
-     visit_occurrence_id, 
-     site)
+     visit_occurrence_id)
 SELECT 
      4005823 AS observation_concept_id,
      vt.measure_date::date AS observation_date,
      (vt.measure_date|| ' '|| vt.measure_time)::timestamp AS observation_datetime,
-     nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
+     nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
      'Tobacco|'||vt.tobacco||'|'||coalesce(vt.raw_tobacco,' '),
      38000280 AS observation_type_concept_id,
@@ -166,13 +189,15 @@ SELECT
      NULL AS value_as_number,
      NULL AS value_as_string,
      tobacco as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id,           
-     'SITE' as site
+     vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.vital vt
 inner join SITE_pedsnet.visit_occurrence vo 
      on vt.encounterid=vo.visit_source_value
 WHERE vt.tobacco is not null;
 
+commit;
+
+begin;
 INSERT INTO SITE_pedsnet.observation(
      observation_concept_id,
      observation_date, 
@@ -191,13 +216,12 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_number, 
      value_as_string, 
      value_source_value,
-     visit_occurrence_id, 
-     site)
+     visit_occurrence_id)
 SELECT 
      4219336 AS observation_concept_id,
      vt.measure_date::date AS observation_date,
      (vt.measure_date|| ' '|| vt.measure_time)::timestamp AS observation_datetime,
-     nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
+     nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
      'Tobacco Type|'||vt.tobacco_type||'|'||coalesce(vt.raw_tobacco_type,' '),
      38000280 AS observation_type_concept_id,
@@ -220,8 +244,7 @@ SELECT
      NULL AS value_as_number,
      NULL AS value_as_string,
      tobacco_type as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id,           
-     'SITE' as site
+     vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.vital vt
 inner join SITE_pedsnet.visit_occurrence vo 
      on vt.encounterid=vo.visit_source_value
@@ -229,7 +252,7 @@ WHERE vt.tobacco_type is not null;
 
 commit;
 
-
+begin;
 INSERT INTO SITE_pedsnet.observation(
      observation_concept_id,
      observation_date, 
@@ -248,13 +271,12 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_number, 
      value_as_string,
      value_source_value,
-     visit_occurrence_id, 
-     site)
+     visit_occurrence_id)
 SELECT 
      4275495 AS observation_concept_id,
      vt.measure_date::date AS observation_date,
      (vt.measure_date|| ' '|| vt.measure_time)::timestamp AS observation_datetime,
-     nextval('SITE_pedsnet.obs_seq')::bigint AS observation_id,
+     nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
      'Smoking|'||vt.smoking||'|'||coalesce(vt.raw_smoking,' ') AS observation_source_value,
      38000280 AS observation_type_concept_id,
@@ -278,8 +300,7 @@ SELECT
      NULL AS value_as_number,
      NULL AS value_as_string,
      smoking as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id,           
-     'SITE' as site
+     vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.vital vt
 inner join SITE_pedsnet.visit_occurrence vo 
      on vt.encounterid=vo.visit_source_value

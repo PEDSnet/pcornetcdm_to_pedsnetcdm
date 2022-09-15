@@ -1,5 +1,35 @@
 create sequence if not exists SITE_pedsnet.drug_exposure_seq;
 
+CREATE OR REPLACE FUNCTION isnumeric(text) RETURNS BOOLEAN AS $$
+DECLARE x NUMERIC;
+BEGIN
+        x = $1::NUMERIC;
+            RETURN TRUE;
+        EXCEPTION WHEN others THEN
+                RETURN FALSE;
+END;
+$$
+STRICT
+LANGUAGE plpgsql IMMUTABLE;
+
+create or replace function is_date(s varchar) returns boolean as $$
+begin
+	  perform s::date;
+	  return true;
+	exception when others then
+		  return false;
+end;
+$$ language plpgsql;
+
+create or replace function is_time(s varchar) returns boolean as $$
+begin
+	  perform s::time;
+	  return true;
+	exception when others then
+		  return false;
+end;
+$$ language plpgsql;
+
 begin;
 
 insert into SITE_pedsnet.drug_exposure(
@@ -30,11 +60,11 @@ insert into SITE_pedsnet.drug_exposure(
 	route_source_value,
 	sig,
 	stop_reason,
-	visit_occurrence_id,
-	site)
+	visit_occurrence_id)
 
 select
-	dispense_sup as days_supply,
+	case when(isnumeric(dispense_sup::varchar)) then dispense_sup::numeric
+	end as days_supply,	
 	0 as dispense_as_written_concept_id, 
 	coalesce(case 
 			when disp.dispense_dose_disp_unit = 'NI' then ucum_maps.source_concept_id::int
@@ -45,11 +75,17 @@ select
 	coalesce(ndc_map.concept_id_2,0) drug_concept_id,
 	null as drug_exposure_end_date,
 	null as drug_exposure_end_datetime,
-	nextval('SITE_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
+	nextval('SITE_pedsnet.drug_exposure_seq') AS drug_exposure_id,
 	null as drug_exposure_order_date,
 	null as drug_exposure_order_datetime,
-	dispense_date::date as drug_exposure_start_date,
-	dispense_date::timestamp as drug_exposure_start_datetime,
+	case
+            when dispense_date is null then '0001-01-01'::date
+	    else dispense_date::date
+	end as drug_exposure_start_date,
+	case
+	   when dispense_date is null then '0001-01-01'::timestamp
+	   else dispense_date::timestamp
+	end as drug_exposure_start_datetime,
 	--only have concept mappings for 'OD' and 'BI'. Else default to no information
 	case
 		when dispense_source = 'OD' then 38000275
@@ -59,12 +95,14 @@ select
 	'NDC' as drug_source_value,
 	38000175 as drug_type_concept_id,
 	dispense_dose_disp::varchar as eff_drug_dose_source_value,
-	dispense_dose_disp as effective_drug_dose,
+	case when(isnumeric(dispense_dose_disp::varchar)) then dispense_dose_disp::numeric
+        end as effective_drug_dose,
 	null as frequency,
 	null as lot_number,
 	person.person_id,
 	null as provider_id,
-	dispense_amt as quantity,
+	case when isnumeric(dispense_amt::varchar)
+		then dispense_amt::numeric end as quantity,
 	null as refills,
 	coalesce(
 		case
@@ -74,8 +112,7 @@ select
 	dispense_route as route_source_value,
 	null as sig,
 	null as stop_reason,
-	null as visit_occurrence_id,
-	'SITE' as site
+	null as visit_occurrence_id
 from SITE_pcornet.dispensing disp
 inner join SITE_pedsnet.person person 
       on disp.patid = person.person_source_value
@@ -109,6 +146,7 @@ left join
 ;
 commit;
 
+begin;
 insert into SITE_pedsnet.drug_exposure(
 	days_supply,
 	dispense_as_written_concept_id,
@@ -137,15 +175,15 @@ insert into SITE_pedsnet.drug_exposure(
 	route_source_value,
 	sig,
 	stop_reason,
-	visit_occurrence_id,
-	site)
+	visit_occurrence_id)
 
 select
-	rx_days_supply as days_supply,
+	case when isnumeric(rx_days_supply::varchar) then rx_days_supply::int
+	end as days_supply,
 	case 
 		when rx_dispense_as_written='Y' then 4188539 -- Yes
 		when rx_dispense_as_written='N' then 4188540 -- No
-		when rx_dispense_as_written='NI' then 444814650 -- No Information
+		when rx_dispense_as_written='NI' then 44814650 -- No Information
         when rx_dispense_as_written='OT' then 44814649 -- Other
         when rx_dispense_as_written='UN' then 44814653 -- Unknown
 		end as dispense_as_written_concept_id,
@@ -159,22 +197,33 @@ select
 	coalesce(rxnorm.concept_id,0) as drug_concept_id,
 	rx_end_date::date as drug_exposure_end_date,
 	rx_end_date::timestamp as drug_exposure_end_datetime,
-	nextval('SITE_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
+	nextval('SITE_pedsnet.drug_exposure_seq') AS drug_exposure_id,
 	rx_order_date::date as drug_exposure_order_date,
-	(rx_order_date || ' '|| rx_order_time)::timestamp as drug_exposure_order_datetime,
-	rx_start_date::date as drug_exposure_start_date,
-	rx_start_date::timestamp as drug_exposure_start_datetime,
+	case when is_time(rx_order_time) then
+	(rx_order_date || ' '|| rx_order_time)::timestamp 
+	else rx_order_date::timestamp end as drug_exposure_order_datetime,
+	case
+           when rx_start_date is null then '0001-01-01'::date
+           else rx_start_date::date
+	end as drug_exposure_start_date,
+	case
+	    when rx_start_date is null then '0001-01-01'::timestamp
+	    else rx_start_date::timestamp
+	end as drug_exposure_start_datetime,
 	coalesce(rxnorm.concept_id,0) as drug_source_concept_id,
 	coalesce(left(raw_rx_med_name, 200),' ')||'|'||coalesce(rxnorm_cui,' ') as drug_source_value,
 	38000177 as drug_type_concept_id,
 	null as eff_drug_dose_source_value,
-	rx_dose_ordered as effective_drug_dose,
+	case when(isnumeric(rx_dose_ordered::varchar)) then rx_dose_ordered::numeric
+        end as effective_drug_dose,
 	rx_frequency as frequency,
 	null as lot_number,
 	person.person_id as person_id,
 	vo.provider_id as provider_id,
-	rx_quantity as quantity,
-	rx_refills as refills,
+	case when isnumeric(rx_quantity::varchar) then rx_quantity::numeric
+	end as quantity,
+	case when isnumeric(rx_refills::varchar) then rx_refills::int
+	end as refills,
 	coalesce(case
 			when presc.rx_route = 'OT' then 44814649
 			else route.concept_id
@@ -182,8 +231,7 @@ select
 	rx_route as route_source_value,
 	null as sig,
 	null as stop_reason,
- 	vo.visit_occurrence_id as visit_occurrence_id,
-	'SITE' as site
+ 	vo.visit_occurrence_id as visit_occurrence_id
 from SITE_pcornet.prescribing presc
 inner join SITE_pedsnet.person person 
     on presc.patid = person.person_source_value
@@ -219,6 +267,7 @@ left join
 
 commit;
 
+begin;
 insert into SITE_pedsnet.drug_exposure(
 	days_supply,
 	dispense_as_written_concept_id, 
@@ -247,8 +296,7 @@ insert into SITE_pedsnet.drug_exposure(
 	route_source_value,
 	sig, 
 	stop_reason, 
-	visit_occurrence_id,
-	site)
+	visit_occurrence_id)
 
 select
 	null as days_supply,
@@ -268,11 +316,17 @@ select
 		end, 0) as drug_concept_id,
 	medadmin_stop_date::date as drug_exposure_end_date,
 	(medadmin_stop_date || ' '|| medadmin_stop_time)::timestamp as drug_exposure_end_datetime,
- 	nextval('SITE_pedsnet.drug_exposure_seq')::bigint AS drug_exposure_id,
+ 	nextval('SITE_pedsnet.drug_exposure_seq') AS drug_exposure_id,
 	null as drug_exposure_order_date,
 	null as drug_exposure_order_datetime,
-	medadmin_start_date as drug_exposure_start_date,
-	(medadmin_start_date || ' '|| medadmin_start_time)::timestamp as drug_exposure_start_datetime,
+	case
+            when medadmin_start_date is null then '0001-01-01'::date
+	    else medadmin_start_date
+	end as drug_exposure_start_date,
+	case
+	    when medadmin_start_date is null OR medadmin_start_time is null then '0001-01-01'::timestamp
+            else (medadmin_start_date || ' '|| medadmin_start_time)::timestamp
+	end as drug_exposure_start_datetime,
 	case
 		when medadmin_type='ND' then ndc.concept_id
 		when medadmin_type='RX' then rxnorm.concept_id
@@ -280,7 +334,8 @@ select
 	coalesce(left(raw_medadmin_med_name, 200)||'...',' ')||'|'||coalesce(medadmin_code,' ') as drug_source_value,
 	38000180 as drug_type_concept_id,
 	medadmin_dose_admin::varchar as eff_drug_dose_source_value,
-	medadmin_dose_admin as effective_drug_dose,
+	case when(isnumeric(medadmin_dose_admin::varchar)) then medadmin_dose_admin::numeric
+        end as effective_drug_dose,
 	null as frequency,
 	null as lot_number,
 	person.person_id as person_id,
@@ -295,8 +350,7 @@ select
 	medadmin_route as route_source_value,
 	null as sig,
 	null as stop_reason,
-	vo.visit_occurrence_id as visit_occurrence_id,
-	'SITE' as site
+	vo.visit_occurrence_id as visit_occurrence_id
 from SITE_pcornet.med_admin as medadmin
 inner join SITE_pedsnet.person person 
 on medadmin.patid = person.person_source_value

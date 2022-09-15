@@ -1,3 +1,15 @@
+CREATE OR REPLACE FUNCTION isnumeric(text) RETURNS BOOLEAN AS $$
+DECLARE x NUMERIC;
+BEGIN
+        x = $1::NUMERIC;
+            RETURN TRUE;
+        EXCEPTION WHEN others THEN
+                RETURN FALSE;
+END;
+$$
+STRICT
+LANGUAGE plpgsql IMMUTABLE;
+
 begin;
 INSERT INTO SITE_pedsnet.care_site(
     care_site_id,
@@ -7,18 +19,17 @@ INSERT INTO SITE_pedsnet.care_site(
     place_of_service_concept_id,
     place_of_service_source_value,
     specialty_concept_id, 
-    specialty_source_value,
-    site)
+    specialty_source_value)
 SELECT 
-    distinct on (facilityid)facilityid::bigint  AS care_site_id,
+    distinct on (facilityid)facilityid AS care_site_id,
     enc.facility_type AS care_site_name,
     substr(enc.facility_type, 1, 50) AS care_site_source_value,
     loc.location_id location_id,
-    coalesce(place.source_concept_id::int , 44814650) AS place_of_service_concept_id,
+    case when(isnumeric(place.source_concept_id::varchar)) then place.source_concept_id::int else 44814650 end  AS place_of_service_concept_id,
     substr(enc.facility_type, 1, 50) AS place_of_service_source_value,  -- ehr/encounter
-    coalesce(facility_spec.value_as_concept_id::int,prov_spec.source_concept_id::int,44814650)  as speciality_concept_id,
-    coalesce(facility_spec.target_concept,prov_spec.concept_description,'') as specialty_source_value,
-    'SITE' as site
+    case when(isnumeric(facility_spec.value_as_concept_id::varchar)) then
+	facility_spec.value_as_concept_id::int when (isnumeric(prov_spec.source_concept_id::varchar)) then prov_spec.source_concept_id::int else 44814650 end  as speciality_concept_id,
+    coalesce(facility_spec.target_concept,prov_spec.concept_description,'') as specialty_source_value
 FROM SITE_pcornet.encounter enc
 left join SITE_pcornet.provider prov on prov.providerid = enc.providerid
 LEFT JOIN cdmh_staging.visit_xwalk vx ON vx.cdm_tbl = 'ENCOUNTER'
@@ -41,6 +52,7 @@ WHERE enc.facility_type IS NOT NULL and enc.facility_location is not null
 
 commit;
 
+begin;
 -- default care site
 
 INSERT INTO SITE_pedsnet.care_site(
@@ -48,7 +60,6 @@ INSERT INTO SITE_pedsnet.care_site(
     care_site_source_value,
     location_id,
     place_of_service_concept_id,
-    specialty_concept_id, 
-    site)
-values(9999999,'9999999',9999999,44814650,44814650,'SITE');
+    specialty_concept_id)
+values(9999999,'9999999',9999999,44814650,44814650);
 commit;

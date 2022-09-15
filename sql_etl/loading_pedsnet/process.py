@@ -100,17 +100,17 @@ def ddl_only():
             # endregion
 
             # region Alter tables and add site column
-            try:
-                print('\nAltering tables, adding additional column for "site" ...')
-                cur.execute("SET search_path TO " + schemas + ";")
+            #try:
+                #print('\nAltering tables, adding additional column for "site" ...')
+                #cur.execute("SET search_path TO " + schemas + ";")
                 #creates sql function to add SITE column for each table in schema
-                cur.execute(query.site_col())
-                cur.execute("select * from add_site_column('" + db_name + "', '" + schemas + "');")
-                conn.commit()
-                print('Table altering successful.')
-            except(Exception, psycopg2.OperationalError) as error:
-                print('Table Altering Failed.')
-                print(error)
+                #cur.execute(query.site_col())
+                #cur.execute("select * from add_site_column('" + db_name + "', '" + schemas + "');")
+                #conn.commit()
+                #print('Table altering successful.')
+            #except(Exception, psycopg2.OperationalError) as error:
+                #print('Table Altering Failed.')
+                #print(error)
             # endregion
 
             # region permissions

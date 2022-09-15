@@ -12,11 +12,10 @@ insert into SITE_pedsnet.location_history(
 	location_preferred_concept_id, 
 	relationship_type_concept_id, 
 	start_date, 
-	start_datetime,
-	site
+	start_datetime
 )
 select
- 	nextval('SITE_pedsnet.loc_hist_seq')::bigint as location_history_id,
+ 	nextval('SITE_pedsnet.loc_hist_seq') as location_history_id,
 	'Person' as domain_id,
 	address_period_end::date as end_date,
 	address_period_end::timestamp as end_datetime,
@@ -25,8 +24,7 @@ select
 	44814653 as location_preferred_concept_id,
 	0 as relationship_type_concept_id,
 	address_period_start::date as start_date,
-	address_period_start::timestamp as start_datetime,
-	'SITE' as site
+	address_period_start::timestamp as start_datetime
 from
 	(select
 	 	patid,

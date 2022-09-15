@@ -1,5 +1,13 @@
 create sequence if not exists SITE_pedsnet.imm_seq;
 
+create or replace function is_date(s varchar) returns boolean as $$
+begin
+          perform s::date;
+          return true;
+        exception when others then
+                  return false;
+end;
+$$ language plpgsql;
 
 begin;
 insert into SITE_pedsnet.immunization(
@@ -26,8 +34,7 @@ insert into SITE_pedsnet.immunization(
 	person_id, 
 	procedure_occurrence_id, 
 	provider_id, 
-	visit_occurrence_id,
-	site)
+	visit_occurrence_id)
 select
 	coalesce(
 		case
@@ -65,9 +72,11 @@ select
 	44814650) as imm_body_site_concept_id,
 	imm.vx_body_site as imm_body_site_source_value, 
 	coalesce(unit_map.source_concept_id::int, 44814653) as imm_dose_unit_concept_id, 
-	imm.vx_dose_unit as imm_dose_unit_source_value, 
-	imm.vx_exp_date as imm_exp_date, 
-	imm.vx_exp_date::timestamp as imm_exp_datetime, 
+	imm.vx_dose_unit as imm_dose_unit_source_value,
+        case when is_date(imm.vx_exp_date::varchar) 
+		then imm.vx_exp_date::date end as imm_exp_date,
+        case when is_date(imm.vx_exp_date::varchar)	
+	 	then imm.vx_exp_date::timestamp end as imm_exp_datetime, 
 	imm.vx_lot_num as imm_lot_num, 
 	imm.vx_manufacturer as imm_manufacturer, 
 	imm.vx_record_date as imm_recorded_date, 
@@ -89,7 +98,7 @@ select
 	coalesce(imm.vx_admin_date,imm.vx_record_date) as immunization_date,
 	coalesce(imm.vx_admin_date,imm.vx_record_date)::timestamp as immunization_datetime,
 	imm.vx_dose as dose,
-	nextval('SITE_pedsnet.imm_seq')::bigint as immunization_id,
+	nextval('SITE_pedsnet.imm_seq') as immunization_id,
 	coalesce(	
 		case
             when c_hcpcs.concept_id is not null then c_hcpcs.concept_id
@@ -113,8 +122,7 @@ select
 	person.person_id as person_id,
 	po.procedure_occurrence_id as procedure_occurrence_id,
 	vo.provider_id as provider_id,
-	vo.visit_occurrence_id as visit_occurrence_id,
-	'SITE' as site
+	vo.visit_occurrence_id as visit_occurrence_id
 from SITE_pcornet.immunization imm
 inner join SITE_pedsnet.person person 
     on imm.patid = person.person_source_value

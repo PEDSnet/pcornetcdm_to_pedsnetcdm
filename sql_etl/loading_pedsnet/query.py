@@ -36,15 +36,13 @@ def create_table(schema):
 # region Schema Creation
 def create_schema(schema):
     """creates schema if not exists"""
-    command = """CREATE SCHEMA IF NOT EXISTS """ + schema + """ AUTHORIZATION pcor_et_user;
-                 GRANT USAGE ON SCHEMA """ + schema + """ TO peds_staff;
-                 GRANT ALL ON SCHEMA """ + schema + """ TO dcc_owner;
-                 GRANT ALL ON SCHEMA """ + schema + """ TO loading_user;
+    command = """CREATE SCHEMA IF NOT EXISTS """ + schema + """ AUTHORIZATION chop_etl;
+                 GRANT ALL ON SCHEMA """ + schema + """ TO chop_etl;
                  """
     return command
 # First line of query was originally 
 # "CREATE SCHEMA IF NOT EXISTS (Insert Schema) AUTHORIZATION pcornet_user"
-#removed AUTHORIZATION pcornet_user as the permission was throwing errors
+#removed AUTHORIZATION pcornet_user as the permission was throwing err
 # endregion
 
 # region create DDL
@@ -54,7 +52,7 @@ def dll(pedsnet_version):
         if pedsnet_version:
             dll_url = "http://data-models-sqlalchemy.research.chop.edu/pedsnet/" + pedsnet_version.strip('v') + ".0/ddl/postgresql/tables/"
         else:
-           dll_url = 'https://data-models-sqlalchemy.research.chop.edu/pedsnet/4.5.0/ddl/postgresql/tables/'
+           dll_url = 'http://data-models-sqlalchemy.research.chop.edu/pedsnet/4.5.0/ddl/postgresql/tables/'
         dll_script = requests.get(dll_url).text
         return dll_script
     except (Exception, requests.ConnectionError) as e:
@@ -63,7 +61,7 @@ def dll(pedsnet_version):
 
 # region Alter site column
 def site_col():
-    """This function alters the table and creates the site columns"""
+    """This function alters the table andc creates the site columns"""
     # Replace variables in file
     #for line in fileinput.input(site_col_file, inplace=1, backup='.bak'):
     #    line = re.sub('db_name .*?\)', db_name+ ",\'" + schema + "\'", line.rstrip())

@@ -7,15 +7,13 @@ INSERT INTO SITE_pedsnet.location(
     zip,
     location_source_value,
     country_concept_id,
-    country_source_value,
-    site)
+    country_source_value)
 select 
-	nextval('SITE_pedsnet.loc_seq')::bigint AS location_id,
+	nextval('SITE_pedsnet.loc_seq') AS location_id,
 	facility_location as zip,
 	'encounter | ' || facility_location  as location_source_value,
-    148838 as country_concept_id,
-    'United States' as country_source_value,
-	'SITE' as site
+    42046186 as country_concept_id,
+    'United States' as country_source_value
  FROM SITE_pcornet.encounter enc
  WHERE enc.facility_type IS NOT NULL
  GROUP BY facility_location;
@@ -27,17 +25,15 @@ INSERT INTO SITE_pedsnet.location(
     zip,
     location_source_value,
     country_concept_id,
-    country_source_value,
-    site)
+    country_source_value)
 select 
- 	nextval('SITE_pedsnet.loc_seq')::bigint AS location_id,
+ 	nextval('SITE_pedsnet.loc_seq') AS location_id,
     address_city as city,
     address_state as state,
 	zip as zip,
 	'patient history | ' || zip as location_source_value,
-    148838 as country_concept_id,
-    'United States' as country_source_value,
-	'SITE' as site
+    42046186 as country_concept_id,
+    'United States' as country_source_value
 FROM 
     (select 
         case
@@ -54,7 +50,6 @@ GROUP BY zip, address_city, address_state;
  -- default location
 
  INSERT INTO SITE_pedsnet.location(
-    location_id,
-    site)
- values(9999999,'SITE');
+    location_id)
+ values(9999999);
 commit;

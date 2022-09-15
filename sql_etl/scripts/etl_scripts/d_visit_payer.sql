@@ -8,8 +8,7 @@ insert into SITE_pedsnet.visit_payer(
 	plan_type, 
 	visit_occurrence_id, 
 	visit_payer_id, 
-	visit_payer_type_concept_id,
-	site)
+	visit_payer_type_concept_id)
 with payer_info as (
 --primary
 select
@@ -74,7 +73,6 @@ select
 	coalesce(payer_info.plan_type,'Other/Unknown') as plan_type,
 	payer_info.visit_occurrence_id,
  	nextval('SITE_pedsnet.visit_payer_seq')::bigint as visit_payer_id,
-	payer_info.visit_payer_type_concept_id,
-	'SITE' as site
+	payer_info.visit_payer_type_concept_id
 from payer_info;
 commit;

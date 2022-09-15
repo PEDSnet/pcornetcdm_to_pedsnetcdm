@@ -14,8 +14,7 @@ INSERT INTO SITE_pedsnet.procedure_occurrence (
       procedure_type_concept_id, 
       provider_id, 
       quantity, 
-      visit_occurrence_id, 
-      site)
+      visit_occurrence_id)
 SELECT 
       distinct 
       row_number() over (order by proc.proceduresid)::bigint AS PROCEDURE_OCCURRENCE_ID,
@@ -29,9 +28,14 @@ SELECT
             when proc.px_type='09' then c_icd10.concept_id
             else 0 
       end, 0) as procedure_concept_id,
-      coalesce(proc.px_date,proc.admit_date) as procedure_date,
+      case when is_date(proc.px_date::varchar) then proc.px_date::date
+      when is_date(proc.admit_date::varchar) then proc.admit_date::date
+      end as procedure_date,
       null::date as procedure_end_date,
-      proc.px_date::timestamp as procedure_datetime,
+      case
+          when proc.px_date is null then '0001-01-01'::timestamp
+	  else proc.px_date::timestamp
+      end as procedure_datetime,
       null::timestamp as procedure_end_datetime,
       case
             when c_hcpcs.concept_id is not null then c_hcpcs.concept_id
@@ -48,8 +52,7 @@ SELECT
       end AS procedure_type_concept_id,   
       vo.provider_id,
       null::bigint as quantity,
-      vo.visit_occurrence_id,
-      'SITE' as site
+      vo.visit_occurrence_id
 FROM SITE_pcornet.procedures proc
 inner join SITE_pedsnet.person person 
       on proc.patid = person.person_source_value

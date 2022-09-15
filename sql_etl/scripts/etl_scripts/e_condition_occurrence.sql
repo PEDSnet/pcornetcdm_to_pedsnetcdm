@@ -1,6 +1,15 @@
 
 CREATE SEQUENCE if not exists SITE_pedsnet.cond_occ_seq;
 
+create or replace function is_date(s varchar) returns boolean as $$
+begin
+          perform s::date;
+          return true;
+        exception when others then
+                  return false;
+end;
+$$ language plpgsql;
+
 begin;
 
 -- problem_list
@@ -20,8 +29,7 @@ INSERT INTO SITE_pedsnet.condition_occurrence(
         poa_concept_id, 
         provider_id,
         stop_reason,
-        visit_occurrence_id,
-        site)
+        visit_occurrence_id)
 SELECT 
     coalesce(case
         when cond.condition_type='09' then cr_icd9.concept_id_2
@@ -38,11 +46,17 @@ SELECT
         0
     end,44814650)::int as condition_source_concept_id,
     cond.condition as condition_source_value,
-    cond.resolve_date as condition_end_date, 
-    cond.resolve_date::timestamp as condition_end_datetime,
-    nextval('SITE_pedsnet.cond_occ_seq')::bigint as condition_occurrence_id,
-    coalesce(cond.onset_date,cond.report_date) as condition_start_date, 
-    coalesce(cond.onset_date,cond.report_date)::timestamp as condition_start_datetime,
+    case when is_date(cond.resolve_date::varchar) then cond.resolve_date::date
+    end as condition_end_date,
+    case when is_date(cond.resolve_date::varchar) then cond.resolve_date::timestamp
+    end as condition_end_datetime,
+    nextval('SITE_pedsnet.cond_occ_seq') as condition_occurrence_id,
+    case when is_date(cond.onset_date::varchar) then cond.onset_date::date
+    when is_date(cond.report_date::varchar) then cond.report_date::date
+    end as condition_start_date,
+    case when is_date(cond.onset_date::varchar) then cond.onset_date::timestamp
+    when is_date(cond.report_date::varchar) then cond.report_date::timestamp
+    end as condition_start_datetime,
     4230359 AS condition_status_concept_id,
     cond.raw_condition_status AS condition_status_source_value,
     2000000089 as condition_type_concept_id,
@@ -50,8 +64,7 @@ SELECT
     44814650 as poa_concept_id, 
     vo.provider_id as provider_id,   
     NULL as stop_reason,    
-    vo.visit_occurrence_id as visit_occurrence_id, 
-    'SITE' as site    
+    vo.visit_occurrence_id as visit_occurrence_id    
 FROM (
     select *
     from SITE_pcornet.condition
@@ -76,7 +89,7 @@ left join vocabulary.concept_relationship cr_icd10
 ;
 
 commit;
-
+begin;
 -- visit diagnoses
 
 INSERT INTO SITE_pedsnet.condition_occurrence(
@@ -93,8 +106,7 @@ INSERT INTO SITE_pedsnet.condition_occurrence(
         poa_concept_id, 
         provider_id,
         stop_reason,
-        visit_occurrence_id,
-        site)
+        visit_occurrence_id)
 SELECT 
     coalesce(case
         when cond.dx_type='09' then cr_icd9.concept_id_2
@@ -103,7 +115,7 @@ SELECT
     else
      0
     end,44814650)::int as condition_concept_id,
-    nextval('SITE_pedsnet.cond_occ_seq')::bigint as condition_occurrence_id,
+    nextval('SITE_pedsnet.cond_occ_seq') as condition_occurrence_id,
     coalesce(case
         when cond.dx_type='09' then c_icd9.concept_id
         when cond.dx_type='10' then c_icd10.concept_id
@@ -112,8 +124,12 @@ SELECT
         0
     end,44814650)::int as condition_source_concept_id,
     cond.dx as condition_source_value,
-    coalesce(cond.dx_date,cond.admit_date) as condition_start_date, 
-    coalesce(cond.dx_date,cond.admit_date)::timestamp as condition_start_datetime,
+    case when is_date(cond.dx_date::varchar) then cond.dx_date::date
+    when is_date(cond.admit_date::varchar) then cond.admit_date::date
+    end as condition_start_date,
+    case when is_date(cond.dx_date::varchar) then cond.dx_date::timestamp
+    when is_date(cond.admit_date::varchar) then cond.admit_date::timestamp
+    end as condition_start_datetime,
     4230359 AS condition_status_concept_id,
     cond.dx_source AS condition_status_source_value,
     case 
@@ -142,8 +158,7 @@ SELECT
     coalesce(case when dx_poa='Y' then 4188539 else 4188540 end,44814650)::int as poa_concept_id, 
     vo.provider_id as provider_id,   
     NULL as stop_reason,    
-    vo.visit_occurrence_id as visit_occurrence_id, 
-    'SITE' as site
+    vo.visit_occurrence_id as visit_occurrence_id
 FROM SITE_pcornet.diagnosis cond
 inner join SITE_pedsnet.person person 
     on cond.patid=person.person_source_value
