@@ -31,21 +31,35 @@ INSERT INTO SITE_pedsnet.condition_occurrence(
         stop_reason,
         visit_occurrence_id)
 SELECT 
-    coalesce(case
-        when cond.condition_type='09' then cr_icd9.concept_id_2
-        when cond.condition_type='10' then cr_icd10.concept_id_2
-        when cond.condition_type='SM' then c_snomed.concept_id
-    else
-     0
-    end,44814650)::int as condition_concept_id,
-    coalesce(case
-        when cond.condition_type='09' then c_icd9.concept_id
-        when cond.condition_type='10' then c_icd10.concept_id
-        when cond.condition_type='SM' then c_snomed.concept_id
-    else
-        0
-    end,44814650)::int as condition_source_concept_id,
-    cond.condition as condition_source_value,
+    coalesce(
+        case
+            when cond.condition_type='09' or cond.condition_type='ICD09' then cr_icd9.concept_id_2
+            when cond.condition_type='10' or cond.condition_type='ICD10' then cr_icd10.concept_id_2
+            when cond.condition_type='SM' then c_snomed.concept_id
+            -- RegEx for ICD09 codes if condition_type <>'09' 
+            when cond.condition ~ '^V[0-9]{2}.?[0-9]{0,2}$' then cr_icd9.concept_id_2
+            when cond.condition ~ '^E[0-9]{3}.?[0-9]?$' then cr_icd9.concept_id_2
+            when cond.condition ~ '^[0-9]{3}.?[0-9]{0,2}$' then cr_icd9.concept_id_2
+            -- RegEx for ICD10 codes if condition_type <>'10' 
+            when cond.condition ~ '^[A-Z][0-9][0-9A-Z].?[0-9A-Z]{0,4}$' then cr_icd10.concept_id_2
+            else NULL
+        END, 
+    44814650)::int as condition_concept_id,
+    coalesce(
+        case
+            when cond.condition_type='09' then c_icd9.concept_id
+            when cond.condition_type='10' then c_icd10.concept_id
+            when cond.condition_type='SM' then c_snomed.concept_id
+            -- RegEx for ICD09 codes if condition_type <>'09' 
+            when cond.condition ~ '^V[0-9]{2}.?[0-9]{0,2}$' then c_icd9.concept_id
+            when cond.condition ~ '^E[0-9]{3}.?[0-9]?$' then c_icd9.concept_id
+            when cond.condition ~ '^[0-9]{3}.?[0-9]{0,2}$' then c_icd9.concept_id
+            -- RegEx for ICD10 codes if condition_type <>'10' 
+            when cond.condition ~ '^[A-Z][0-9][0-9A-Z].?[0-9A-Z]{0,4}$' then c_icd10.concept_id
+            else NULL
+        end,
+    44814650)::int as condition_source_concept_id,
+    left(cond.condition,248) || ' | ' || cond.condition_type as condition_source_value,
     case when is_date(cond.resolve_date::varchar) then cond.resolve_date::date
     end as condition_end_date,
     case when is_date(cond.resolve_date::varchar) then cond.resolve_date::timestamp
@@ -75,9 +89,9 @@ inner join SITE_pedsnet.person person
 left join SITE_pedsnet.visit_occurrence vo 
     on cond.encounterid=vo.visit_source_value
 left join vocabulary.concept c_icd9 on cond.condition=c_icd9.concept_code
-    and c_icd9.vocabulary_id='ICD9CM' and cond.condition_type='09'
+    and c_icd9.vocabulary_id='ICD9CM'
 left join vocabulary.concept c_icd10 on cond.condition=c_icd10.concept_code
-    and c_icd10.vocabulary_id='ICD10CM' and cond.condition_type='10'
+    and c_icd10.vocabulary_id='ICD10CM'
 left join vocabulary.concept c_snomed on cond.condition=c_snomed.concept_code
     and c_snomed.vocabulary_id='SNOMED' and cond.condition_type='SM'
 left join vocabulary.concept_relationship cr_icd9
@@ -108,22 +122,36 @@ INSERT INTO SITE_pedsnet.condition_occurrence(
         stop_reason,
         visit_occurrence_id)
 SELECT 
-    coalesce(case
-        when cond.dx_type='09' then cr_icd9.concept_id_2
-        when cond.dx_type='10' then cr_icd10.concept_id_2
-        when cond.dx_type='SM' then c_snomed.concept_id
-    else
-     0
-    end,44814650)::int as condition_concept_id,
+    coalesce(
+        case
+            when cond.dx_type='09' or cond.dx_type='ICD09' then cr_icd9.concept_id_2
+            when cond.dx_type='10' or cond.dx_type='ICD10' then cr_icd10.concept_id_2
+            when cond.dx_type='SM' then c_snomed.concept_id
+             -- RegEx for ICD09 codes if condition_type <>'09' 
+            when cond.dx ~ '^V[0-9]{2}.?[0-9]{0,2}$' then cr_icd9.concept_id_2
+            when cond.dx ~ '^E[0-9]{3}.?[0-9]?$' then cr_icd9.concept_id_2
+            when cond.dx ~ '^[0-9]{3}.?[0-9]{0,2}$' then cr_icd9.concept_id_2
+            -- RegEx for ICD10 codes if condition_type <>'10' 
+            when cond.dx ~ '^[A-Z][0-9][0-9A-Z].?[0-9A-Z]{0,4}$' then cr_icd10.concept_id_2
+            else NULL
+        end,
+    44814650)::int as condition_concept_id,
     nextval('SITE_pedsnet.cond_occ_seq') as condition_occurrence_id,
-    coalesce(case
-        when cond.dx_type='09' then c_icd9.concept_id
-        when cond.dx_type='10' then c_icd10.concept_id
-        when cond.dx_type='SM' then c_snomed.concept_id
-    else
-        0
-    end,44814650)::int as condition_source_concept_id,
-    cond.dx as condition_source_value,
+    coalesce(
+        case
+            when cond.dx_type='09' or cond.dx_type='ICD09' then c_icd9.concept_id
+            when cond.dx_type='10' or cond.dx_type='ICD10' then c_icd10.concept_id
+            when cond.dx_type='SM' then c_snomed.concept_id
+            -- RegEx for ICD09 codes if condition_type <>'09' 
+            when cond.dx ~ '^V[0-9]{2}.?[0-9]{0,2}$' then c_icd9.concept_id
+            when cond.dx ~ '^E[0-9]{3}.?[0-9]?$' then c_icd9.concept_id
+            when cond.dx ~ '^[0-9]{3}.?[0-9]{0,2}$' then c_icd9.concept_id
+            -- RegEx for ICD10 codes if condition_type <>'10' 
+            when cond.dx ~ '^[A-Z][0-9][0-9A-Z].?[0-9A-Z]{0,4}$' then c_icd10.concept_id
+            else NULL
+        end,
+    44814650)::int as condition_source_concept_id,
+    left(cond.dx,248) || ' | ' || dx_type as condition_source_value,
     case when is_date(cond.dx_date::varchar) then cond.dx_date::date
     when is_date(cond.admit_date::varchar) then cond.admit_date::date
     end as condition_start_date,
@@ -165,9 +193,9 @@ inner join SITE_pedsnet.person person
 left join SITE_pedsnet.visit_occurrence vo 
     on cond.encounterid=vo.visit_source_value
 left join vocabulary.concept c_icd9 on cond.dx=c_icd9.concept_code
-    and c_icd9.vocabulary_id='ICD9CM' and cond.dx_type='09'
+    and c_icd9.vocabulary_id='ICD9CM' 
 left join vocabulary.concept c_icd10 on cond.dx=c_icd10.concept_code
-    and c_icd10.vocabulary_id='ICD10CM' and cond.dx_type='10'
+    and c_icd10.vocabulary_id='ICD10CM'
 left join vocabulary.concept c_snomed on cond.dx=c_snomed.concept_code
     and c_snomed.vocabulary_id='SNOMED' and cond.dx_type='SM'
 left join vocabulary.concept_relationship cr_icd9

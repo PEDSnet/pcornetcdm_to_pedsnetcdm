@@ -2048,12 +2048,12 @@ dx origin	BI	NULL	2000000090	Billing	NULL
 dx origin	CL	NULL	2000000097	Claim	NULL
 dx origin	CL	NULL	2000000094	Claim	NULL
 dx origin	CL	NULL	2000000100	Claim	NULL
-BP Position	3	NULL	3013940	Supine (Diastolic)	NULL
-BP Position	2	NULL	3019962	Standing (Diastolic)	NULL
-BP Position	1	NULL	3034703	Sitting (Diastolic)	NULL
-BP Position	3	NULL	3009395	Supine (Systolic)	NULL
-BP Position	2	NULL	3035856	Standing (Systolic)	NULL
-BP Position	1	NULL	3018586	Sitting (Systolic)	NULL
+BP Position	03	NULL	3013940	Supine (Diastolic)	NULL
+BP Position	02	NULL	3019962	Standing (Diastolic)	NULL
+BP Position	01	NULL	3034703	Sitting (Diastolic)	NULL
+BP Position	03	NULL	3009395	Supine (Systolic)	NULL
+BP Position	02	NULL	3035856	Standing (Systolic)	NULL
+BP Position	01	NULL	3018586	Sitting (Systolic)	NULL
 dx origin	NI	NULL	44814653	No information	NULL
 dx origin	UN	NULL	44814649	Unknown	NULL
 dx origin	OT	NULL	44814650	Other	NULL
@@ -6117,71 +6117,71 @@ result_unit_source	pg/dL	picogram per deciliter	pg/dL	NULL	NULL
 result_unit_source	{ratio}	ratio	ratio	NULL	NULL
 result_unit_source	{ISR}	immune status ratio	ISR	NULL	NULL
 result_unit_source	g/(24.h)	gram per 24 hour	g/24hr	NULL	NULL
-Race	7	NULL	44814660	Refuse to answer	NULL
-Race	6	NULL	44814659	Multiple race	NULL
-Race	5	NULL	8527	White	NULL
-Race	4	NULL	8557	Native Hawaiian or Other Pacific Islander	NULL
-Race	3	NULL	8516	Black or African American	NULL
-Race	2	NULL	8515	Asian	NULL
-Race	1	NULL	8657	American Indian or Alaska Native	NULL
+Race	07	NULL	44814660	Refuse to answer	NULL
+Race	06	NULL	44814659	Multiple race	NULL
+Race	05	NULL	8527	White	NULL
+Race	04	NULL	8557	Native Hawaiian or Other Pacific Islander	NULL
+Race	03	NULL	8516	Black or African American	NULL
+Race	02	NULL	8515	Asian	NULL
+Race	01	NULL	8657	American Indian or Alaska Native	NULL
 Procedure Code Type	9	NULL	ICD9Proc	ICD-9-PCS	NULL
-Rx Frequency	2	Two times a day (BID)	2 times a day	NULL	null
-Rx Frequency	2	Two times a day (BID)	2 times daily	NULL	null
-Rx Frequency	2	Two times a day (BID)	2 times daily before meals	NULL	null
-Rx Frequency	2	Two times a day (BID)	2 times daily with meals	NULL	null
-Rx Frequency	3	Three times a day (TID)	3 times a day	NULL	null
-Rx Frequency	3	Three times a day (TID)	3 times daily	NULL	null
-Rx Frequency	3	Three times a day (TID)	3 times daily with meals	NULL	null
-Rx Frequency	4	Four times a day (QID)	4 times a day	NULL	null
-Rx Frequency	4	Four times a day (QID)	4 times daily	NULL	null
-Rx Frequency	2	Two times a day (BID)	bid	NULL	null
-Rx Frequency	1	Everyday	daily	NULL	null
-Rx Frequency	2	Two times a day (BID)	every 12 hours	NULL	null
-Rx Frequency	1	Everyday	every 24 hours	NULL	null
-Rx Frequency	4	Four times a day (QID)	every 6 hours	NULL	null
-Rx Frequency	3	Three times a day (TID)	every 8 hours	NULL	null
-Rx Frequency	1	Everyday	every day	NULL	null
-Rx Frequency	5	Every morning	every morning	NULL	null
-Rx Frequency	5	Every morning	every morning before breakfast	NULL	null
-Rx Frequency	5	Every morning	every morning with breakfast	NULL	null
-Rx Frequency	2	Two times a day (BID)	every twelve hours	NULL	null
-Rx Frequency	4	Four times a day (QID)	four times a day	NULL	null
-Rx Frequency	1	Everyday	once a day	NULL	null
-Rx Frequency	2	Two times a day (BID)	q 12 hrs	NULL	null
-Rx Frequency	4	Four times a day (QID)	q 6 hrs	NULL	null
-Rx Frequency	3	Three times a day (TID)	q 8 hrs	NULL	null
-Rx Frequency	5	Every morning	q am	NULL	null
-Rx Frequency	2	Two times a day (BID)	q12h	NULL	null
-Rx Frequency	4	Four times a day (QID)	q6h	NULL	null
-Rx Frequency	3	Three times a day (TID)	q8h	NULL	null
-Rx Frequency	5	Every morning	qam	NULL	null
-Rx Frequency	1	Everyday	qday	NULL	null
-Rx Frequency	4	Four times a day (QID)	qid	NULL	null
-Rx Frequency	3	Three times a day (TID)	three times a day	NULL	null
-Rx Frequency	3	Three times a day (TID)	tid	NULL	null
-Rx Frequency	2	Two times a day (BID)	twice a day	NULL	null
-Rx Frequency	2	Two times a day (BID)	twice daily	NULL	null
-smoking	6	NULL	4275495	Unknown if ever smoked	4141786
-smoking	4	NULL	4275495	Never smoker	4144272
-smoking	3	NULL	4275495	Former smoker	4310250
-smoking	2	NULL	4275495	Current someday smoker	4.28E+14
-smoking	1	NULL	4275495	Current everyday smoker	42709996
-smoking	5	NULL	4275495	Smoker current status unknown	4298794
-smoking	7	NULL	4275495	Heavy tobacco smoker	4044778
-smoking	7	NULL	4275495	Heavy tobacco smoker	4209006
-smoking	8	NULL	4275495	Light tobacco smoker	4209585
-tobacco	4	NULL	4005823	Passive or environmental exposure	4030580
-tobacco	3	NULL	4005823	Quit/Former smoker	45765917
-tobacco	2	NULL	4005823	Never	45765920
-tobacco	1	NULL	4005823	Current user	4005823
-tobacco type	3	NULL	4219336	Snuff tobacco	4218197
-tobacco type	3	NULL	4219336	Chewing tobacco	4219234
-tobacco type	4	NULL	4219336	None	4052465
-tobacco type	4	NULL	4219336	None	4218917
-tobacco type	1	NULL	4219336	Cigar smoking tobacco	4132133
-tobacco type	1	NULL	4219336	Cigarette smoking tobacco	4282779
-tobacco type	1	NULL	4219336	Pipe smoking tobacco	4224317
-tobacco type	1	NULL	4219336	Smoked tobacco only	4298794
+Rx Frequency	02	Two times a day (BID)	2 times a day	NULL	null
+Rx Frequency	02	Two times a day (BID)	2 times daily	NULL	null
+Rx Frequency	02	Two times a day (BID)	2 times daily before meals	NULL	null
+Rx Frequency	02	Two times a day (BID)	2 times daily with meals	NULL	null
+Rx Frequency	03	Three times a day (TID)	3 times a day	NULL	null
+Rx Frequency	03	Three times a day (TID)	3 times daily	NULL	null
+Rx Frequency	03	Three times a day (TID)	3 times daily with meals	NULL	null
+Rx Frequency	04	Four times a day (QID)	4 times a day	NULL	null
+Rx Frequency	04	Four times a day (QID)	4 times daily	NULL	null
+Rx Frequency	02	Two times a day (BID)	bid	NULL	null
+Rx Frequency	01	Everyday	daily	NULL	null
+Rx Frequency	02	Two times a day (BID)	every 12 hours	NULL	null
+Rx Frequency	01	Everyday	every 24 hours	NULL	null
+Rx Frequency	04	Four times a day (QID)	every 6 hours	NULL	null
+Rx Frequency	03	Three times a day (TID)	every 8 hours	NULL	null
+Rx Frequency	01	Everyday	every day	NULL	null
+Rx Frequency	05	Every morning	every morning	NULL	null
+Rx Frequency	05	Every morning	every morning before breakfast	NULL	null
+Rx Frequency	05	Every morning	every morning with breakfast	NULL	null
+Rx Frequency	02	Two times a day (BID)	every twelve hours	NULL	null
+Rx Frequency	04	Four times a day (QID)	four times a day	NULL	null
+Rx Frequency	01	Everyday	once a day	NULL	null
+Rx Frequency	02	Two times a day (BID)	q 12 hrs	NULL	null
+Rx Frequency	04	Four times a day (QID)	q 6 hrs	NULL	null
+Rx Frequency	03	Three times a day (TID)	q 8 hrs	NULL	null
+Rx Frequency	05	Every morning	q am	NULL	null
+Rx Frequency	02	Two times a day (BID)	q12h	NULL	null
+Rx Frequency	04	Four times a day (QID)	q6h	NULL	null
+Rx Frequency	03	Three times a day (TID)	q8h	NULL	null
+Rx Frequency	05	Every morning	qam	NULL	null
+Rx Frequency	01	Everyday	qday	NULL	null
+Rx Frequency	04	Four times a day (QID)	qid	NULL	null
+Rx Frequency	03	Three times a day (TID)	three times a day	NULL	null
+Rx Frequency	03	Three times a day (TID)	tid	NULL	null
+Rx Frequency	02	Two times a day (BID)	twice a day	NULL	null
+Rx Frequency	02	Two times a day (BID)	twice daily	NULL	null
+smoking	06	NULL	4275495	Unknown if ever smoked	4141786
+smoking	04	NULL	4275495	Never smoker	4144272
+smoking	03	NULL	4275495	Former smoker	4310250
+smoking	02	NULL	4275495	Current someday smoker	4.28E+14
+smoking	01	NULL	4275495	Current everyday smoker	42709996
+smoking	05	NULL	4275495	Smoker current status unknown	4298794
+smoking	07	NULL	4275495	Heavy tobacco smoker	4044778
+smoking	07	NULL	4275495	Heavy tobacco smoker	4209006
+smoking	08	NULL	4275495	Light tobacco smoker	4209585
+tobacco	04	NULL	4005823	Passive or environmental exposure	4030580
+tobacco	03	NULL	4005823	Quit/Former smoker	45765917
+tobacco	02	NULL	4005823	Never	45765920
+tobacco	01	NULL	4005823	Current user	4005823
+tobacco type	03	NULL	4219336	Snuff tobacco	4218197
+tobacco type	03	NULL	4219336	Chewing tobacco	4219234
+tobacco type	04	NULL	4219336	None	4052465
+tobacco type	04	NULL	4219336	None	4218917
+tobacco type	01	NULL	4219336	Cigar smoking tobacco	4132133
+tobacco type	01	NULL	4219336	Cigarette smoking tobacco	4282779
+tobacco type	01	NULL	4219336	Pipe smoking tobacco	4224317
+tobacco type	01	NULL	4219336	Smoked tobacco only	4298794
 vx_manufacturer_source	SOL	Solvay Pharmaceuticals	NULL	NULL	NULL
 Encounter type	TH	NULL	581399	Telehealth	NULL
 Facility type	HOSPITAL_OUTPATIENT_HEMONC_CLINIC	HOSPITAL_OUTPATIENT_CLINIC-AMBULATORY_CARE-subset	8756	outpatient hospital Hematology Oncology	45756811
