@@ -63,7 +63,8 @@ insert into SITE_pedsnet.drug_exposure(
 	visit_occurrence_id)
 
 select
-	case when(isnumeric(dispense_sup::varchar)) then dispense_sup::numeric
+	case 
+		when(isnumeric(dispense_sup::varchar)) then dispense_sup::numeric
 	end as days_supply,	
 	0 as dispense_as_written_concept_id, 
 	coalesce(case 
@@ -79,7 +80,7 @@ select
 	null as drug_exposure_order_date,
 	null as drug_exposure_order_datetime,
 	case
-            when dispense_date is null then '0001-01-01'::date
+        when dispense_date is null then '0001-01-01'::date
 	    else dispense_date::date
 	end as drug_exposure_start_date,
 	case
@@ -92,11 +93,12 @@ select
 		when dispense_source = 'BI' then 44786630
 		else 44814653 
 	end as drug_source_concept_id,
-	'NDC' as drug_source_value,
+	disp.ndc as drug_source_value,
 	38000175 as drug_type_concept_id,
 	dispense_dose_disp::varchar as eff_drug_dose_source_value,
-	case when(isnumeric(dispense_dose_disp::varchar)) then dispense_dose_disp::numeric
-        end as effective_drug_dose,
+	case 
+		when(isnumeric(dispense_dose_disp::varchar)) then dispense_dose_disp::numeric
+    end as effective_drug_dose,
 	null as frequency,
 	null as lot_number,
 	person.person_id,
@@ -178,7 +180,8 @@ insert into SITE_pedsnet.drug_exposure(
 	visit_occurrence_id)
 
 select
-	case when isnumeric(rx_days_supply::varchar) then rx_days_supply::int
+	case 
+		when isnumeric(rx_days_supply::varchar) then rx_days_supply::int
 	end as days_supply,
 	case 
 		when rx_dispense_as_written='Y' then 4188539 -- Yes
@@ -199,12 +202,13 @@ select
 	rx_end_date::timestamp as drug_exposure_end_datetime,
 	nextval('SITE_pedsnet.drug_exposure_seq') AS drug_exposure_id,
 	rx_order_date::date as drug_exposure_order_date,
-	case when is_time(rx_order_time) then
-	(rx_order_date || ' '|| rx_order_time)::timestamp 
-	else rx_order_date::timestamp end as drug_exposure_order_datetime,
+	case 
+		when is_time(rx_order_time) then (rx_order_date || ' '|| rx_order_time)::timestamp 
+		else rx_order_date::timestamp 
+	end as drug_exposure_order_datetime,
 	case
-           when rx_start_date is null then '0001-01-01'::date
-           else rx_start_date::date
+        when rx_start_date is null then '0001-01-01'::date
+        else rx_start_date::date
 	end as drug_exposure_start_date,
 	case
 	    when rx_start_date is null then '0001-01-01'::timestamp
@@ -214,8 +218,9 @@ select
 	coalesce(left(raw_rx_med_name, 200),' ')||'|'||coalesce(rxnorm_cui,' ') as drug_source_value,
 	38000177 as drug_type_concept_id,
 	null as eff_drug_dose_source_value,
-	case when(isnumeric(rx_dose_ordered::varchar)) then rx_dose_ordered::numeric
-        end as effective_drug_dose,
+	case 
+		when(isnumeric(rx_dose_ordered::varchar)) then rx_dose_ordered::numeric
+    end as effective_drug_dose,
 	rx_frequency as frequency,
 	null as lot_number,
 	person.person_id as person_id,

@@ -29,7 +29,7 @@ SELECT
     substr(enc.facility_type, 1, 50) AS place_of_service_source_value,  -- ehr/encounter
     case when(isnumeric(facility_spec.value_as_concept_id::varchar)) then
 	facility_spec.value_as_concept_id::int when (isnumeric(prov_spec.source_concept_id::varchar)) then prov_spec.source_concept_id::int else 44814650 end  as speciality_concept_id,
-    coalesce(facility_spec.target_concept,prov_spec.concept_description,'') as specialty_source_value
+    coalesce(facility_spec.target_concept,prov_spec.concept_description,enc.facility_type) as specialty_source_value
 FROM SITE_pcornet.encounter enc
 left join SITE_pcornet.provider prov on prov.providerid = enc.providerid
 LEFT JOIN cdmh_staging.visit_xwalk vx ON vx.cdm_tbl = 'ENCOUNTER'

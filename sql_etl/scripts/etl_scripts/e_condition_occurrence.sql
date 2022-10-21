@@ -11,7 +11,6 @@ end;
 $$ language plpgsql;
 
 begin;
-
 -- problem_list
 INSERT INTO SITE_pedsnet.condition_occurrence(
         condition_concept_id,
@@ -60,19 +59,23 @@ SELECT
         end,
     44814650)::int as condition_source_concept_id,
     left(cond.condition,248) || ' | ' || cond.condition_type as condition_source_value,
-    case when is_date(cond.resolve_date::varchar) then cond.resolve_date::date
+    case 
+        when is_date(cond.resolve_date::varchar) then cond.resolve_date::date 
     end as condition_end_date,
-    case when is_date(cond.resolve_date::varchar) then cond.resolve_date::timestamp
+    case 
+        when is_date(cond.resolve_date::varchar) then cond.resolve_date::timestamp 
     end as condition_end_datetime,
     nextval('SITE_pedsnet.cond_occ_seq') as condition_occurrence_id,
-    case when is_date(cond.onset_date::varchar) then cond.onset_date::date
-    when is_date(cond.report_date::varchar) then cond.report_date::date
+    case 
+        when is_date(cond.onset_date::varchar) then cond.onset_date::date
+        when is_date(cond.report_date::varchar) then cond.report_date::date
     end as condition_start_date,
-    case when is_date(cond.onset_date::varchar) then cond.onset_date::timestamp
-    when is_date(cond.report_date::varchar) then cond.report_date::timestamp
+    case 
+        when is_date(cond.onset_date::varchar) then cond.onset_date::timestamp
+        when is_date(cond.report_date::varchar) then cond.report_date::timestamp
     end as condition_start_datetime,
     4230359 AS condition_status_concept_id,
-    cond.raw_condition_status AS condition_status_source_value,
+    coalesce(cond.CONDITION_STATUS,cond.raw_condition_status) AS condition_status_source_value,
     2000000089 as condition_type_concept_id,
     person.person_id AS person_id,   
     44814650 as poa_concept_id, 
@@ -99,13 +102,11 @@ left join vocabulary.concept_relationship cr_icd9
     and cr_icd9.relationship_id='Maps to'
 left join vocabulary.concept_relationship cr_icd10
     on c_icd10.concept_id = cr_icd10.concept_id_1
-    and cr_icd10.relationship_id='Maps to'
-;
-
+    and cr_icd10.relationship_id='Maps to';
 commit;
+
 begin;
 -- visit diagnoses
-
 INSERT INTO SITE_pedsnet.condition_occurrence(
         condition_concept_id,
         condition_occurrence_id,
@@ -159,7 +160,7 @@ SELECT
     when is_date(cond.admit_date::varchar) then cond.admit_date::timestamp
     end as condition_start_datetime,
     4230359 AS condition_status_concept_id,
-    cond.dx_source AS condition_status_source_value,
+    coalesce(cond.dx_source,cond.RAW_DX_SOURCE) AS condition_status_source_value,
     case 
         when enc_type='ED' and dx_origin='BI' and pdx='P'then 2000001282
         when enc_type='ED' and dx_origin='OD' and pdx='P'then 2000001280
@@ -179,11 +180,15 @@ SELECT
         when enc_type in ('IP','OS','IS','EI') and dx_origin='BI' and pdx='S'then 2000000099
         when enc_type in ('IP','OS','IS','EI') and dx_origin='OD' and pdx='S'then 2000000098
         when enc_type in ('IP','OS','IS','EI') and dx_origin='CL' and pdx='S'then 2000000100
-    else 
-        44814650
-    end  as condition_type_concept_id,
+    else 44814650
+    end as condition_type_concept_id,
     person.person_id AS person_id,   
-    coalesce(case when dx_poa='Y' then 4188539 else 4188540 end,44814650)::int as poa_concept_id, 
+    coalesce(
+        case 
+            when dx_poa='Y' then 4188539 
+            else 4188540 
+        end,
+        44814650)::int as poa_concept_id, 
     vo.provider_id as provider_id,   
     NULL as stop_reason,    
     vo.visit_occurrence_id as visit_occurrence_id
@@ -203,8 +208,5 @@ left join vocabulary.concept_relationship cr_icd9
     and cr_icd9.relationship_id='Maps to'
 left join vocabulary.concept_relationship cr_icd10
     on c_icd10.concept_id = cr_icd10.concept_id_1
-    and cr_icd10.relationship_id='Maps to'
-;
+    and cr_icd10.relationship_id='Maps to';
 commit;
-
-

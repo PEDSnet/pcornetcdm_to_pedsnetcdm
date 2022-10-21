@@ -182,7 +182,7 @@ SELECT
      null as measurement_result_date, 
      null as measurement_result_datetime, 
      0 AS measurement_source_concept_id,
-     coalesce(v_sys.raw_systolic,' ') AS measurement_source_value, 
+     coalesce(v_sys.raw_systolic,v_sys.systolic,' ') AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
      4172703 AS operator_concept_id, 
      person.person_id  AS person_id, 
@@ -266,7 +266,7 @@ SELECT
      null as measurement_result_date, 
      null as measurement_result_datetime, 
      coalesce(dia_con.source_concept_id::int, 3012888) AS measurement_source_concept_id,
-     coalesce(v_dia.raw_diastolic,' ') AS measurement_source_value, 
+     coalesce(v_dia.raw_diastolic,v_dia.diastolic,' ') AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
      4172703 AS operator_concept_id, 
      person.person_id  AS person_id, 
@@ -572,7 +572,7 @@ timestamp
                when lab.result_unit = 'kU/L' then 8810
                else units.source_concept_id::int
           end, 0) as unit_source_concept_id,  
-     lab.raw_unit as unit_source_value, 
+     lab.result_unit as unit_source_value, 
      case 
 		when lower(trim(result_qual)) = 'positive' then 45884084
 	     when lower(trim(result_qual)) = 'negative' then 45878583
@@ -770,7 +770,7 @@ SELECT distinct
      null::date as measurement_result_date, 
      null::timestamp as measurement_result_datetime, 
      coalesce(lnc.concept_id,0) AS measurement_source_concept_id,
-     coalesce(clin.raw_obsclin_name,lnc.concept_name,' ') AS measurement_source_value, 
+     coalesce(clin.raw_obsclin_name,clin.OBSCLIN_CODE,lnc.concept_name,' ') AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
      case 
           when clin.obsclin_result_modifier ='GE' then 4171755
@@ -883,7 +883,7 @@ SELECT distinct
      null::date as measurement_result_date, 
      null::timestamp as measurement_result_datetime, 
       coalesce(sm.concept_id,0) AS measurement_source_concept_id,
-     coalesce(clin.raw_obsclin_name,sm.concept_name,' ') AS measurement_source_value, 
+     coalesce(clin.raw_obsclin_name,clin.OBSCLIN_CODE,sm.concept_name,' ') AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
      case 
           when clin.obsclin_result_modifier ='GE' then 4171755

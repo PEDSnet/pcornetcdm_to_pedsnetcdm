@@ -1,7 +1,7 @@
 create sequence if not exists SITE_pedsnet.loc_seq;
 
+-- care site locations
 begin;
-
 INSERT INTO SITE_pedsnet.location(
     location_id,
     zip,
@@ -17,7 +17,10 @@ select
  FROM SITE_pcornet.encounter enc
  WHERE enc.facility_type IS NOT NULL
  GROUP BY facility_location;
+commit;
 
+-- address history locations
+begin;
 INSERT INTO SITE_pedsnet.location(
     location_id,
     city,
@@ -46,9 +49,26 @@ FROM
 	) as lds
 where zip is not null
 GROUP BY zip, address_city, address_state;
+commit;
+
+-- census block group locations
+begin;
+INSERT INTO SITE_pedsnet.location(
+    location_id,
+    location_source_value,
+    census_block_group)
+select 
+ 	nextval('SITE_pedsnet.loc_seq') AS location_id,
+    'census block group | ' || GEOCODE_BLOCK as location_source_value,
+    GEOCODE_BLOCK as census_block_group
+ FROM 
+    SITE_pcornet.PRIVATE_ADDRESS_GEOCODE
+ GROUP BY 
+    GEOCODE_BLOCK;
+commit;
 
  -- default location
-
+ begin;
  INSERT INTO SITE_pedsnet.location(
     location_id)
  values(9999999);

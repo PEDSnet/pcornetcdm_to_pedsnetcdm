@@ -73,10 +73,12 @@ select
 	imm.vx_body_site as imm_body_site_source_value, 
 	coalesce(unit_map.source_concept_id::int, 44814653) as imm_dose_unit_concept_id, 
 	imm.vx_dose_unit as imm_dose_unit_source_value,
-        case when is_date(imm.vx_exp_date::varchar) 
-		then imm.vx_exp_date::date end as imm_exp_date,
-        case when is_date(imm.vx_exp_date::varchar)	
-	 	then imm.vx_exp_date::timestamp end as imm_exp_datetime, 
+    case 
+		when is_date(imm.vx_exp_date::varchar) then imm.vx_exp_date::date 
+	end as imm_exp_date,
+    case 
+		when is_date(imm.vx_exp_date::varchar) then imm.vx_exp_date::timestamp 
+	end as imm_exp_datetime, 
 	imm.vx_lot_num as imm_lot_num, 
 	imm.vx_manufacturer as imm_manufacturer, 
 	imm.vx_record_date as imm_recorded_date, 
@@ -111,7 +113,7 @@ select
             when imm.vx_code_type='OT' then 44814649
       else 0 
 	end, 0) as immunization_source_concept_id, 
-	coalesce(imm.raw_vx_name,'')||'|'||coalesce(imm.raw_vx_code,'') as immunization_source_value, 
+	coalesce(imm.raw_vx_name,'')||'|'||coalesce(imm.vx_code,'') as immunization_source_value, 
 	case 
 		when vx_source='OD' then 2000001288
 		when vx_source='EF' then 2000001289

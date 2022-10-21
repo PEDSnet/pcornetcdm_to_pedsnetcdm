@@ -168,7 +168,7 @@ SELECT
      (vt.measure_date|| ' '|| vt.measure_time)::timestamp AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
-     'Tobacco|'||vt.tobacco||'|'||coalesce(vt.raw_tobacco,' '),
+     'Tobacco|'||vt.tobacco||'|'||coalesce(vt.raw_tobacco,' ') as observation_source_value,
      38000280 AS observation_type_concept_id,
      vo.person_id AS person_id,
      vo.provider_id AS provider_id,
@@ -185,7 +185,7 @@ SELECT
           when tobacco='NI' then 44814650 --No information
           when tobacco='UN' then 44814649 --Unknown
           when tobacco='OT' then 44814653 --Other
-         end as value_as_concept_id,           
+     end as value_as_concept_id,           
      NULL AS value_as_number,
      NULL AS value_as_string,
      tobacco as value_source_value,
@@ -223,7 +223,7 @@ SELECT
      (vt.measure_date|| ' '|| vt.measure_time)::timestamp AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
-     'Tobacco Type|'||vt.tobacco_type||'|'||coalesce(vt.raw_tobacco_type,' '),
+     'Tobacco Type|'||vt.tobacco_type||'|'||coalesce(vt.raw_tobacco_type,' ') as observation_source_value,
      38000280 AS observation_type_concept_id,
      vo.person_id AS person_id,
      vo.provider_id AS provider_id,
@@ -307,4 +307,3 @@ inner join SITE_pedsnet.visit_occurrence vo
 WHERE vt.smoking is not null;
 
 commit;
-
