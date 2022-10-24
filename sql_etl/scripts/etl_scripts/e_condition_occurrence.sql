@@ -32,6 +32,77 @@ INSERT INTO SITE_pedsnet.condition_occurrence(
 SELECT 
     coalesce(
         case
+            --covid diagnosis codes
+            when cond.condition = '398447004' then 320651::int
+            when cond.condition = '713084008' then 37016927::int
+            when cond.condition = '1240521000000100' then 37310254::int
+            when cond.condition = '1240441000000100' then 37310260::int
+            when cond.condition = '1240571000000100' then 37310283::int
+            when cond.condition = '1240561000000100' then 37310284::int
+            when cond.condition = '1240551000000100' then 37310285::int
+            when cond.condition = '1240541000000100' then 37310286::int
+            when cond.condition = '1240531000000100' then 37310287::int
+            when cond.condition = '840546002' then 37311059::int
+            when cond.condition = '840539006' then 37311061::int
+            when cond.condition = '441590008' then 40479642::int
+            when cond.condition = '444482005' then 40479782::int
+            when cond.condition = '408688009' then 4248811::int
+            when cond.condition = '186747009' then 439676::int
+            when cond.condition = '702547000' then 45765578::int
+            when cond.condition = 'OMOP4873948' then 756022::int
+            when cond.condition = 'OMOP4873906' then 756023::int
+            when cond.condition = 'OMOP4873964' then 756027::int
+            when cond.condition = 'OMOP4873909' then 756031::int
+            when cond.condition = 'OMOP4873949' then 756035::int
+            when cond.condition = 'OMOP4873953' then 756037::int
+            when cond.condition = 'OMOP4873907' then 756039::int
+            when cond.condition = 'OMOP4873957' then 756041::int
+            when cond.condition = 'OMOP4873911' then 756044::int
+            when cond.condition = 'OMOP4873954' then 756045::int
+            when cond.condition = 'OMOP4873958' then 756047::int
+            when cond.condition = 'OMOP4873947' then 756050::int
+            when cond.condition = 'OMOP4873910' then 756061::int
+            when cond.condition = 'OMOP4873951' then 756062::int
+            when cond.condition = 'OMOP4873946' then 756064::int
+            when cond.condition = 'OMOP4873950' then 756068::int
+            when cond.condition = 'OMOP4873959' then 756069::int
+            when cond.condition = 'OMOP4873956' then 756072::int
+            when cond.condition = 'OMOP4873952' then 756075::int
+            when cond.condition = 'OMOP4873961' then 756076::int
+            when cond.condition = 'OMOP4873960' then 756077::int
+            when cond.condition = 'OMOP4873955' then 756079::int
+            when cond.condition = 'OMOP4873908' then 756081::int
+            when cond.condition = 'OMOP4873963' then 756082::int
+            when cond.condition = 'OMOP4873962' then 756083::int
+            when cond.condition = '840544004' then 37311060::int
+            when cond.condition = '840533007' then 37311065::int
+            when cond.condition = 'OMOP4912978' then 704996::int
+            when cond.condition = '138389411000119000' then 3661405::int
+            when cond.condition = '674814021000119000' then 3661406::int
+            when cond.condition = '882784691000119000' then 3661408::int
+            when cond.condition = '189486241000119000' then 3662381::int
+            when cond.condition = '880529761000119000' then 3663281::int
+            when cond.condition = '870588003' then 3655975::int
+            when cond.condition = '870590002' then 3655976::int
+            when cond.condition = '870591003' then 3655977::int
+            when cond.condition = '119731000146105' then 3656667::int
+            when cond.condition = '119741000146102' then 3656668::int
+            when cond.condition = '119981000146107' then 3656669::int
+            when cond.condition = '866152006' then 3661632::int
+            when cond.condition = '870589006' then 3661748::int
+            when cond.condition = '119751000146104' then 3661885::int
+            when cond.condition = '292508471000119000' then 3661980::int
+            when cond.condition = '870577009' then 3655973::int
+            when cond.condition = '1240581000000100' then 37310282::int
+            when cond.condition = '870577009' then 3655973::int
+            --misc codes
+            when cond.condition = 'OMOP5042964' then 703578::int
+            when cond.condition = 'M35.81' then 713856::int
+            when cond.condition = 'U10' then 931072::int
+            when cond.condition = 'U10.9' then 931073::int
+            --pasc code
+            when cond.condition = 'U09.9' then 766503::int
+            --derivation via condition_type and OMOP vocabulary
             when cond.condition_type='09' or cond.condition_type='ICD09' then cr_icd9.concept_id_2
             when cond.condition_type='10' or cond.condition_type='ICD10' then cr_icd10.concept_id_2
             when cond.condition_type='SM' then c_snomed.concept_id
@@ -86,6 +157,7 @@ FROM (
     select *
     from SITE_pcornet.condition
     where encounterid is not null
+    and condition <> 'COVID'
 ) as cond
 inner join SITE_pedsnet.person person 
     on cond.patid=person.person_source_value
@@ -125,6 +197,77 @@ INSERT INTO SITE_pedsnet.condition_occurrence(
 SELECT 
     coalesce(
         case
+            --covid diagnosis codes
+            when cond.dx = '398447004' then 320651::int
+            when cond.dx = '713084008' then 37016927::int
+            when cond.dx = '1240521000000100' then 37310254::int
+            when cond.dx = '1240441000000100' then 37310260::int
+            when cond.dx = '1240571000000100' then 37310283::int
+            when cond.dx = '1240561000000100' then 37310284::int
+            when cond.dx = '1240551000000100' then 37310285::int
+            when cond.dx = '1240541000000100' then 37310286::int
+            when cond.dx = '1240531000000100' then 37310287::int
+            when cond.dx = '840546002' then 37311059::int
+            when cond.dx = '840539006' then 37311061::int
+            when cond.dx = '441590008' then 40479642::int
+            when cond.dx = '444482005' then 40479782::int
+            when cond.dx = '408688009' then 4248811::int
+            when cond.dx = '186747009' then 439676::int
+            when cond.dx = '702547000' then 45765578::int
+            when cond.dx = 'OMOP4873948' then 756022::int
+            when cond.dx = 'OMOP4873906' then 756023::int
+            when cond.dx = 'OMOP4873964' then 756027::int
+            when cond.dx = 'OMOP4873909' then 756031::int
+            when cond.dx = 'OMOP4873949' then 756035::int
+            when cond.dx = 'OMOP4873953' then 756037::int
+            when cond.dx = 'OMOP4873907' then 756039::int
+            when cond.dx = 'OMOP4873957' then 756041::int
+            when cond.dx = 'OMOP4873911' then 756044::int
+            when cond.dx = 'OMOP4873954' then 756045::int
+            when cond.dx = 'OMOP4873958' then 756047::int
+            when cond.dx = 'OMOP4873947' then 756050::int
+            when cond.dx = 'OMOP4873910' then 756061::int
+            when cond.dx = 'OMOP4873951' then 756062::int
+            when cond.dx = 'OMOP4873946' then 756064::int
+            when cond.dx = 'OMOP4873950' then 756068::int
+            when cond.dx = 'OMOP4873959' then 756069::int
+            when cond.dx = 'OMOP4873956' then 756072::int
+            when cond.dx = 'OMOP4873952' then 756075::int
+            when cond.dx = 'OMOP4873961' then 756076::int
+            when cond.dx = 'OMOP4873960' then 756077::int
+            when cond.dx = 'OMOP4873955' then 756079::int
+            when cond.dx = 'OMOP4873908' then 756081::int
+            when cond.dx = 'OMOP4873963' then 756082::int
+            when cond.dx = 'OMOP4873962' then 756083::int
+            when cond.dx = '840544004' then 37311060::int
+            when cond.dx = '840533007' then 37311065::int
+            when cond.dx = 'OMOP4912978' then 704996::int
+            when cond.dx = '138389411000119000' then 3661405::int
+            when cond.dx = '674814021000119000' then 3661406::int
+            when cond.dx = '882784691000119000' then 3661408::int
+            when cond.dx = '189486241000119000' then 3662381::int
+            when cond.dx = '880529761000119000' then 3663281::int
+            when cond.dx = '870588003' then 3655975::int
+            when cond.dx = '870590002' then 3655976::int
+            when cond.dx = '870591003' then 3655977::int
+            when cond.dx = '119731000146105' then 3656667::int
+            when cond.dx = '119741000146102' then 3656668::int
+            when cond.dx = '119981000146107' then 3656669::int
+            when cond.dx = '866152006' then 3661632::int
+            when cond.dx = '870589006' then 3661748::int
+            when cond.dx = '119751000146104' then 3661885::int
+            when cond.dx = '292508471000119000' then 3661980::int
+            when cond.dx = '870577009' then 3655973::int
+            when cond.dx = '1240581000000100' then 37310282::int
+            when cond.dx = '870577009' then 3655973::int
+            --misc codes
+            when cond.dx = 'OMOP5042964' then 703578::int
+            when cond.dx = 'M35.81' then 713856::int
+            when cond.dx = 'U10' then 931072::int
+            when cond.dx = 'U10.9' then 931073::int
+            --pasc code
+            when cond.dx = 'U09.9' then 766503::int
+            --derive by dx_type
             when cond.dx_type='09' or cond.dx_type='ICD09' then cr_icd9.concept_id_2
             when cond.dx_type='10' or cond.dx_type='ICD10' then cr_icd10.concept_id_2
             when cond.dx_type='SM' then c_snomed.concept_id

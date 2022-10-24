@@ -87,6 +87,14 @@ select
 	imm.vx_route as imm_route_source_value, 
 	coalesce(
 		case
+			when imm.VX_CODE = '207' then 724906::int
+			when imm.VX_CODE = '208' then 724907::int
+			when imm.VX_CODE = '210' then 724905::int
+			when imm.VX_CODE = '213' then 724904::int
+			when imm.VX_CODE = '212' then 702866::int
+			when imm.VX_CODE = '217' then 702677::int
+			when imm.VX_CODE = '218' then 702678::int
+			when imm.VX_CODE = '211' then 702679::int
             when c_hcpcs.concept_id is not null then c_hcpcs.concept_id
             when imm.vx_code_type='CH' then c_cpt.concept_id
             when imm.vx_code_type='CX' then c_cvx.concept_id
