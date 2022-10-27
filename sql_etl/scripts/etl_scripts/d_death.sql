@@ -40,8 +40,9 @@ SELECT
 		44814650)::int as cause_source_concept_id,
 	dc.death_cause as cause_source_value,
 	nextval('SITE_pedsnet.death_seq') as death_cause_id,
-	case when d.death_date is not null then d.death_date::date end as death_date,
-	case when d.death_date is not null then (d.death_date::date ||' 00:00:00')::timestamp end as death_datetime,
+	case when d.death_date is not null then d.death_date::date
+        else '0001-01-01'::date end as death_date,
+		case when d.death_date is not null then (d.death_date::date ||' 00:00:00')::timestamp else '0001-01-01'::timestamp end as death_datetime,
 	coalesce (impu.source_concept_id::int, 44814650)  as death_impute_concept_id, 
 	coalesce(dt.target_concept_id,0) as death_type_concept_id,
 	person.person_id as person_id

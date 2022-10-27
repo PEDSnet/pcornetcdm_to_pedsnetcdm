@@ -14,7 +14,7 @@ with payer_info as (
 select
 	split_part(source_concept_id,'-',1) as plan_class,
 	split_part(source_concept_id,'-',2)as plan_type,
-	coalesce(raw_payer_name_primary,source_concept_id) as plan_name,
+	coalesce(raw_payer_name_primary,source_concept_id,' ') as plan_name,
 	vo.visit_occurrence_id,
 	31968::int as visit_payer_type_concept_id -- primary
 from SITE_pcornet.encounter enc
@@ -42,7 +42,7 @@ union
 select
 	split_part(source_concept_id,'-',1) as plan_class,
 	split_part(source_concept_id,'-',2)as plan_type,
-	coalesce(raw_payer_name_secondary,source_concept_id) as plan_name,
+	coalesce(raw_payer_name_secondary,source_concept_id, ' ') as plan_name,
 	vo.visit_occurrence_id,
 	31969::int as visit_payer_type_concept_id -- secondary
 from SITE_pcornet.encounter enc
