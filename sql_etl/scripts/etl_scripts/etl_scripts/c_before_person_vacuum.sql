@@ -1,1 +1,0 @@
-VACUUM (VERBOSE, ANALYZE) SITE_pedsnet.person_primary_provider;
