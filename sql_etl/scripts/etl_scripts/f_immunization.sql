@@ -105,8 +105,8 @@ select
             when imm.vx_code_type='OT' then 44814649
       		else 0 
 		end, 0) as immunization_concept_id,
-	coalesce(imm.vx_admin_date,imm.vx_record_date) as immunization_date,
-	coalesce(imm.vx_admin_date,imm.vx_record_date)::timestamp as immunization_datetime,
+	coalesce(imm.vx_admin_date,imm.vx_record_date,'0001-01-01')::date as immunization_date,
+	coalesce(imm.vx_admin_date,imm.vx_record_date,'0001-01-01')::timestamp as immunization_datetime,
 	imm.vx_dose as dose,
 	nextval('SITE_pedsnet.imm_seq') as immunization_id,
 	coalesce(	
