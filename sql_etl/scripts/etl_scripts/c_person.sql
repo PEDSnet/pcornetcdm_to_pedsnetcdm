@@ -98,14 +98,7 @@ with x_walk as (
         on loc.census_block_group = geo.GEOCODE_BLOCK
 )
  Update SITE_pedsnet.person p
-<<<<<<< HEAD
  set location_id = x_walk.location_id
  from x_walk
  where p.person_id::varchar = x_walk.patid;
  commit;
-=======
- set p.location_id = x_walk.location_id
- from x_walk
- where p.person_id::varchar = x_walk.patid;
- commit;
->>>>>>> 4c6cd1397f9f7e77ed070314a30b877f90ff8643

@@ -138,7 +138,6 @@ SELECT
     end as condition_end_datetime,
     nextval('SITE_pedsnet.cond_occ_seq') as condition_occurrence_id,
     case 
-<<<<<<< HEAD
         when cond.onset_date::varchar is not null and is_date(cond.onset_date::varchar) then cond.onset_date::date
         when cond.report_date is not null and is_date(cond.report_date::varchar) then cond.report_date::date
 	else '0001-01-01'::date
@@ -147,14 +146,6 @@ SELECT
         when cond.onset_date is not null and is_date(cond.onset_date::varchar) then cond.onset_date::timestamp
         when cond.report_date is not null and is_date(cond.report_date::varchar) then cond.report_date::timestamp
 	else '0001-01-01'::timestamp
-=======
-        when is_date(cond.onset_date::varchar) then cond.onset_date::date
-        when is_date(cond.report_date::varchar) then cond.report_date::date
-    end as condition_start_date,
-    case 
-        when is_date(cond.onset_date::varchar) then cond.onset_date::timestamp
-        when is_date(cond.report_date::varchar) then cond.report_date::timestamp
->>>>>>> 4c6cd1397f9f7e77ed070314a30b877f90ff8643
     end as condition_start_datetime,
     4230359 AS condition_status_concept_id,
     coalesce(cond.CONDITION_STATUS,cond.raw_condition_status) AS condition_status_source_value,
@@ -307,14 +298,9 @@ SELECT
         end,
     44814650)::int as condition_source_concept_id,
     left(cond.dx,248) || ' | ' || dx_type as condition_source_value,
-<<<<<<< HEAD
     case when cond.dx_date is not null and is_date(cond.dx_date::varchar) then cond.dx_date::date
     when cond.admit_date is not null and is_date(cond.admit_date::varchar) then cond.admit_date::date
     else '0001-01-01'::date
-=======
-    case when is_date(cond.dx_date::varchar) then cond.dx_date::date
-    when is_date(cond.admit_date::varchar) then cond.admit_date::date
->>>>>>> 4c6cd1397f9f7e77ed070314a30b877f90ff8643
     end as condition_start_date,
     case when cond.dx_date is not null and is_date(cond.dx_date::varchar) then cond.dx_date::timestamp
     when cond.admit_date is not null and is_date(cond.admit_date::varchar) then cond.admit_date::timestamp
@@ -370,8 +356,4 @@ left join vocabulary.concept_relationship cr_icd9
 left join vocabulary.concept_relationship cr_icd10
     on c_icd10.concept_id = cr_icd10.concept_id_1
     and cr_icd10.relationship_id='Maps to';
-<<<<<<< HEAD
 commit;
-=======
-commit;
->>>>>>> 4c6cd1397f9f7e77ed070314a30b877f90ff8643

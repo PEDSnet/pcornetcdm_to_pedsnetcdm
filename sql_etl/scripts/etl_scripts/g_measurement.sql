@@ -182,11 +182,7 @@ SELECT
      null as measurement_result_date, 
      null as measurement_result_datetime, 
      0 AS measurement_source_concept_id,
-<<<<<<< HEAD
      coalesce(v_sys.raw_systolic,v_sys.systolic::varchar,' ') AS measurement_source_value, 
-=======
-     coalesce(v_sys.raw_systolic,v_sys.systolic,' ') AS measurement_source_value, 
->>>>>>> 4c6cd1397f9f7e77ed070314a30b877f90ff8643
      2000000033 as measurement_type_concept_id, 
      4172703 AS operator_concept_id, 
      person.person_id  AS person_id, 
@@ -270,11 +266,7 @@ SELECT
      null as measurement_result_date, 
      null as measurement_result_datetime, 
      coalesce(dia_con.source_concept_id::int, 3012888) AS measurement_source_concept_id,
-<<<<<<< HEAD
      coalesce(v_dia.raw_diastolic,v_dia.diastolic::varchar,' ') AS measurement_source_value, 
-=======
-     coalesce(v_dia.raw_diastolic,v_dia.diastolic,' ') AS measurement_source_value, 
->>>>>>> 4c6cd1397f9f7e77ed070314a30b877f90ff8643
      2000000033 as measurement_type_concept_id, 
      4172703 AS operator_concept_id, 
      person.person_id  AS person_id, 

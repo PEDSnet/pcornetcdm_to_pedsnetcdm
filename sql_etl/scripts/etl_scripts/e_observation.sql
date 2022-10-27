@@ -322,8 +322,4 @@ inner join SITE_pedsnet.visit_occurrence vo
      on vt.encounterid=vo.visit_source_value
 WHERE vt.smoking is not null;
 
-<<<<<<< HEAD
 commit;
-=======
-commit;
->>>>>>> 4c6cd1397f9f7e77ed070314a30b877f90ff8643
