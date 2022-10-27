@@ -32,11 +32,13 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      44813951 AS observation_concept_id,
-     case when is_date(enc.discharge_date::varchar) then enc.discharge_date::date
-     when is_date(enc.admit_date::varchar) then enc.admit_date:: date
+     case when enc.discharge_date is not null and  is_date(enc.discharge_date::varchar) then enc.discharge_date::date
+     when enc.admit_date is not null and is_date(enc.admit_date::varchar) then enc.admit_date:: date
+     else '0001-01-01'::date
      end AS observation_date,
      case when is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
-     when is_date(enc.admit_date::varchar) then enc.admit_date:: timestamp
+     when enc.admit_date is not null and is_date(enc.admit_date::varchar) then enc.admit_date:: timestamp
+     else '0001-01-01'::timestamp
      end  AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
@@ -89,11 +91,13 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      3040464 AS observation_concept_id,
-     case when is_date(enc.discharge_date::varchar) then enc.discharge_date::date
-     when is_date(enc.admit_date::varchar) then enc.admit_date::date
+     case when enc.discharge_date is not null and is_date(enc.discharge_date::varchar) then enc.discharge_date::date
+     when enc.admit_date is not null and is_date(enc.admit_date::varchar) then enc.admit_date::date
+     else '0001-01-01'::date
      end AS observation_date,
-     case when is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
-     when is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
+     case when enc.discharge_date is not null and is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
+     when enc.admit_date is not null and is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
+     else '0001-01-01'::timestamp
      end AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
@@ -164,11 +168,15 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      4005823 AS observation_concept_id,
-     vt.measure_date::date AS observation_date,
-     (vt.measure_date|| ' '|| vt.measure_time)::timestamp AS observation_datetime,
+     case when vt.measure_date is not null then vt.measure_date::date
+     else '0001-01-01'::date
+     end AS observation_date,
+     case when vt.measure_time is not null and vt.measure_date is not null then
+     (vt.measure_date || ' '|| vt.measure_time)::timestamp
+     else '0001-01-01'::timestamp end AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
-     'Tobacco|'||vt.tobacco||'|'||coalesce(vt.raw_tobacco,' '),
+     'Tobacco|'||vt.tobacco||'|'||coalesce(vt.raw_tobacco,' ') as observation_source_value,
      38000280 AS observation_type_concept_id,
      vo.person_id AS person_id,
      vo.provider_id AS provider_id,
@@ -185,7 +193,7 @@ SELECT
           when tobacco='NI' then 44814650 --No information
           when tobacco='UN' then 44814649 --Unknown
           when tobacco='OT' then 44814653 --Other
-         end as value_as_concept_id,           
+     end as value_as_concept_id,           
      NULL AS value_as_number,
      NULL AS value_as_string,
      tobacco as value_source_value,
@@ -219,11 +227,15 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      4219336 AS observation_concept_id,
-     vt.measure_date::date AS observation_date,
-     (vt.measure_date|| ' '|| vt.measure_time)::timestamp AS observation_datetime,
+     case when vt.measure_date is not null then
+     vt.measure_date::date 
+     else '0001-01-01':: date end AS observation_date,
+     case when vt.measure_time is not null and vt.measure_date is not null then
+     (vt.measure_date|| ' '|| vt.measure_time)::timestamp
+     else '0001-01-01'::timestamp end  AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
-     'Tobacco Type|'||vt.tobacco_type||'|'||coalesce(vt.raw_tobacco_type,' '),
+     'Tobacco Type|'||vt.tobacco_type||'|'||coalesce(vt.raw_tobacco_type,' ') as observation_source_value,
      38000280 AS observation_type_concept_id,
      vo.person_id AS person_id,
      vo.provider_id AS provider_id,
@@ -274,8 +286,12 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      4275495 AS observation_concept_id,
-     vt.measure_date::date AS observation_date,
-     (vt.measure_date|| ' '|| vt.measure_time)::timestamp AS observation_datetime,
+     case when vt.measure_date is not null then vt.measure_date::date
+        else '0001-01-01'::date	
+	end AS observation_date,
+     case when vt.measure_time is not null and vt.measure_date is not null then
+     (vt.measure_date || ' '|| vt.measure_time)::timestamp
+      else '0001-01-01'::timestamp end AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
      'Smoking|'||vt.smoking||'|'||coalesce(vt.raw_smoking,' ') AS observation_source_value,
@@ -307,4 +323,3 @@ inner join SITE_pedsnet.visit_occurrence vo
 WHERE vt.smoking is not null;
 
 commit;
-
