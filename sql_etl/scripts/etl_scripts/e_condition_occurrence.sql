@@ -95,6 +95,7 @@ SELECT
             when cond.condition = '870577009' then 3655973::int
             when cond.condition = '1240581000000100' then 37310282::int
             when cond.condition = '870577009' then 3655973::int
+            when cond.condition = 'Z86.16' then 3661980::int
             --misc codes
             when cond.condition = 'OMOP5042964' then 703578::int
             when cond.condition = 'M35.81' then 713856::int
@@ -262,6 +263,7 @@ SELECT
             when cond.dx = '870577009' then 3655973::int
             when cond.dx = '1240581000000100' then 37310282::int
             when cond.dx = '870577009' then 3655973::int
+            when cond.dx = 'Z86.16' then 3661980::int
             --misc codes
             when cond.dx = 'OMOP5042964' then 703578::int
             when cond.dx = 'M35.81' then 713856::int
