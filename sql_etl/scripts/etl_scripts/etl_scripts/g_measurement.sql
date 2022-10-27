@@ -48,7 +48,7 @@ SELECT distinct
      'cm (converted from inches)' AS unit_source_value, 
      NULL AS value_as_concept_id,
      case when isnumeric(v_ht.ht::varchar) then
-	(v_ht.ht::numeric*2.54) end AS value_as_number,
+	(v_ht.ht::numeric*2.54) end AS value_as_number, 
      v_ht.ht AS value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id 
 FROM SITE_pcornet.vital v_ht
@@ -67,7 +67,7 @@ measurement_order_date, measurement_order_datetime, measurement_result_date, mea
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high, range_high_operator_concept_id, 
 range_high_source_value, range_low, range_low_operator_concept_id, range_low_source_value, specimen_concept_id, 
-specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id, value_as_number,value_source_value,
+specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
 visit_occurrence_id)
 select measurement_concept_id, measurement_date, measurement_datetime, nextval('SITE_pedsnet.measurement_id_seq') as measurement_id, 
 measurement_order_date::date, measurement_order_datetime::timestamp, measurement_result_date::date, measurement_result_datetime::timestamp, 
@@ -87,7 +87,7 @@ range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id:
 specimen_source_value, unit_concept_id,unit_source_concept_id, unit_source_value, value_as_concept_id::int,
  case when isnumeric(value_as_number::varchar) 
 	then value_as_number::numeric end as value_as_number, 
-value_source_value,
+ value_source_value,
 visit_occurrence_id
 from SITE_pedsnet.meas_vital_ht;
 
@@ -125,8 +125,8 @@ SELECT
      'kg (converted from pounds)' AS unit_source_value, 
      NULL AS value_as_concept_id,
      case when isnumeric(v_wt.wt::varchar) then (v_wt.wt::numeric*0.453592)
-     end AS value_as_number,
-     v_wt.wt as value_source_value,
+     end AS value_as_number, 
+     v_wt.wt AS value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.vital v_wt
 left join SITE_pcornet.encounter enc on enc.encounterid = v_wt.encounterid
@@ -164,7 +164,7 @@ end as range_low,
 specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id::int,
 case when (isnumeric(value_as_number::varchar)) then
         value_as_number::numeric end AS value_as_number,
-	value_source_value,
+value_source_value,
 visit_occurrence_id
 from SITE_pedsnet.meas_vital_wt;
 
@@ -182,11 +182,7 @@ SELECT
      null as measurement_result_date, 
      null as measurement_result_datetime, 
      0 AS measurement_source_concept_id,
-<<<<<<< HEAD
-     coalesce(v_sys.raw_systolic,v_sys.systolic::varchar,' ') AS measurement_source_value, 
-=======
      coalesce(v_sys.raw_systolic,v_sys.systolic,' ') AS measurement_source_value, 
->>>>>>> 4c6cd1397f9f7e77ed070314a30b877f90ff8643
      2000000033 as measurement_type_concept_id, 
      4172703 AS operator_concept_id, 
      person.person_id  AS person_id, 
@@ -207,7 +203,7 @@ SELECT
      NULL AS value_as_concept_id,
      case when (isnumeric(v_sys.systolic::varchar)) then
         v_sys.systolic::numeric end AS value_as_number,
-     v_sys.systolic as value_source_value,
+     v_sys.raw_systolic AS value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.vital v_sys
 left join SITE_pcornet.encounter enc on enc.encounterid = v_sys.encounterid
@@ -252,7 +248,7 @@ range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id:
 specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id::int, 
 case when isnumeric(value_as_number::varchar)
         then value_as_number::numeric end as value_as_number,
-	value_source_value,
+value_source_value,
 visit_occurrence_id
 from SITE_pedsnet.meas_vital_sys;
 
@@ -270,11 +266,7 @@ SELECT
      null as measurement_result_date, 
      null as measurement_result_datetime, 
      coalesce(dia_con.source_concept_id::int, 3012888) AS measurement_source_concept_id,
-<<<<<<< HEAD
-     coalesce(v_dia.raw_diastolic,v_dia.diastolic::varchar,' ') AS measurement_source_value, 
-=======
      coalesce(v_dia.raw_diastolic,v_dia.diastolic,' ') AS measurement_source_value, 
->>>>>>> 4c6cd1397f9f7e77ed070314a30b877f90ff8643
      2000000033 as measurement_type_concept_id, 
      4172703 AS operator_concept_id, 
      person.person_id  AS person_id, 
@@ -397,7 +389,7 @@ measurement_order_date, measurement_order_datetime, measurement_result_date, mea
 measurement_source_concept_id, measurement_source_value, measurement_type_concept_id, operator_concept_id, person_id, 
 priority_concept_id, priority_source_value, provider_id, range_high, range_high_operator_concept_id, 
 range_high_source_value, range_low, range_low_operator_concept_id, range_low_source_value, specimen_concept_id, 
-specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id, value_as_number,value_source_value,
+specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id, value_as_number, value_source_value,
 visit_occurrence_id)
 select measurement_concept_id, measurement_date, measurement_datetime, nextval('SITE_pedsnet.measurement_id_seq') as measurement_id, 
 measurement_order_date::date, measurement_order_datetime::timestamp, measurement_result_date::date, measurement_result_datetime::timestamp, 
@@ -949,12 +941,9 @@ with
              and standard_concept='S')    
 SELECT distinct
      nextval('SITE_pedsnet.measurement_id_seq') AS measurement_id,
-     coalesce(lnc.concept_id,0) AS measurement_concept_id,
-     case when clin.obsclin_start_date is not null then clin.obsclin_start_date
-     else '0001-01-01'::date end AS measurement_date,
-     case when clin.obsclin_start_date is not null and clin.obsclin_start_time is not null then	(clin.obsclin_start_date || ' '|| clin.obsclin_start_time)::timestamp 
-     when clin.obsclin_start_date is not null then clin.obsclin_start_date::timestamp
-     else '0001-01-01'::timestamp end AS measurement_datetime, 
+     coalesce(lnc.concept_id,0) AS measurement_concept_id, 
+     clin.obsclin_start_date AS measurement_date, 
+     (clin.obsclin_start_date || ' '|| clin.obsclin_start_time)::timestamp AS measurement_datetime, 
      null::date as measurement_order_date, 
      null::timestamp as measurement_order_datetime, 
      null::date as measurement_result_date, 
@@ -1066,10 +1055,8 @@ with
 SELECT distinct
      nextval('SITE_pedsnet.measurement_id_seq') AS measurement_id,
      coalesce(sm.concept_id,0) AS measurement_concept_id, 
-     case when clin.obsclin_start_date is not null then clin.obsclin_start_date      else '0001-01-01'::date end AS measurement_date,
-     case when clin.obsclin_start_date is not null and clin.obsclin_start_time is not null then (clin.obsclin_start_date || ' '|| clin.obsclin_start_time)::timestamp
-     when clin.obsclin_start_date is not null then clin.obsclin_start_date::timestamp
-     else '0001-01-01'::timestamp end AS measurement_datetime,
+     clin.obsclin_start_date AS measurement_date, 
+     (clin.obsclin_start_date || ' '|| clin.obsclin_start_time)::timestamp AS measurement_datetime, 
      null::date as measurement_order_date, 
      null::timestamp as measurement_order_datetime, 
      null::date as measurement_result_date, 
