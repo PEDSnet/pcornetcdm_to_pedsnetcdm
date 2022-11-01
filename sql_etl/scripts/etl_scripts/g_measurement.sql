@@ -287,7 +287,7 @@ SELECT
      NULL AS value_as_concept_id,
      case when isnumeric(v_dia.diastolic::varchar)
         then v_dia.diastolic::numeric end as value_as_number,
-     dia_con.concept_description AS value_source_value,
+     coalesce(dia_con.concept_description,' ') AS value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.vital v_dia
 left join SITE_pcornet.encounter enc on enc.encounterid = v_dia.encounterid
@@ -660,6 +660,7 @@ timestamp
      vo.provider_id as provider_id,
      case
         when lab.norm_range_high !~ '^[0-9\.]+$' then null
+	when not isnumeric(lab.norm_range_high::text) then null 
         else lab.norm_range_high::numeric
      end as range_high,
      coalesce(
@@ -670,6 +671,7 @@ timestamp
      null as range_high_source_value,
      case
         when lab.norm_range_low !~ '^[0-9\.]+$' then null
+	when not isnumeric(lab.norm_range_low::text) then null
         else lab.norm_range_low::numeric 
      end as range_low,
      coalesce(
@@ -994,7 +996,7 @@ SELECT distinct
 	clin.obsclin_result_num::numeric end AS value_as_number, 
      coalesce(clin.obsclin_result_text,
                  clin.obsclin_result_qual,
-                 clin.obsclin_result_num::text) AS value_source_value,
+                 clin.obsclin_result_num::text,' ') AS value_source_value,
     vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.obs_clin clin
 inner join SITE_pedsnet.person person on clin.patid=person.person_source_value
@@ -1109,7 +1111,7 @@ SELECT distinct
         clin.obsclin_result_num::numeric end AS value_as_number,
      coalesce(clin.obsclin_result_text,
                  clin.obsclin_result_qual,
-                 clin.obsclin_result_num::text) AS value_source_value,
+                 clin.obsclin_result_num::text,' ') AS value_source_value,
     vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.obs_clin clin
 inner join SITE_pedsnet.person person on clin.patid=person.person_source_value

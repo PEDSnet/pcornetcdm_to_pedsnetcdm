@@ -47,7 +47,7 @@ left join pcornet_maps.pedsnet_pcornet_valueset_map place on place.target_concep
 														 and place.value_as_concept_id is null
                                                         and place.source_concept_class='Facility type'
 left join SITE_pedsnet.location loc on enc.facility_location=loc.zip
-WHERE enc.facility_type IS NOT NULL and enc.facility_location is not null
+WHERE enc.facility_type IS NOT NULL and enc.facility_location is not null and enc.facilityid is not null;
 ;
 
 commit;
