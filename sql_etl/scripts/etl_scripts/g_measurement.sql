@@ -22,7 +22,9 @@ create table if not exists SITE_pedsnet.meas_vital_ht as
 SELECT distinct
      3023540 AS measurement_concept_id, 
      v_ht.measure_date AS measurement_date, 
-     (v_ht.measure_date || ' '|| v_ht.measure_time)::timestamp AS measurement_datetime, 
+     case when v_ht.measure_time is not null 
+	then (v_ht.measure_date || ' '|| v_ht.measure_time)::timestamp
+     else v_ht.measure_date::timestamp end AS measurement_datetime,
      null as measurement_order_date, 
      null as measurement_order_datetime, 
      null as measurement_result_date, 
@@ -98,8 +100,10 @@ begin;
 create table if not exists SITE_pedsnet.meas_vital_wt as
 SELECT
      3013762 AS measurement_concept_id, 
-     v_wt.measure_date AS measurement_date, 
-     (v_wt.measure_date || ' '|| v_wt.measure_time)::timestamp AS measurement_datetime, 
+     v_wt.measure_date AS measurement_date,
+     case when v_wt.measure_time is not null 
+        then (v_wt.measure_date || ' '|| v_wt.measure_time)::timestamp
+     else v_wt.measure_date::timestamp end AS measurement_datetime,
      null as measurement_order_date, 
      null as measurement_order_datetime, 
      null as measurement_result_date, 
@@ -176,7 +180,9 @@ create table if not exists SITE_pedsnet.meas_vital_sys as
 SELECT
      coalesce(sys_con.source_concept_id::int, 3004249) AS measurement_concept_id, 
      v_sys.measure_date AS measurement_date, 
-     (v_sys.measure_date || ' '|| v_sys.measure_time)::timestamp AS measurement_datetime,
+     case when v_sys.measure_time is not null 
+        then (v_sys.measure_date || ' '|| v_sys.measure_time)::timestamp
+     else v_sys.measure_date::timestamp end AS measurement_datetime,
      null as measurement_order_date, 
      null as measurement_order_datetime, 
      null as measurement_result_date, 
@@ -260,7 +266,9 @@ create table if not exists SITE_pedsnet.meas_vital_dia as
 SELECT
      3012888 AS measurement_concept_id, 
      v_dia.measure_date AS measurement_date, 
-     (v_dia.measure_date || ' '|| v_dia.measure_time)::timestamp AS measurement_datetime, 
+     case when v_dia.measure_time is not null 
+        then (v_dia.measure_date || ' '|| v_dia.measure_time)::timestamp
+     else v_dia.measure_date::timestamp end AS measurement_datetime, 
      null as measurement_order_date, 
      null as measurement_order_datetime, 
      null as measurement_result_date, 
@@ -343,8 +351,9 @@ begin;
 Create table if not exists SITE_pedsnet.meas_vital_bmi as
 SELECT
 3038553 AS measurement_concept_id, 
-v_bmi.measure_date AS measurement_date, 
-(v_bmi.measure_date || ' '|| v_bmi.measure_time)::timestamp AS measurement_datetime, 
+v_bmi.measure_date AS measurement_date,
+case when v_bmi.measure_time is not null then (v_bmi.measure_date || ' '|| v_bmi.measure_time)::timestamp
+else v_bmi.measure_date::timestamp end AS measurement_datetime, 
 null as measurement_order_date, 
 null as measurement_order_datetime, 
 null as measurement_result_date, 
@@ -391,20 +400,22 @@ priority_concept_id, priority_source_value, provider_id, range_high, range_high_
 range_high_source_value, range_low, range_low_operator_concept_id, range_low_source_value, specimen_concept_id, 
 specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id, value_as_number,value_source_value,
 visit_occurrence_id)
-select measurement_concept_id, measurement_date, measurement_datetime, nextval('SITE_pedsnet.measurement_id_seq') as measurement_id, 
+select measurement_concept_id, 
+case when measurement_date is not null then measurement_date else '0001-01-01'::date end as measurement_date, 
+case when measurement_datetime is not null then measurement_datetime else '0001-01-01'::timestamp end as measurement_datetime, 
+nextval('SITE_pedsnet.measurement_id_seq') as measurement_id, 
 measurement_order_date::date, measurement_order_datetime::timestamp, measurement_result_date::date, measurement_result_datetime::timestamp, 
 measurement_source_concept_id, coalesce(measurement_source_value,' '), measurement_type_concept_id, operator_concept_id::int, person_id, 
-priority_concept_id, priority_source_value, provider_id,
+case when isnumeric(priority_concept_id::varchar) then priority_concept_id else '0'::int end as priority_concept_id, priority_source_value, 
+case when provider_id is not null then provider_id end as provider_id,
 case
-    when range_high !~ '^[0-9\.]+$' then null
-    else range_high::numeric
-end as range_high,
+    when isnumeric(range_high::varchar) then range_high::numeric
+    else null end as range_high,
 range_high_operator_concept_id::int, 
 range_high_source_value,
 case
-    when range_low !~ '^[0-9\.]+$' then null
-    else range_low::numeric
-end as range_low,
+    when isnumeric(range_low::varchar) then range_low::numeric
+    else null end as range_low,
 range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
 specimen_source_value, unit_concept_id::int, unit_source_concept_id::int, unit_source_value, value_as_concept_id::int,
 case when isnumeric(value_as_number::varchar)
@@ -631,12 +642,12 @@ select distinct
                else null
           end,
           c.concept_id,0)  as measurement_concept_id,
-     case when is_date(lab.result_date::varchar) then lab.result_date::date
-     when is_date(lab.specimen_date::varchar) then lab.specimen_date::date
-     end as measurement_date,
-     case when is_date(lab.result_date::varchar) then lab.result_date::timestamp
-     when is_date(lab.specimen_date::varchar) then lab.specimen_date::timestamp
-     end as measurement_datetime,
+     case when lab.result_date is  not null and is_date(lab.result_date::varchar) then lab.result_date::date
+     when lab.specimen_date is not null and is_date(lab.specimen_date::varchar) then lab.specimen_date::date
+     else '0001-01-01'::date end as measurement_date,
+     case when lab.result_date is not null and is_date(lab.result_date::varchar) then lab.result_date::timestamp
+     when lab.specimen_date is not null and is_date(lab.specimen_date::varchar) then lab.specimen_date::timestamp
+     else '0001-01-01'::timestamp end as measurement_datetime,
      case when is_date(lab.lab_order_date::varchar) then lab.lab_order_date::date
      end as measurement_order_date,
      case when is_date(lab.lab_order_date::varchar) then lab.lab_order_date::
