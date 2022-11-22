@@ -790,9 +790,12 @@ timestamp
      end as value_as_concept_id,
      case when isnumeric(lab.result_num::varchar)
         then lab.result_num::numeric end as value_as_number,
-     case when (isnumeric(lab.result_num::varchar)) and (lab.result_num::text != '0') then lab.result_num::text
-     when lab.raw_result IS NOT NULL then lab.raw_result
-     else 'Unknown' end as value_source_value, 
+     case 
+          when (isnumeric(lab.result_num::varchar)) and (lab.result_num::text != '0') and lab.result_num is not null then lab.result_num::text
+          when result_qual is not null then result_qual
+          when lab.raw_result IS NOT NULL then lab.raw_result
+          else 'Unknown' 
+     end as value_source_value, 
      vo.visit_occurrence_id as visit_occurrence_id
 from SITE_pcornet.LAB_RESULT_CM as lab
 inner join SITE_pedsnet.person person on lab.patid=person.person_source_value
