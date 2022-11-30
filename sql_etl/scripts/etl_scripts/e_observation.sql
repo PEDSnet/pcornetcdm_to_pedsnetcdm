@@ -1,6 +1,6 @@
 create sequence if not exists SITE_pedsnet.obs_seq;
 
-create or replace function is_date(s varchar) returns boolean as $$
+create or replace function SITE_pedsnet.is_date(s varchar) returns boolean as $$
 begin
           perform s::date;
           return true;

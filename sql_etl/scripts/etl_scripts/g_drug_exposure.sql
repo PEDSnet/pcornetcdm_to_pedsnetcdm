@@ -1,6 +1,6 @@
 create sequence if not exists SITE_pedsnet.drug_exposure_seq;
 
-CREATE OR REPLACE FUNCTION isnumeric(text) RETURNS BOOLEAN AS $$
+CREATE OR REPLACE FUNCTION SITE_pedsnet.isnumeric(text) RETURNS BOOLEAN AS $$
 DECLARE x NUMERIC;
 BEGIN
         x = $1::NUMERIC;
@@ -12,7 +12,7 @@ $$
 STRICT
 LANGUAGE plpgsql IMMUTABLE;
 
-create or replace function is_date(s varchar) returns boolean as $$
+create or replace function SITE_pedsnet.is_date(s varchar) returns boolean as $$
 begin
 	  perform s::date;
 	  return true;
@@ -21,7 +21,7 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function is_time(s varchar) returns boolean as $$
+create or replace function SITE_pedsnet.is_time(s varchar) returns boolean as $$
 begin
 	  perform s::time;
 	  return true;
