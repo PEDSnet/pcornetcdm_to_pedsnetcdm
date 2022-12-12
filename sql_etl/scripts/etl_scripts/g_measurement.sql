@@ -777,10 +777,12 @@ timestamp
           when lower(trim(result_qual)) = 'inconclusive' then 45877990
           when lower(trim(result_qual)) = 'normal' then 45884153
           when lower(trim(result_qual)) = 'abnormal' then 45878745
+          when lower(trim(result_qual)) = 'reactive' then 45884084
+          when lower(trim(result_qual)) = 'nonreactive' then 45878583
           when lower(trim(result_qual)) = 'low' then 45881666
           when lower(trim(result_qual)) = 'high' then 45876384
           when lower(trim(result_qual)) = 'borderline' then 45880922
-          when lower(trim(result_qual)) = 'elevated' then 4328749  --ssh add issue number 55 - 6/26/2020 
+          when lower(trim(result_qual)) = 'elevated' then 4328749
           when lower(trim(result_qual)) = 'undetermined' then 45880649
           when lower(trim(result_qual)) = 'undetectable' then 45878583 
           when lower(trim(result_qual)) = 'un' then 0
@@ -791,8 +793,8 @@ timestamp
      case when isnumeric(lab.result_num::varchar)
         then lab.result_num::numeric end as value_as_number,
      case 
-          when (isnumeric(lab.result_num::varchar)) and (lab.result_num::text != '0') and lab.result_num is not null then lab.result_num::text
           when result_qual is not null then result_qual
+          when (isnumeric(lab.result_num::varchar)) and (lab.result_num::text != '0') and lab.result_num is not null then lab.result_num::text
           when lab.raw_result IS NOT NULL then lab.raw_result
           else 'Unknown' 
      end as value_source_value, 
@@ -1001,11 +1003,36 @@ SELECT distinct
           end,0) AS unit_source_concept_id,
      coalesce(clin.obsclin_result_unit,clin.raw_obsclin_unit) AS unit_source_value, 
      coalesce(
+          case 
+               when lower(trim(clin.obsclin_result_qual)) = 'positive' then 45884084
+               when lower(trim(clin.obsclin_result_qual)) = 'negative' then 45878583
+               when lower(trim(clin.obsclin_result_qual)) = 'pos' then 45884084
+               when lower(trim(clin.obsclin_result_qual)) = 'neg' then 45878583
+               when lower(trim(clin.obsclin_result_qual)) = 'presumptive positive' then 45884084
+               when lower(trim(clin.obsclin_result_qual)) = 'presumptive negative' then 45878583
+               when lower(trim(clin.obsclin_result_qual)) = 'detected' then 45884084
+               when lower(trim(clin.obsclin_result_qual)) = 'not detected' then 45878583
+               when lower(trim(clin.obsclin_result_qual)) = 'inconclusive' then 45877990
+               when lower(trim(clin.obsclin_result_qual)) = 'normal' then 45884153
+               when lower(trim(clin.obsclin_result_qual)) = 'abnormal' then 45878745
+               when lower(trim(clin.obsclin_result_qual)) = 'reactive' then 45884084
+               when lower(trim(clin.obsclin_result_qual)) = 'nonreactive' then 45878583
+               when lower(trim(clin.obsclin_result_qual)) = 'low' then 45881666
+               when lower(trim(clin.obsclin_result_qual)) = 'high' then 45876384
+               when lower(trim(clin.obsclin_result_qual)) = 'borderline' then 45880922
+               when lower(trim(clin.obsclin_result_qual)) = 'elevated' then 4328749  --ssh add issue number 55 - 6/26/2020 
+               when lower(trim(clin.obsclin_result_qual)) = 'undetermined' then 45880649
+               when lower(trim(clin.obsclin_result_qual)) = 'undetectable' then 45878583 
+               when lower(trim(clin.obsclin_result_qual)) = 'un' then 0
+               when lower(trim(clin.obsclin_result_qual)) = 'unknown' then 0
+               when lower(trim(clin.obsclin_result_qual)) = 'no information' then 46237210
+          end,
           case
                when clin.obsclin_result_qual = 'NI' then 44814650
                when clin.obsclin_result_qual = 'OT' then 44814649
                else qual.concept_id
-          end,0) AS value_as_concept_id,
+          end,
+          0) AS value_as_concept_id,
      case when (isnumeric(clin.obsclin_result_num::varchar)) then
 	clin.obsclin_result_num::numeric end AS value_as_number, 
      coalesce(clin.obsclin_result_text,
@@ -1116,11 +1143,36 @@ SELECT distinct
           end,0) AS unit_source_concept_id,
      coalesce(clin.obsclin_result_unit,clin.raw_obsclin_unit) AS unit_source_value, 
      coalesce(
+          case 
+               when lower(trim(clin.obsclin_result_qual)) = 'positive' then 45884084
+               when lower(trim(clin.obsclin_result_qual)) = 'negative' then 45878583
+               when lower(trim(clin.obsclin_result_qual)) = 'pos' then 45884084
+               when lower(trim(clin.obsclin_result_qual)) = 'neg' then 45878583
+               when lower(trim(clin.obsclin_result_qual)) = 'presumptive positive' then 45884084
+               when lower(trim(clin.obsclin_result_qual)) = 'presumptive negative' then 45878583
+               when lower(trim(clin.obsclin_result_qual)) = 'detected' then 45884084
+               when lower(trim(clin.obsclin_result_qual)) = 'not detected' then 45878583
+               when lower(trim(clin.obsclin_result_qual)) = 'inconclusive' then 45877990
+               when lower(trim(clin.obsclin_result_qual)) = 'normal' then 45884153
+               when lower(trim(clin.obsclin_result_qual)) = 'abnormal' then 45878745
+               when lower(trim(clin.obsclin_result_qual)) = 'reactive' then 45884084
+               when lower(trim(clin.obsclin_result_qual)) = 'nonreactive' then 45878583
+               when lower(trim(clin.obsclin_result_qual)) = 'low' then 45881666
+               when lower(trim(clin.obsclin_result_qual)) = 'high' then 45876384
+               when lower(trim(clin.obsclin_result_qual)) = 'borderline' then 45880922
+               when lower(trim(clin.obsclin_result_qual)) = 'elevated' then 4328749  --ssh add issue number 55 - 6/26/2020 
+               when lower(trim(clin.obsclin_result_qual)) = 'undetermined' then 45880649
+               when lower(trim(clin.obsclin_result_qual)) = 'undetectable' then 45878583 
+               when lower(trim(clin.obsclin_result_qual)) = 'un' then 0
+               when lower(trim(clin.obsclin_result_qual)) = 'unknown' then 0
+               when lower(trim(clin.obsclin_result_qual)) = 'no information' then 46237210
+          end,
           case
                when clin.obsclin_result_qual = 'NI' then 44814650
                when clin.obsclin_result_qual = 'OT' then 44814649
                else qual.concept_id
-          end,0) AS value_as_concept_id,
+          end,
+          0) AS value_as_concept_id,
      case when (isnumeric(clin.obsclin_result_num::varchar)) then
         clin.obsclin_result_num::numeric end AS value_as_number,
      coalesce(clin.obsclin_result_text,
