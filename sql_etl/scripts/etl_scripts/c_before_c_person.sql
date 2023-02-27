@@ -4,7 +4,7 @@ with provider_history as (
     select
 	    demo.patid, 
 	    enc.providerid, 
-	    max((enc.admit_date + enc.admit_time::time)::timestamp) as most_recent_date, 
+	    max((coalesce(enc.admit_date,'0001-01-01'::date) + coalesce(enc.admit_time::time,'00:00:00'::time))::timestamp) as most_recent_date, 
 	    count(enc.providerid) as num_visits
     from SITE_pcornet.demographic demo
     left join SITE_pcornet.encounter enc

@@ -2,7 +2,7 @@ CREATE SEQUENCE if not exists SITE_pedsnet.specialty_seq;
 
 begin;
 
-INSERT INTO SITE_pedsnet.provider(
+INSERT INTO SITE_pedsnet.specialty(
    specialty_id,
    domain_id,
    entity_id,

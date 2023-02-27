@@ -12,6 +12,18 @@ $$
 STRICT
 LANGUAGE plpgsql IMMUTABLE;
 
+CREATE OR REPLACE FUNCTION SITE_pedsnet.is_int(text) RETURNS BOOLEAN AS $$
+DECLARE x INT;
+BEGIN
+        x = $1::INT;
+            RETURN TRUE;
+        EXCEPTION WHEN others THEN
+                RETURN FALSE;
+END;
+$$
+STRICT
+LANGUAGE plpgsql IMMUTABLE;
+
 create or replace function SITE_pedsnet.is_date(s varchar) returns boolean as $$
 begin
 	  perform s::date;
@@ -64,7 +76,7 @@ insert into SITE_pedsnet.drug_exposure(
 
 select
 	case 
-		when(isnumeric(dispense_sup::varchar)) then dispense_sup::numeric
+		when(SITE_pedsnet.isnumeric(dispense_sup::varchar)) then dispense_sup::numeric
 	end as days_supply,	
 	0 as dispense_as_written_concept_id, 
 	coalesce(case 
@@ -97,13 +109,13 @@ select
 	38000175 as drug_type_concept_id,
 	dispense_dose_disp::varchar as eff_drug_dose_source_value,
 	case 
-		when(isnumeric(dispense_dose_disp::varchar)) then dispense_dose_disp::numeric
+		when(SITE_pedsnet.isnumeric(dispense_dose_disp::varchar)) then dispense_dose_disp::numeric
     end as effective_drug_dose,
 	null as frequency,
 	null as lot_number,
 	person.person_id,
 	null as provider_id,
-	case when isnumeric(dispense_amt::varchar)
+	case when SITE_pedsnet.isnumeric(dispense_amt::varchar)
 		then dispense_amt::numeric end as quantity,
 	null as refills,
 	coalesce(
@@ -181,7 +193,7 @@ insert into SITE_pedsnet.drug_exposure(
 
 select
 	case 
-		when isnumeric(rx_days_supply::varchar) then rx_days_supply::int
+		when SITE_pedsnet.is_int(rx_days_supply::varchar) then rx_days_supply::int
 	end as days_supply,
 	case 
 		when rx_dispense_as_written='Y' then 4188539 -- Yes
@@ -203,7 +215,7 @@ select
 	nextval('SITE_pedsnet.drug_exposure_seq') AS drug_exposure_id,
 	rx_order_date::date as drug_exposure_order_date,
 	case 
-		when is_time(rx_order_time) then (rx_order_date || ' '|| rx_order_time)::timestamp 
+		when SITE_pedsnet.is_time(rx_order_time) then (rx_order_date || ' '|| rx_order_time)::timestamp 
 		else rx_order_date::timestamp 
 	end as drug_exposure_order_datetime,
 	case
@@ -219,15 +231,15 @@ select
 	38000177 as drug_type_concept_id,
 	null as eff_drug_dose_source_value,
 	case 
-		when(isnumeric(rx_dose_ordered::varchar)) then rx_dose_ordered::numeric
+		when(SITE_pedsnet.isnumeric(rx_dose_ordered::varchar)) then rx_dose_ordered::numeric
     end as effective_drug_dose,
 	rx_frequency as frequency,
 	null as lot_number,
 	person.person_id as person_id,
 	vo.provider_id as provider_id,
-	case when isnumeric(rx_quantity::varchar) then rx_quantity::numeric
+	case when SITE_pedsnet.isnumeric(rx_quantity::varchar) then rx_quantity::numeric
 	end as quantity,
-	case when isnumeric(rx_refills::varchar) then rx_refills::int
+	case when SITE_pedsnet.is_int(rx_refills::varchar) then rx_refills::int
 	end as refills,
 	coalesce(case
 			when presc.rx_route = 'OT' then 44814649
@@ -339,7 +351,7 @@ select
 	coalesce(left(raw_medadmin_med_name, 200)||'...',' ')||'|'||coalesce(medadmin_code,' ') as drug_source_value,
 	38000180 as drug_type_concept_id,
 	medadmin_dose_admin::varchar as eff_drug_dose_source_value,
-	case when(isnumeric(medadmin_dose_admin::varchar)) then medadmin_dose_admin::numeric
+	case when(SITE_pedsnet.isnumeric(medadmin_dose_admin::varchar)) then medadmin_dose_admin::numeric
         end as effective_drug_dose,
 	null as frequency,
 	null as lot_number,

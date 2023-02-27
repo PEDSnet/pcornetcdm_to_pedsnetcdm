@@ -28,8 +28,8 @@ SELECT
             when proc.px_type='09' then c_icd10.concept_id
             else 0 
       end, 0) as procedure_concept_id,
-      case when proc.px_date is not null and is_date(proc.px_date::varchar) then proc.px_date::date
-      when proc.admit_date is not null and is_date(proc.admit_date::varchar) then proc.admit_date::date
+      case when proc.px_date is not null and SITE_pedsnet.is_date(proc.px_date::varchar) then proc.px_date::date
+      when proc.admit_date is not null and SITE_pedsnet.is_date(proc.admit_date::varchar) then proc.admit_date::date
       else '0001-01-01'::date
       end as procedure_date,
       null::date as procedure_end_date,

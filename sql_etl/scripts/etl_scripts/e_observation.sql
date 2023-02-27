@@ -32,12 +32,12 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      44813951 AS observation_concept_id,
-     case when enc.discharge_date is not null and  is_date(enc.discharge_date::varchar) then enc.discharge_date::date
-     when enc.admit_date is not null and is_date(enc.admit_date::varchar) then enc.admit_date:: date
+     case when enc.discharge_date is not null and  SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date
+     when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date:: date
      else '0001-01-01'::date
      end AS observation_date,
-     case when is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
-     when enc.admit_date is not null and is_date(enc.admit_date::varchar) then enc.admit_date:: timestamp
+     case when SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
+     when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date:: timestamp
      else '0001-01-01'::timestamp
      end  AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
@@ -91,12 +91,12 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      3040464 AS observation_concept_id,
-     case when enc.discharge_date is not null and is_date(enc.discharge_date::varchar) then enc.discharge_date::date
-     when enc.admit_date is not null and is_date(enc.admit_date::varchar) then enc.admit_date::date
+     case when enc.discharge_date is not null and SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date
+     when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::date
      else '0001-01-01'::date
      end AS observation_date,
-     case when enc.discharge_date is not null and is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
-     when enc.admit_date is not null and is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
+     case when enc.discharge_date is not null and SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
+     when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
      else '0001-01-01'::timestamp
      end AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
@@ -111,9 +111,9 @@ SELECT
      NULL AS unit_source_value,
      case 
           when 
-		case when is_date(enc.discharge_date::varchar)
+		case when SITE_pedsnet.is_date(enc.discharge_date::varchar)
 			then enc.discharge_date::date < '01-OCT-2007'
-		when is_date(enc.admit_date::varchar)
+		when SITE_pedsnet.is_date(enc.admit_date::varchar)
 			then enc.admit_date::date < '01-OCT-2007'
 		end
           then 
@@ -124,9 +124,9 @@ SELECT
      NULL AS value_as_string,
      case 
           when
-	       case when is_date(enc.discharge_date::varchar)
+	       case when SITE_pedsnet.is_date(enc.discharge_date::varchar)
                         then enc.discharge_date::date < '01-OCT-2007'
-                when is_date(enc.admit_date::varchar)
+                when SITE_pedsnet.is_date(enc.admit_date::varchar)
                         then enc.admit_date::date < '01-OCT-2007'
                 end
           then 

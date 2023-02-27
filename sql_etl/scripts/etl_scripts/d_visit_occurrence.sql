@@ -39,17 +39,24 @@ SELECT
 	enc.providerid AS provider_id,
 	coalesce(typ.source_concept_id::int,0) AS visit_concept_id,
 	case 
-		when is_date(enc.discharge_date::varchar) then enc.discharge_date::date
-		when is_date(enc.admit_date::varchar) then enc.admit_date::date
+		when SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date
+		when SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::date
     end AS visit_end_date,
 	case 
-		when is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
-        when is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
+		when SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
+        when SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
 	end AS visit_end_datetime,
 	0 AS visit_source_concept_id,
 	enc.encounterid AS visit_source_value,
-	enc.admit_date AS visit_start_date,
-	(enc.admit_date)::timestamp AS visit_start_datetime,
+	case 
+		when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar)
+			then enc.admit_date::date
+		else '0001-01-01'::date end AS visit_start_date,
+	case
+		when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar)
+			then enc.admit_date::timestamp
+		else '0001-01-01'::timestamp end  AS visit_start_datetime,
+	
 	44818518 AS visit_type_concept_id
 FROM 
 	SITE_pcornet.encounter enc

@@ -49,7 +49,7 @@ SELECT distinct
      9237 AS unit_source_concept_id, 
      'cm (converted from inches)' AS unit_source_value, 
      NULL AS value_as_concept_id,
-     case when isnumeric(v_ht.ht::varchar) then
+     case when SITE_pedsnet.isnumeric(v_ht.ht::varchar) then
 	(v_ht.ht::numeric*2.54) end AS value_as_number,
      v_ht.ht AS value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id 
@@ -87,7 +87,7 @@ case
 end as range_low, 
 range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
 specimen_source_value, unit_concept_id,unit_source_concept_id, unit_source_value, value_as_concept_id::int,
- case when isnumeric(value_as_number::varchar) 
+ case when SITE_pedsnet.isnumeric(value_as_number::varchar) 
 	then value_as_number::numeric end as value_as_number, 
 value_source_value,
 visit_occurrence_id
@@ -128,7 +128,7 @@ SELECT
      8739 AS unit_source_concept_id, 
      'kg (converted from pounds)' AS unit_source_value, 
      NULL AS value_as_concept_id,
-     case when isnumeric(v_wt.wt::varchar) then (v_wt.wt::numeric*0.453592)
+     case when SITE_pedsnet.isnumeric(v_wt.wt::varchar) then (v_wt.wt::numeric*0.453592)
      end AS value_as_number,
      v_wt.wt as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id
@@ -166,7 +166,7 @@ case
 end as range_low,
  range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
 specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id::int,
-case when (isnumeric(value_as_number::varchar)) then
+case when (SITE_pedsnet.isnumeric(value_as_number::varchar)) then
         value_as_number::numeric end AS value_as_number,
 	value_source_value,
 visit_occurrence_id
@@ -207,7 +207,7 @@ SELECT
      0 AS unit_source_concept_id, 
      'millimeter mercury column' AS unit_source_value, 
      NULL AS value_as_concept_id,
-     case when (isnumeric(v_sys.systolic::varchar)) then
+     case when (SITE_pedsnet.isnumeric(v_sys.systolic::varchar)) then
         v_sys.systolic::numeric end AS value_as_number,
      v_sys.systolic as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id
@@ -252,7 +252,7 @@ case
 end as range_low,
 range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
 specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id::int, 
-case when isnumeric(value_as_number::varchar)
+case when SITE_pedsnet.isnumeric(value_as_number::varchar)
         then value_as_number::numeric end as value_as_number,
 	value_source_value,
 visit_occurrence_id
@@ -293,7 +293,7 @@ SELECT
      0 AS unit_source_concept_id, 
      'millimeter mercury column' AS unit_source_value, 
      NULL AS value_as_concept_id,
-     case when isnumeric(v_dia.diastolic::varchar)
+     case when SITE_pedsnet.isnumeric(v_dia.diastolic::varchar)
         then v_dia.diastolic::numeric end as value_as_number,
      coalesce(dia_con.concept_description,' ') AS value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id
@@ -338,7 +338,7 @@ case
 end as range_low,
 range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
 specimen_source_value, unit_concept_id, unit_source_concept_id, unit_source_value, value_as_concept_id::int, 
-case when isnumeric(value_as_number::varchar)
+case when SITE_pedsnet.isnumeric(value_as_number::varchar)
         then value_as_number::numeric end as value_as_number,
 value_source_value,
 visit_occurrence_id
@@ -378,7 +378,7 @@ null AS unit_concept_id,
 null as unit_source_concept_id,
 null AS unit_source_value, 
 NULL AS value_as_concept_id,
-case when isnumeric(v_bmi.original_bmi::varchar)
+case when SITE_pedsnet.isnumeric(v_bmi.original_bmi::varchar)
         then v_bmi.original_bmi::numeric end as value_as_number,
 v_bmi.original_bmi AS value_source_value,
 vo.visit_occurrence_id AS visit_occurrence_id
@@ -406,19 +406,19 @@ case when measurement_datetime is not null then measurement_datetime else '0001-
 nextval('SITE_pedsnet.measurement_id_seq') as measurement_id, 
 measurement_order_date::date, measurement_order_datetime::timestamp, measurement_result_date::date, measurement_result_datetime::timestamp, 
 measurement_source_concept_id, coalesce(measurement_source_value,' '), measurement_type_concept_id, operator_concept_id::int, person_id, 
-case when isnumeric(priority_concept_id::varchar) then priority_concept_id else '0'::int end as priority_concept_id, priority_source_value, 
+case when SITE_pedsnet.isnumeric(priority_concept_id::varchar) then priority_concept_id else '0'::int end as priority_concept_id, priority_source_value, 
 case when provider_id is not null then provider_id end as provider_id,
 case
-    when isnumeric(range_high::varchar) then range_high::numeric
+    when SITE_pedsnet.isnumeric(range_high::varchar) then range_high::numeric
     else null end as range_high,
 range_high_operator_concept_id::int, 
 range_high_source_value,
 case
-    when isnumeric(range_low::varchar) then range_low::numeric
+    when SITE_pedsnet.isnumeric(range_low::varchar) then range_low::numeric
     else null end as range_low,
 range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
 specimen_source_value, unit_concept_id::int, unit_source_concept_id::int, unit_source_value, value_as_concept_id::int,
-case when isnumeric(value_as_number::varchar)
+case when SITE_pedsnet.isnumeric(value_as_number::varchar)
         then value_as_number::numeric end as value_as_number,
 value_source_value,
 visit_occurrence_id
@@ -642,20 +642,20 @@ select distinct
                else null
           end,
           c.concept_id,0)  as measurement_concept_id,
-     case when lab.result_date is  not null and is_date(lab.result_date::varchar) then lab.result_date::date
-     when lab.specimen_date is not null and is_date(lab.specimen_date::varchar) then lab.specimen_date::date
+     case when lab.result_date is  not null and result_date_valid then lab.result_date::date
+     when lab.specimen_date is not null and specimen_date_valid then lab.specimen_date::date
      else '0001-01-01'::date end as measurement_date,
-     case when lab.result_date is not null and is_date(lab.result_date::varchar) then lab.result_date::timestamp
-     when lab.specimen_date is not null and is_date(lab.specimen_date::varchar) then lab.specimen_date::timestamp
+     case when lab.result_date is not null and result_date_valid then lab.result_date::timestamp
+     when lab.specimen_date is not null and specimen_date_valid then lab.specimen_date::timestamp
      else '0001-01-01'::timestamp end as measurement_datetime,
-     case when is_date(lab.lab_order_date::varchar) then lab.lab_order_date::date
+     case when order_date_valid then lab.lab_order_date::date
      end as measurement_order_date,
-     case when is_date(lab.lab_order_date::varchar) then lab.lab_order_date::
+     case when order_date_valid then lab.lab_order_date::
 timestamp
      end as measurement_order_datetime,
-     case when is_date(lab.result_date::varchar) then lab.result_date::date
+     case when result_date_valid then lab.result_date::date
      end as measurement_result_date,
-     case when is_date(lab.result_date::varchar) then lab.result_date::timestamp
+     case when result_date_valid then lab.result_date::timestamp
      end as measurement_result_datetime,
      coalesce(c.concept_id,0) as measurement_source_concept_id,
      coalesce(lab.LAB_LOINC,' ') as measurement_source_value,
@@ -671,7 +671,7 @@ timestamp
      vo.provider_id as provider_id,
      case
         when lab.norm_range_high !~ '^[0-9\.]+$' then null
-	when not isnumeric(lab.norm_range_high::text) then null 
+	when not SITE_pedsnet.isnumeric(lab.norm_range_high::text) then null 
         else lab.norm_range_high::numeric
      end as range_high,
      coalesce(
@@ -682,7 +682,7 @@ timestamp
      null as range_high_source_value,
      case
         when lab.norm_range_low !~ '^[0-9\.]+$' then null
-	when not isnumeric(lab.norm_range_low::text) then null
+	when not SITE_pedsnet.isnumeric(lab.norm_range_low::text) then null
         else lab.norm_range_low::numeric 
      end as range_low,
      coalesce(
@@ -777,12 +777,10 @@ timestamp
           when lower(trim(result_qual)) = 'inconclusive' then 45877990
           when lower(trim(result_qual)) = 'normal' then 45884153
           when lower(trim(result_qual)) = 'abnormal' then 45878745
-          when lower(trim(result_qual)) = 'reactive' then 45884084
-          when lower(trim(result_qual)) = 'nonreactive' then 45878583
           when lower(trim(result_qual)) = 'low' then 45881666
           when lower(trim(result_qual)) = 'high' then 45876384
           when lower(trim(result_qual)) = 'borderline' then 45880922
-          when lower(trim(result_qual)) = 'elevated' then 4328749
+          when lower(trim(result_qual)) = 'elevated' then 4328749  --ssh add issue number 55 - 6/26/2020 
           when lower(trim(result_qual)) = 'undetermined' then 45880649
           when lower(trim(result_qual)) = 'undetectable' then 45878583 
           when lower(trim(result_qual)) = 'un' then 0
@@ -790,14 +788,11 @@ timestamp
           when lower(trim(result_qual)) = 'no information' then 46237210
           else 45877393 
      end as value_as_concept_id,
-     case when isnumeric(lab.result_num::varchar)
+     case when SITE_pedsnet.isnumeric(lab.result_num::varchar)
         then lab.result_num::numeric end as value_as_number,
-     case 
-          when result_qual is not null then result_qual
-          when (isnumeric(lab.result_num::varchar)) and (lab.result_num::text != '0') and lab.result_num is not null then lab.result_num::text
-          when lab.raw_result IS NOT NULL then lab.raw_result
-          else 'Unknown' 
-     end as value_source_value, 
+     case when (SITE_pedsnet.isnumeric(lab.result_num::varchar)) and (lab.result_num::text != '0') then lab.result_num::text
+     when lab.raw_result IS NOT NULL then lab.raw_result
+     else 'Unknown' end as value_source_value, 
      vo.visit_occurrence_id as visit_occurrence_id
 from SITE_pcornet.LAB_RESULT_CM as lab
 inner join SITE_pedsnet.person person on lab.patid=person.person_source_value
@@ -905,7 +900,10 @@ left join
           and not(target_concept = 'TISSUE' and source_concept_id <> '4002890')
           and not(target_concept = 'URINE' and source_concept_id <> '4046280')
           and not(target_concept = 'XXX.SWAB' and source_concept_id <> '4120698')
-     ) as spec_con on spec_con.target_concept = lab.specimen_source;
+     ) as spec_con on spec_con.target_concept = lab.specimen_source
+,LATERAL(SELECT SITE_pedsnet.is_date(lab.result_date::varchar),
+	SITE_pedsnet.is_date(lab.specimen_date::varchar),
+	SITE_pedsnet.is_date(lab.lab_order_date::varchar)) as s1(result_date_valid, specimen_date_valid, order_date_valid);
 
 commit;
 
@@ -913,7 +911,7 @@ begin;
  -- pulling LOINC data from obs_clin
 INSERT INTO SITE_pedsnet.measurement ( 
      measurement_id,
-     measurement_concept_id, 
+     measurement_concept_id,
      measurement_date, 
      measurement_datetime,
      measurement_order_date,
@@ -1003,37 +1001,12 @@ SELECT distinct
           end,0) AS unit_source_concept_id,
      coalesce(clin.obsclin_result_unit,clin.raw_obsclin_unit) AS unit_source_value, 
      coalesce(
-          case 
-               when lower(trim(clin.obsclin_result_qual)) = 'positive' then 45884084
-               when lower(trim(clin.obsclin_result_qual)) = 'negative' then 45878583
-               when lower(trim(clin.obsclin_result_qual)) = 'pos' then 45884084
-               when lower(trim(clin.obsclin_result_qual)) = 'neg' then 45878583
-               when lower(trim(clin.obsclin_result_qual)) = 'presumptive positive' then 45884084
-               when lower(trim(clin.obsclin_result_qual)) = 'presumptive negative' then 45878583
-               when lower(trim(clin.obsclin_result_qual)) = 'detected' then 45884084
-               when lower(trim(clin.obsclin_result_qual)) = 'not detected' then 45878583
-               when lower(trim(clin.obsclin_result_qual)) = 'inconclusive' then 45877990
-               when lower(trim(clin.obsclin_result_qual)) = 'normal' then 45884153
-               when lower(trim(clin.obsclin_result_qual)) = 'abnormal' then 45878745
-               when lower(trim(clin.obsclin_result_qual)) = 'reactive' then 45884084
-               when lower(trim(clin.obsclin_result_qual)) = 'nonreactive' then 45878583
-               when lower(trim(clin.obsclin_result_qual)) = 'low' then 45881666
-               when lower(trim(clin.obsclin_result_qual)) = 'high' then 45876384
-               when lower(trim(clin.obsclin_result_qual)) = 'borderline' then 45880922
-               when lower(trim(clin.obsclin_result_qual)) = 'elevated' then 4328749  --ssh add issue number 55 - 6/26/2020 
-               when lower(trim(clin.obsclin_result_qual)) = 'undetermined' then 45880649
-               when lower(trim(clin.obsclin_result_qual)) = 'undetectable' then 45878583 
-               when lower(trim(clin.obsclin_result_qual)) = 'un' then 0
-               when lower(trim(clin.obsclin_result_qual)) = 'unknown' then 0
-               when lower(trim(clin.obsclin_result_qual)) = 'no information' then 46237210
-          end,
           case
                when clin.obsclin_result_qual = 'NI' then 44814650
                when clin.obsclin_result_qual = 'OT' then 44814649
                else qual.concept_id
-          end,
-          0) AS value_as_concept_id,
-     case when (isnumeric(clin.obsclin_result_num::varchar)) then
+          end,0) AS value_as_concept_id,
+     case when (SITE_pedsnet.isnumeric(clin.obsclin_result_num::varchar)) then
 	clin.obsclin_result_num::numeric end AS value_as_number, 
      coalesce(clin.obsclin_result_text,
                  clin.obsclin_result_qual,
@@ -1143,37 +1116,12 @@ SELECT distinct
           end,0) AS unit_source_concept_id,
      coalesce(clin.obsclin_result_unit,clin.raw_obsclin_unit) AS unit_source_value, 
      coalesce(
-          case 
-               when lower(trim(clin.obsclin_result_qual)) = 'positive' then 45884084
-               when lower(trim(clin.obsclin_result_qual)) = 'negative' then 45878583
-               when lower(trim(clin.obsclin_result_qual)) = 'pos' then 45884084
-               when lower(trim(clin.obsclin_result_qual)) = 'neg' then 45878583
-               when lower(trim(clin.obsclin_result_qual)) = 'presumptive positive' then 45884084
-               when lower(trim(clin.obsclin_result_qual)) = 'presumptive negative' then 45878583
-               when lower(trim(clin.obsclin_result_qual)) = 'detected' then 45884084
-               when lower(trim(clin.obsclin_result_qual)) = 'not detected' then 45878583
-               when lower(trim(clin.obsclin_result_qual)) = 'inconclusive' then 45877990
-               when lower(trim(clin.obsclin_result_qual)) = 'normal' then 45884153
-               when lower(trim(clin.obsclin_result_qual)) = 'abnormal' then 45878745
-               when lower(trim(clin.obsclin_result_qual)) = 'reactive' then 45884084
-               when lower(trim(clin.obsclin_result_qual)) = 'nonreactive' then 45878583
-               when lower(trim(clin.obsclin_result_qual)) = 'low' then 45881666
-               when lower(trim(clin.obsclin_result_qual)) = 'high' then 45876384
-               when lower(trim(clin.obsclin_result_qual)) = 'borderline' then 45880922
-               when lower(trim(clin.obsclin_result_qual)) = 'elevated' then 4328749  --ssh add issue number 55 - 6/26/2020 
-               when lower(trim(clin.obsclin_result_qual)) = 'undetermined' then 45880649
-               when lower(trim(clin.obsclin_result_qual)) = 'undetectable' then 45878583 
-               when lower(trim(clin.obsclin_result_qual)) = 'un' then 0
-               when lower(trim(clin.obsclin_result_qual)) = 'unknown' then 0
-               when lower(trim(clin.obsclin_result_qual)) = 'no information' then 46237210
-          end,
           case
                when clin.obsclin_result_qual = 'NI' then 44814650
                when clin.obsclin_result_qual = 'OT' then 44814649
                else qual.concept_id
-          end,
-          0) AS value_as_concept_id,
-     case when (isnumeric(clin.obsclin_result_num::varchar)) then
+          end,0) AS value_as_concept_id,
+     case when (SITE_pedsnet.isnumeric(clin.obsclin_result_num::varchar)) then
         clin.obsclin_result_num::numeric end AS value_as_number,
      coalesce(clin.obsclin_result_text,
                  clin.obsclin_result_qual,

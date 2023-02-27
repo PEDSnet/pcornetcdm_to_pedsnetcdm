@@ -88,29 +88,17 @@ commit;
 
 begin;
 with x_walk as (
-  select 
-    geo.addressid as patid,
-    loc.location_id
-  from 
-    SITE_pcornet.PRIVATE_ADDRESS_GEOCODE geo 
-  inner join 
-    SITE_pedsnet.location loc
-    on loc.census_block_group = geo.GEOCODE_BLOCK 
-    and geo.GEOCODE_BLOCK is not null
-  UNION 
-  select 
-    geo.addressid as patid,
-    loc.location_id
-  from 
-    SITE_pcornet.PRIVATE_ADDRESS_GEOCODE geo 
-  inner join 
-    SITE_pedsnet.location loc
-    on loc.census_block_group = geo.geocode_group 
-    and geo.geocode_group is not null
+    select 
+        geo.addressid as patid,
+        loc.location_id
+    from 
+        SITE_pcornet.PRIVATE_ADDRESS_GEOCODE geo 
+    inner join 
+        SITE_pedsnet.location loc
+        on loc.census_block_group = geo.GEOCODE_BLOCK
 )
-Update SITE_pedsnet.person p
-set location_id = x_walk.location_id
-from x_walk
-where p.person_id::varchar = x_walk.patid;
-commit;
-
+ Update SITE_pedsnet.person p
+ set location_id = x_walk.location_id
+ from x_walk
+ where p.person_id::varchar = x_walk.patid;
+ commit;
