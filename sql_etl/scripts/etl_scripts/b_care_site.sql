@@ -1,3 +1,4 @@
+
 CREATE OR REPLACE FUNCTION SITE_pedsnet.isnumeric(text) RETURNS BOOLEAN AS $$
 DECLARE x NUMERIC;
 BEGIN
@@ -23,32 +24,59 @@ INSERT INTO SITE_pedsnet.care_site(
 SELECT 
     distinct on (facilityid)facilityid AS care_site_id,
     enc.facility_type AS care_site_name,
-    substr(enc.facility_type, 1, 50) AS care_site_source_value,
+    coalesce(
+        case when enc.facility_type is not null then substr(enc.facility_type, 1, 50) else null end,
+        enc.RAW_FACILITY_TYPE,
+        enc.facilityid
+    ) AS care_site_source_value,
     loc.location_id location_id,
-    case when(SITE_pedsnet.isnumeric(place.source_concept_id::varchar)) then place.source_concept_id::int else 44814650 end  AS place_of_service_concept_id,
-    substr(enc.facility_type, 1, 50) AS place_of_service_source_value,  -- ehr/encounter
-    case when(SITE_pedsnet.isnumeric(facility_spec.value_as_concept_id::varchar)) then
-	facility_spec.value_as_concept_id::int when (SITE_pedsnet.isnumeric(prov_spec.source_concept_id::varchar)) then prov_spec.source_concept_id::int else 44814650 end  as speciality_concept_id,
-    coalesce(facility_spec.target_concept,prov_spec.concept_description,enc.facility_type) as specialty_source_value
-FROM SITE_pcornet.encounter enc
-left join SITE_pcornet.provider prov on prov.providerid = enc.providerid
-LEFT JOIN cdmh_staging.visit_xwalk vx ON vx.cdm_tbl = 'ENCOUNTER'
-                                      AND vx.cdm_name = 'PCORnet'
-                                      AND vx.src_visit_type = coalesce(TRIM(enc.enc_type), 'UN')
-left join pcornet_maps.pedsnet_pcornet_valueset_map prov_spec on prov_spec.source_concept_class='Provider Specialty'
-                                          and prov_spec.target_concept = prov.provider_specialty_primary
-											          and prov_spec.source_concept_id is not null	
-left join pcornet_maps.pedsnet_pcornet_valueset_map facility_spec on prov_spec.source_concept_class='Facility type'
-                                             and vx.src_visit_type=facility_spec.source_concept_id
-                                             and enc.facility_type=facility_spec.target_concept
-                                             and prov_spec.target_concept = prov.provider_specialty_primary
-left join pcornet_maps.pedsnet_pcornet_valueset_map place on place.target_concept = enc.facility_type
-                                                        and place.source_concept_id is not null
-														 and place.value_as_concept_id is null
-                                                        and place.source_concept_class='Facility type'
-left join SITE_pedsnet.location loc on enc.facility_location=loc.zip
-WHERE enc.facility_type IS NOT NULL and enc.facility_location is not null and enc.facilityid is not null;
-;
+    case 
+        when(isnumeric(place.source_concept_id::varchar)) then place.source_concept_id::int 
+        else 44814650 
+    end AS place_of_service_concept_id,
+    substr(enc.facility_type, 1, 50) AS place_of_service_source_value,
+    case 
+        when(isnumeric(facility_spec.value_as_concept_id::varchar)) then facility_spec.value_as_concept_id::int 
+        when (isnumeric(prov_spec.source_concept_id::varchar)) then prov_spec.source_concept_id::int 
+        else 44814650 
+    end as speciality_concept_id,
+    coalesce(
+        facility_spec.target_concept,
+        prov_spec.concept_description,
+        enc.facility_type
+    ) as specialty_source_value
+FROM 
+    SITE_pcornet.encounter enc
+left join 
+    SITE_pcornet.provider prov 
+    on prov.providerid = enc.providerid
+LEFT JOIN 
+    cdmh_staging.visit_xwalk vx 
+    ON vx.cdm_tbl = 'ENCOUNTER'
+    AND vx.cdm_name = 'PCORnet'
+    AND vx.src_visit_type = coalesce(TRIM(enc.enc_type), 'UN')
+left join 
+    pcornet_maps.pedsnet_pcornet_valueset_map prov_spec 
+    on prov_spec.source_concept_class='Provider Specialty'
+    and prov_spec.target_concept = prov.provider_specialty_primary
+    and prov_spec.source_concept_id is not null 
+left join 
+    pcornet_maps.pedsnet_pcornet_valueset_map facility_spec 
+    on prov_spec.source_concept_class='Facility type'
+    and vx.src_visit_type=facility_spec.source_concept_id
+    and enc.facility_type=facility_spec.target_concept
+    and prov_spec.target_concept = prov.provider_specialty_primary
+left join 
+    pcornet_maps.pedsnet_pcornet_valueset_map place 
+    on place.target_concept = enc.facility_type
+    and place.source_concept_id is not null
+    and place.value_as_concept_id is null
+    and place.source_concept_class='Facility type'
+left join 
+    SITE_pedsnet.location loc 
+    on enc.facility_location=loc.zip
+WHERE 
+    enc.facilityid is not null;
 
 commit;
 
