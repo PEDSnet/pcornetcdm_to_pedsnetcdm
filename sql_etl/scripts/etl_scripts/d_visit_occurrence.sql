@@ -41,10 +41,12 @@ SELECT
     case 
         when is_date(enc.discharge_date::varchar) then enc.discharge_date::date
         when is_date(enc.admit_date::varchar) then enc.admit_date::date
+		else '9999-12-31'::date
     end AS visit_end_date,
     case 
         when is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
         when is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
+		else '9999-12-31'::timestamp
     end AS visit_end_datetime,
     0 AS visit_source_concept_id,
     enc.encounterid AS visit_source_value,
