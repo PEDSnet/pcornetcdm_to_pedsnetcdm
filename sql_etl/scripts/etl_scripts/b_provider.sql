@@ -25,10 +25,10 @@ SELECT
     9999999 AS care_site_id, -- default to a default care_site id for now for not null requirement
     coalesce(
 	    case 
-            when specialty_map.source_concept_id = 'NULL' or specialty_map.source_concept_id is null then 44814650
+            when specialty_map.source_concept_id = 'NULL' or specialty_map.source_concept_id is null then 38004477
 	        else specialty_map.source_concept_id::int
 	    end,
-        44814650) as speciality_concept_id,
+        38004477) as speciality_concept_id,
     coalesce(prov.provider_specialty_primary,'')||'|'||coalesce(specialty_map.concept_description,'') as specialty_source_value
 FROM 
     SITE_pcornet.provider prov
