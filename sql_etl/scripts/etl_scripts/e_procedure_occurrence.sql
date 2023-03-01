@@ -47,8 +47,10 @@ SELECT
       end as procedure_source_concept_id,
       proc.proceduresid as procedure_source_value,
       case 
-            when proc.px_source = 'OD' then 38000275
-            when proc.px_source ='BI' then 44786631
+            when proc.px_source = 'OD' and proc.ppx = 'P' then 2000001494
+            when proc.px_source = 'OD' and proc.ppx <> 'P' then 38000275
+            when proc.px_source ='BI' and proc.ppx = 'P' then 44786630
+            when proc.px_source ='BI' and proc.ppx <> 'P' then 44786631
             else 44814650
       end AS procedure_type_concept_id,   
       vo.provider_id,
