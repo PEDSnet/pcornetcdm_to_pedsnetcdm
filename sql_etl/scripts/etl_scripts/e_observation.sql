@@ -62,7 +62,7 @@ SELECT
      enc.discharge_disposition as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.encounter enc
-inner join SITE_pedsnet.visit_occurrence vo 
+left join SITE_pedsnet.visit_occurrence vo 
      on enc.encounterid=vo.visit_source_value
 WHERE enc.discharge_disposition is not null;
 
@@ -135,7 +135,7 @@ SELECT
          end::varchar as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.encounter enc
-inner join SITE_pedsnet.visit_occurrence vo 
+left join SITE_pedsnet.visit_occurrence vo 
      on enc.encounterid=vo.visit_source_value
 left join vocabulary.concept drg on enc.drg=drg.concept_code and drg.concept_class_id = 'DRG' and valid_end_date = '30-SEP-2007' and invalid_reason = 'D' 
 left join vocabulary.concept msdrg on enc.drg=msdrg.concept_code and msdrg.concept_class_id = 'MS-DRG' and msdrg.invalid_reason is null 
@@ -145,8 +145,6 @@ commit;
 
 begin;
 --add vital smoking/tobacco information
-
-
 INSERT INTO SITE_pedsnet.observation(
      observation_concept_id,
      observation_date, 
@@ -199,7 +197,7 @@ SELECT
      tobacco as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.vital vt
-inner join SITE_pedsnet.visit_occurrence vo 
+left join SITE_pedsnet.visit_occurrence vo 
      on vt.encounterid=vo.visit_source_value
 WHERE vt.tobacco is not null;
 
@@ -258,7 +256,7 @@ SELECT
      tobacco_type as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.vital vt
-inner join SITE_pedsnet.visit_occurrence vo 
+left join SITE_pedsnet.visit_occurrence vo 
      on vt.encounterid=vo.visit_source_value
 WHERE vt.tobacco_type is not null;
 
@@ -318,8 +316,24 @@ SELECT
      smoking as value_source_value,
      vo.visit_occurrence_id AS visit_occurrence_id
 FROM SITE_pcornet.vital vt
-inner join SITE_pedsnet.visit_occurrence vo 
+left join SITE_pedsnet.visit_occurrence vo 
      on vt.encounterid=vo.visit_source_value
 WHERE vt.smoking is not null;
-
 commit;
+
+-- add sexual_orientation
+AS=Asexual 
+BI=Bisexual 
+GA=Gay 
+LE=Lesbian 
+QU=Queer 
+QS=Questioning 
+ST=Straight 
+SE=Something else 
+MU=Multiple sexual orientations 
+DC=Decline to answer
+NI=No information 
+UN=Unknow n 
+OT=Other
+
+--add gender identity

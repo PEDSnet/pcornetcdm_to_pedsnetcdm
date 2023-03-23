@@ -252,7 +252,7 @@ select
 from SITE_pcornet.prescribing presc
 inner join SITE_pedsnet.person person 
     on presc.patid = person.person_source_value
-inner join SITE_pedsnet.visit_occurrence vo 
+left join SITE_pedsnet.visit_occurrence vo 
     on presc.encounterid = vo.visit_source_value
 left join vocabulary.concept as rxnorm 
 	on presc.rxnorm_cui = rxnorm.concept_code and vocabulary_id='RxNorm' and standard_concept='S'
@@ -371,7 +371,7 @@ select
 from SITE_pcornet.med_admin as medadmin
 inner join SITE_pedsnet.person person 
 on medadmin.patid = person.person_source_value
-inner join SITE_pedsnet.visit_occurrence vo 
+left join SITE_pedsnet.visit_occurrence vo 
       on medadmin.encounterid = vo.visit_source_value
 left join vocabulary.concept ndc on medadmin.medadmin_code=ndc.concept_code and medadmin_type='ND' and ndc.vocabulary_id='NDC' and ndc.invalid_reason is null
 left join vocabulary.concept_relationship ndc_map on ndc.concept_id=ndc_map.concept_id_1 and ndc_map.relationship_id='Maps to'

@@ -59,7 +59,7 @@ SELECT
 FROM SITE_pcornet.procedures proc
 inner join SITE_pedsnet.person person 
       on proc.patid = person.person_source_value
-inner join SITE_pedsnet.visit_occurrence vo 
+left join SITE_pedsnet.visit_occurrence vo 
       on proc.encounterid = vo.visit_source_value
 left join vocabulary.concept c_hcpcs
       on proc.px=c_hcpcs.concept_code and proc.px_type='CH' and c_hcpcs.vocabulary_id='HCPCS' and proc.px ~ '[A-Z]'
