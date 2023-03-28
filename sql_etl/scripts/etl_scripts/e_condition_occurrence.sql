@@ -153,28 +153,40 @@ SELECT
     2000000089 as condition_type_concept_id,
     person.person_id AS person_id,   
     44814650 as poa_concept_id, 
-    vo.provider_id as provider_id,   
+    enc.providerid as provider_id,   
     NULL as stop_reason,    
-    vo.visit_occurrence_id as visit_occurrence_id    
-FROM (
-    select *
-    from SITE_pcornet.condition
-    where condition <> 'COVID'
-) as cond
-inner join SITE_pedsnet.person person 
+    enc.encounterid as visit_occurrence_id   
+FROM 
+    (
+        select *
+        from SITE_pcornet.condition
+        where condition <> 'COVID'
+    ) as cond
+inner join 
+    SITE_pedsnet.person person 
     on cond.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-    on cond.encounterid=vo.visit_source_value
-left join vocabulary.concept c_icd9 on cond.condition=c_icd9.concept_code
+left join 
+    SITE_pcornet.encounter enc
+    on cond.encounterid=enc.encounterid
+left join 
+    vocabulary.concept c_icd9 
+    on cond.condition=c_icd9.concept_code
     and c_icd9.vocabulary_id='ICD9CM'
-left join vocabulary.concept c_icd10 on cond.condition=c_icd10.concept_code
+left join 
+    vocabulary.concept c_icd10 
+    on cond.condition=c_icd10.concept_code
     and c_icd10.vocabulary_id='ICD10CM'
-left join vocabulary.concept c_snomed on cond.condition=c_snomed.concept_code
-    and c_snomed.vocabulary_id='SNOMED' and cond.condition_type='SM'
-left join vocabulary.concept_relationship cr_icd9
+left join 
+    vocabulary.concept c_snomed 
+    on cond.condition=c_snomed.concept_code
+    and c_snomed.vocabulary_id='SNOMED' 
+    and cond.condition_type='SM'
+left join 
+    vocabulary.concept_relationship cr_icd9
     on c_icd9.concept_id = cr_icd9.concept_id_1
     and cr_icd9.relationship_id='Maps to'
-left join vocabulary.concept_relationship cr_icd10
+left join 
+    vocabulary.concept_relationship cr_icd10
     on c_icd10.concept_id = cr_icd10.concept_id_1
     and cr_icd10.relationship_id='Maps to';
 commit;
@@ -312,25 +324,25 @@ SELECT
     4230359 AS condition_status_concept_id,
     coalesce(cond.dx_source,cond.RAW_DX_SOURCE) AS condition_status_source_value,
     case 
-        when enc_type='ED' and dx_origin='BI' and pdx='P'then 2000001282
-        when enc_type='ED' and dx_origin='OD' and pdx='P'then 2000001280
-        when enc_type='ED' and dx_origin='CL' and pdx='P'then 2000001281
-        when enc_type='ED' and dx_origin='BI' and pdx='S'then 2000001284
-        when enc_type='ED' and dx_origin='OD' and pdx='S'then 2000001283
-        when enc_type='ED' and dx_origin='CL' and pdx='S'then 2000001285
-        when enc_type in ('AV','OA','TH') and dx_origin='BI' and pdx='P'then 2000000096
-        when enc_type in ('AV','OA','TH') and dx_origin='OD' and pdx='P'then 2000000095
-        when enc_type in ('AV','OA','TH') and dx_origin='CL' and pdx='P'then 2000000097
-        when enc_type in ('AV','OA','TH') and dx_origin='BI' and pdx='S'then 2000000102
-        when enc_type in ('AV','OA','TH') and dx_origin='OD' and pdx='S'then 2000000101
-        when enc_type in ('AV','OA','TH') and dx_origin='CL' and pdx='S'then 2000000103
-        when enc_type in ('IP','OS','IS','EI') and dx_origin='BI' and pdx='P'then 2000000093
-        when enc_type in ('IP','OS','IS','EI') and dx_origin='OD' and pdx='P'then 2000000092
-        when enc_type in ('IP','OS','IS','EI') and dx_origin='CL' and pdx='P'then 2000000094
-        when enc_type in ('IP','OS','IS','EI') and dx_origin='BI' and pdx='S'then 2000000099
-        when enc_type in ('IP','OS','IS','EI') and dx_origin='OD' and pdx='S'then 2000000098
-        when enc_type in ('IP','OS','IS','EI') and dx_origin='CL' and pdx='S'then 2000000100
-    else 44814650
+        when cond.enc_type='ED' and dx_origin='BI' and pdx='P'then 2000001282
+        when cond.enc_type='ED' and dx_origin='OD' and pdx='P'then 2000001280
+        when cond.enc_type='ED' and dx_origin='CL' and pdx='P'then 2000001281
+        when cond.enc_type='ED' and dx_origin='BI' and pdx='S'then 2000001284
+        when cond.enc_type='ED' and dx_origin='OD' and pdx='S'then 2000001283
+        when cond.enc_type='ED' and dx_origin='CL' and pdx='S'then 2000001285
+        when cond.enc_type in ('AV','OA','TH') and dx_origin='BI' and pdx='P'then 2000000096
+        when cond.enc_type in ('AV','OA','TH') and dx_origin='OD' and pdx='P'then 2000000095
+        when cond.enc_type in ('AV','OA','TH') and dx_origin='CL' and pdx='P'then 2000000097
+        when cond.enc_type in ('AV','OA','TH') and dx_origin='BI' and pdx='S'then 2000000102
+        when cond.enc_type in ('AV','OA','TH') and dx_origin='OD' and pdx='S'then 2000000101
+        when cond.enc_type in ('AV','OA','TH') and dx_origin='CL' and pdx='S'then 2000000103
+        when cond.enc_type in ('IP','OS','IS','EI') and dx_origin='BI' and pdx='P'then 2000000093
+        when cond.enc_type in ('IP','OS','IS','EI') and dx_origin='OD' and pdx='P'then 2000000092
+        when cond.enc_type in ('IP','OS','IS','EI') and dx_origin='CL' and pdx='P'then 2000000094
+        when cond.enc_type in ('IP','OS','IS','EI') and dx_origin='BI' and pdx='S'then 2000000099
+        when cond.enc_type in ('IP','OS','IS','EI') and dx_origin='OD' and pdx='S'then 2000000098
+        when cond.enc_type in ('IP','OS','IS','EI') and dx_origin='CL' and pdx='S'then 2000000100
+        else 44814650
     end as condition_type_concept_id,
     person.person_id AS person_id,   
     coalesce(
@@ -339,24 +351,36 @@ SELECT
             else 4188540 
         end,
         44814650)::int as poa_concept_id, 
-    vo.provider_id as provider_id,   
+    enc.providerid as provider_id,   
     NULL as stop_reason,    
-    vo.visit_occurrence_id as visit_occurrence_id
-FROM SITE_pcornet.diagnosis cond
-inner join SITE_pedsnet.person person 
+    enc.encounterid as visit_occurrence_id  
+FROM 
+    SITE_pcornet.diagnosis cond
+inner join 
+    SITE_pedsnet.person person 
     on cond.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-    on cond.encounterid=vo.visit_source_value
-left join vocabulary.concept c_icd9 on cond.dx=c_icd9.concept_code
+left join 
+    SITE_pcornet.encounter enc
+    on cond.encounterid=enc.encounterid
+left join 
+    vocabulary.concept c_icd9 
+    on cond.dx=c_icd9.concept_code
     and c_icd9.vocabulary_id='ICD9CM' 
-left join vocabulary.concept c_icd10 on cond.dx=c_icd10.concept_code
+left join 
+    vocabulary.concept c_icd10 
+    on cond.dx=c_icd10.concept_code
     and c_icd10.vocabulary_id='ICD10CM'
-left join vocabulary.concept c_snomed on cond.dx=c_snomed.concept_code
-    and c_snomed.vocabulary_id='SNOMED' and cond.dx_type='SM'
-left join vocabulary.concept_relationship cr_icd9
+left join 
+    vocabulary.concept c_snomed 
+    on cond.dx=c_snomed.concept_code
+    and c_snomed.vocabulary_id='SNOMED' 
+    and cond.dx_type='SM'
+left join 
+    vocabulary.concept_relationship cr_icd9
     on c_icd9.concept_id = cr_icd9.concept_id_1
     and cr_icd9.relationship_id='Maps to'
-left join vocabulary.concept_relationship cr_icd10
+left join 
+    vocabulary.concept_relationship cr_icd10
     on c_icd10.concept_id = cr_icd10.concept_id_1
     and cr_icd10.relationship_id='Maps to';
 commit;

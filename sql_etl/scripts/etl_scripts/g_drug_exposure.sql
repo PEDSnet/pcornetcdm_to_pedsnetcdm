@@ -127,15 +127,24 @@ select
 	null as sig,
 	null as stop_reason,
 	null as visit_occurrence_id
-from SITE_pcornet.dispensing disp
-inner join SITE_pedsnet.person person 
-      on disp.patid = person.person_source_value
-left join vocabulary.concept ndc 
-	on disp.ndc=ndc.concept_code and ndc.vocabulary_id='NDC' and ndc.invalid_reason is null
-left join vocabulary.concept_relationship ndc_map 
-	on ndc.concept_id=ndc_map.concept_id_1 and ndc_map.relationship_id='Maps to'
-left join pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
-	on disp.dispense_dose_disp_unit = ucum_maps.target_concept and ucum_maps.source_concept_class = 'Dose unit'
+from 
+	SITE_pcornet.dispensing disp
+inner join 
+	SITE_pedsnet.person person 
+    on disp.patid = person.person_source_value
+left join 
+	vocabulary.concept ndc 
+	on disp.ndc=ndc.concept_code 
+	and ndc.vocabulary_id='NDC' 
+	and ndc.invalid_reason is null
+left join 
+	vocabulary.concept_relationship ndc_map 
+	on ndc.concept_id=ndc_map.concept_id_1 
+	and ndc_map.relationship_id='Maps to'
+left join 
+	pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
+	on disp.dispense_dose_disp_unit = ucum_maps.target_concept 
+	and ucum_maps.source_concept_class = 'Dose unit'
 left join 
 	(select concept_id
 	from vocabulary.concept
@@ -236,10 +245,12 @@ select
 	rx_frequency as frequency,
 	null as lot_number,
 	person.person_id as person_id,
-	vo.provider_id as provider_id,
-	case when SITE_pedsnet.isnumeric(rx_quantity::varchar) then rx_quantity::numeric
+	enc.providerid as provider_id,
+	case 
+		when SITE_pedsnet.isnumeric(rx_quantity::varchar) then rx_quantity::numeric
 	end as quantity,
-	case when SITE_pedsnet.is_int(rx_refills::varchar) then rx_refills::int
+	case 
+		when SITE_pedsnet.is_int(rx_refills::varchar) then rx_refills::int
 	end as refills,
 	coalesce(case
 			when presc.rx_route = 'OT' then 44814649
@@ -248,16 +259,24 @@ select
 	rx_route as route_source_value,
 	null as sig,
 	null as stop_reason,
- 	vo.visit_occurrence_id as visit_occurrence_id
-from SITE_pcornet.prescribing presc
-inner join SITE_pedsnet.person person 
+ 	enc.encounterid as visit_occurrence_id
+from 
+	SITE_pcornet.prescribing presc
+inner join 
+	SITE_pedsnet.person person 
     on presc.patid = person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-    on presc.encounterid = vo.visit_source_value
-left join vocabulary.concept as rxnorm 
-	on presc.rxnorm_cui = rxnorm.concept_code and vocabulary_id='RxNorm' and standard_concept='S'
-left join pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
-	on presc.rx_dose_ordered_unit = ucum_maps.target_concept and source_concept_class = 'Dose unit'
+left join 
+	SITE_pcornet.encounter enc
+    on presc.encounterid = enc.encounterid
+left join 
+	vocabulary.concept as rxnorm 
+	on presc.rxnorm_cui = rxnorm.concept_code 
+	and vocabulary_id='RxNorm' 
+	and standard_concept='S'
+left join 
+	pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
+	on presc.rx_dose_ordered_unit = ucum_maps.target_concept 
+	and source_concept_class = 'Dose unit'
 left join 
 	(select concept_id
 	from vocabulary.concept
@@ -337,26 +356,28 @@ select
 	null as drug_exposure_order_date,
 	null as drug_exposure_order_datetime,
 	case
-            when medadmin_start_date is null then '0001-01-01'::date
+        when medadmin_start_date is null then '0001-01-01'::date
 	    else medadmin_start_date
 	end as drug_exposure_start_date,
 	case
 	    when medadmin_start_date is null OR medadmin_start_time is null then '0001-01-01'::timestamp
-            else (medadmin_start_date || ' '|| medadmin_start_time)::timestamp
+        else (medadmin_start_date || ' '|| medadmin_start_time)::timestamp
 	end as drug_exposure_start_datetime,
 	case
 		when medadmin_type='ND' then ndc.concept_id
 		when medadmin_type='RX' then rxnorm.concept_id
-		else 0 end as drug_source_concept_id,
+		else 0 
+	end as drug_source_concept_id,
 	coalesce(left(raw_medadmin_med_name, 200)||'...',' ')||'|'||coalesce(medadmin_code,' ') as drug_source_value,
 	38000180 as drug_type_concept_id,
 	medadmin_dose_admin::varchar as eff_drug_dose_source_value,
-	case when(SITE_pedsnet.isnumeric(medadmin_dose_admin::varchar)) then medadmin_dose_admin::numeric
-        end as effective_drug_dose,
+	case 
+		when(SITE_pedsnet.isnumeric(medadmin_dose_admin::varchar)) then medadmin_dose_admin::numeric
+    end as effective_drug_dose,
 	null as frequency,
 	null as lot_number,
 	person.person_id as person_id,
-	vo.provider_id as provider_id,
+	enc.providerid as provider_id,
 	null as quantity,
 	null as refills,
 	coalesce(
@@ -367,17 +388,35 @@ select
 	medadmin_route as route_source_value,
 	null as sig,
 	null as stop_reason,
-	vo.visit_occurrence_id as visit_occurrence_id
-from SITE_pcornet.med_admin as medadmin
-inner join SITE_pedsnet.person person 
-on medadmin.patid = person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-      on medadmin.encounterid = vo.visit_source_value
-left join vocabulary.concept ndc on medadmin.medadmin_code=ndc.concept_code and medadmin_type='ND' and ndc.vocabulary_id='NDC' and ndc.invalid_reason is null
-left join vocabulary.concept_relationship ndc_map on ndc.concept_id=ndc_map.concept_id_1 and ndc_map.relationship_id='Maps to'
-left join vocabulary.concept rxnorm on medadmin.medadmin_code = rxnorm.concept_code and medadmin_type='RX' and rxnorm.vocabulary_id='RxNorm' and rxnorm.standard_concept='S'
-left join pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
-	on medadmin.medadmin_dose_admin_unit = ucum_maps.target_concept and ucum_maps.source_concept_class = 'Dose unit'
+	enc.encounterid as visit_occurrence_id
+from 
+	SITE_pcornet.med_admin as medadmin
+inner join 
+	SITE_pedsnet.person person 
+	on medadmin.patid = person.person_source_value
+left join 
+	SITE_pcornet.encounter enc
+    on medadmin.encounterid = enc.encounterid
+left join 
+	vocabulary.concept ndc 
+	on medadmin.medadmin_code=ndc.concept_code 
+	and medadmin_type='ND' 
+	and ndc.vocabulary_id='NDC' 
+	and ndc.invalid_reason is null
+left join 
+	vocabulary.concept_relationship ndc_map 
+	on ndc.concept_id=ndc_map.concept_id_1 
+	and ndc_map.relationship_id='Maps to'
+left join 
+	vocabulary.concept rxnorm 
+	on medadmin.medadmin_code = rxnorm.concept_code 
+	and medadmin_type='RX' 
+	and rxnorm.vocabulary_id='RxNorm' 
+	and rxnorm.standard_concept='S'
+left join 
+	pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
+	on medadmin.medadmin_dose_admin_unit = ucum_maps.target_concept 
+	and ucum_maps.source_concept_class = 'Dose unit'
 left join 
 	(select concept_id
 	from vocabulary.concept

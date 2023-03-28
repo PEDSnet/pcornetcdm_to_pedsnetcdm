@@ -130,38 +130,48 @@ select
 		else 44814649
 	end as immunization_type_concept_id, 
 	person.person_id as person_id,
-	po.procedure_occurrence_id as procedure_occurrence_id,
-	vo.provider_id as provider_id,
-	vo.visit_occurrence_id as visit_occurrence_id
-from SITE_pcornet.immunization imm
-inner join SITE_pedsnet.person person 
+	po.proceduresid as procedure_occurrence_id,
+	enc.providerid as provider_id,
+	enc.encounterid as visit_occurrence_id
+from 
+	SITE_pcornet.immunization imm
+inner join 
+	SITE_pedsnet.person person 
     on imm.patid = person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-    on imm.encounterid = vo.visit_source_value
-left join SITE_pedsnet.procedure_occurrence po
-    on imm.proceduresid = po.procedure_source_value
-left join vocabulary.concept c_hcpcs
+left join 
+	SITE_pcornet.encounter enc
+    on imm.encounterid = enc.encounterid
+left join 
+	SITE_pcornet.procedures po
+    on imm.proceduresid = po.proceduresid
+left join 
+	vocabulary.concept c_hcpcs
     on imm.vx_code=c_hcpcs.concept_code 
 	and imm.vx_code_type='CH' 
 	and c_hcpcs.vocabulary_id='HCPCS' 
 	and imm.vx_code ~ '[A-Z]'
-left join vocabulary.concept c_cpt
+left join 
+	vocabulary.concept c_cpt
     on imm.vx_code=c_cpt.concept_code 
 	and imm.vx_code_type='CH' 
 	and c_cpt.vocabulary_id='CPT4'
-left join vocabulary.concept c_rxnorm
+left join 
+	vocabulary.concept c_rxnorm
     on imm.vx_code=c_rxnorm.concept_code 
 	and imm.vx_code_type='RX' 
 	and c_rxnorm.vocabulary_id='RxNorm'
-left join vocabulary.concept c_cvx
+left join 
+	vocabulary.concept c_cvx
     on imm.vx_code=c_cvx.concept_code 
 	and imm.vx_code_type='CX' 
 	and c_cvx.vocabulary_id='CVX'
-left join vocabulary.concept c_ndc
+left join 
+	vocabulary.concept c_ndc
     on imm.vx_code=c_ndc.concept_code 
 	and imm.vx_code_type='NDC' 
 	and c_ndc.vocabulary_id='NDC'
-left join pcornet_maps.pedsnet_pcornet_valueset_map unit_map
+left join 
+	pcornet_maps.pedsnet_pcornet_valueset_map unit_map
 	on imm.vx_dose_unit = unit_map.target_concept 
 	and unit_map.target_concept = 'Dose unit'
 left join 
@@ -371,12 +381,15 @@ select
 	2000001288 as immunization_type_concept_id, 
 	person.person_id as person_id,
 	po.procedure_occurrence_id as procedure_occurrence_id,
-	vo.provider_id as provider_id,
+	vo.providerid as provider_id,
 	vo.visit_occurrence_id as visit_occurrence_id
-from SITE_pedsnet.procedure_occurrence po
-inner join SITE_pedsnet.person person 
+from 
+	SITE_pedsnet.procedure_occurrence po
+inner join 
+	SITE_pedsnet.person person 
     on po.person_id = person.person_id
-left join SITE_pedsnet.visit_occurrence vo 
+left join 
+	SITE_pedsnet.visit_occurrence vo 
     on po.visit_occurrence_id = vo.visit_occurrence_id
 where 
 	po.procedure_occurrence_id in
@@ -482,10 +495,13 @@ select
 	null as procedure_occurrence_id,
 	vo.provider_id as provider_id,
 	vo.visit_occurrence_id as visit_occurrence_id
-from SITE_pedsnet.drug_exposure de
-inner join SITE_pedsnet.person person 
+from 
+	SITE_pedsnet.drug_exposure de
+inner join 
+	SITE_pedsnet.person person 
     on de.person_id = person.person_id
-left join SITE_pedsnet.visit_occurrence vo 
+left join 
+	SITE_pedsnet.visit_occurrence vo 
     on de.visit_occurrence_id = vo.visit_occurrence_id
 where
 	drug_concept_id in 

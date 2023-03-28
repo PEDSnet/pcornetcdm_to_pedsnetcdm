@@ -32,20 +32,22 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      44813951 AS observation_concept_id,
-     case when enc.discharge_date is not null and  SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date
-     when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date:: date
-     else '0001-01-01'::date
+     case 
+          when enc.discharge_date is not null and  SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date
+          when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date:: date
+          else '0001-01-01'::date
      end AS observation_date,
-     case when SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
-     when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date:: timestamp
-     else '0001-01-01'::timestamp
-     end  AS observation_datetime,
+     case 
+          when SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
+          when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date:: timestamp
+          else '0001-01-01'::timestamp
+     end AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
      'Discharge Status' AS observation_source_value,
      38000280 AS observation_type_concept_id,
-     vo.person_id AS person_id,
-     vo.provider_id AS provider_id,
+     enc.patid AS person_id,
+     enc.providerid AS provider_id,
      NULL AS qualifier_concept_id,
      NULL AS qualifier_source_value,
      NULL AS unit_concept_id,
@@ -60,15 +62,14 @@ SELECT
      NULL AS value_as_number,
      NULL AS value_as_string,
      enc.discharge_disposition as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id
-FROM SITE_pcornet.encounter enc
-left join SITE_pedsnet.visit_occurrence vo 
-     on enc.encounterid=vo.visit_source_value
-WHERE enc.discharge_disposition is not null;
-
+     enc.encounterid AS visit_occurrence_id
+FROM 
+     SITE_pcornet.encounter enc
+WHERE 
+     enc.discharge_disposition is not null;
 commit;
-begin;
 
+begin;
 -- adding DRG
 INSERT INTO SITE_pedsnet.observation(
      observation_concept_id,
@@ -91,56 +92,62 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      3040464 AS observation_concept_id,
-     case when enc.discharge_date is not null and SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date
-     when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::date
-     else '0001-01-01'::date
+     case 
+          when enc.discharge_date is not null and SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date
+          when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::date
+          else '0001-01-01'::date
      end AS observation_date,
-     case when enc.discharge_date is not null and SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
-     when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
-     else '0001-01-01'::timestamp
+     case 
+          when enc.discharge_date is not null and SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
+          when enc.admit_date is not null and SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
+          else '0001-01-01'::timestamp
      end AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
      'DRG|'||enc.DRG AS observation_source_value,
      38000280 AS observation_type_concept_id,
-     vo.person_id AS person_id,
-     vo.provider_id AS provider_id,
+     enc.patid AS person_id,
+     enc.providerid AS provider_id,
      4269228 AS qualifier_concept_id,
      'Primary' AS qualifier_source_value, -- Only primary DRG recorded in PCORnet
      NULL AS unit_concept_id,
      NULL AS unit_source_value,
      case 
           when 
-		case when SITE_pedsnet.is_date(enc.discharge_date::varchar)
-			then enc.discharge_date::date < '01-OCT-2007'
-		when SITE_pedsnet.is_date(enc.admit_date::varchar)
-			then enc.admit_date::date < '01-OCT-2007'
-		end
-          then 
-               drg.concept_id 
-               else msdrg.concept_id
-         end as value_as_concept_id,           
+		     case 
+                    when SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date < '01-OCT-2007'
+		          when SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::date < '01-OCT-2007'
+		     end
+          then drg.concept_id 
+          else msdrg.concept_id
+     end as value_as_concept_id,           
      NULL AS value_as_number,
      NULL AS value_as_string,
      case 
           when
-	       case when SITE_pedsnet.is_date(enc.discharge_date::varchar)
-                        then enc.discharge_date::date < '01-OCT-2007'
-                when SITE_pedsnet.is_date(enc.admit_date::varchar)
-                        then enc.admit_date::date < '01-OCT-2007'
-                end
-          then 
-               drg.concept_id 
-               else msdrg.concept_id
-         end::varchar as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id
-FROM SITE_pcornet.encounter enc
-left join SITE_pedsnet.visit_occurrence vo 
-     on enc.encounterid=vo.visit_source_value
-left join vocabulary.concept drg on enc.drg=drg.concept_code and drg.concept_class_id = 'DRG' and valid_end_date = '30-SEP-2007' and invalid_reason = 'D' 
-left join vocabulary.concept msdrg on enc.drg=msdrg.concept_code and msdrg.concept_class_id = 'MS-DRG' and msdrg.invalid_reason is null 
-WHERE enc.DRG is not null;
-
+	          case 
+                    when SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date < '01-OCT-2007'
+                    when SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::date < '01-OCT-2007'
+               end
+          then drg.concept_id 
+          else msdrg.concept_id
+     end::varchar as value_source_value,
+     enc.encounterid AS visit_occurrence_id
+FROM 
+     SITE_pcornet.encounter enc
+left join 
+     vocabulary.concept drg 
+     on enc.drg=drg.concept_code 
+     and drg.concept_class_id = 'DRG' 
+     and valid_end_date = '30-SEP-2007' 
+     and invalid_reason = 'D' 
+left join 
+     vocabulary.concept msdrg 
+     on enc.drg=msdrg.concept_code 
+     and msdrg.concept_class_id = 'MS-DRG' 
+     and msdrg.invalid_reason is null 
+WHERE 
+     enc.DRG is not null;
 commit;
 
 begin;
@@ -166,18 +173,20 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      4005823 AS observation_concept_id,
-     case when vt.measure_date is not null then vt.measure_date::date
-     else '0001-01-01'::date
+     case 
+          when vt.measure_date is not null then vt.measure_date::date
+          else '0001-01-01'::date
      end AS observation_date,
-     case when vt.measure_time is not null and vt.measure_date is not null then
-     (vt.measure_date || ' '|| vt.measure_time)::timestamp
-     else '0001-01-01'::timestamp end AS observation_datetime,
+     case 
+          when vt.measure_time is not null and vt.measure_date is not null then (vt.measure_date || ' '|| vt.measure_time)::timestamp
+          else '0001-01-01'::timestamp 
+     end AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
      'Tobacco|'||vt.tobacco||'|'||coalesce(vt.raw_tobacco,' ') as observation_source_value,
      38000280 AS observation_type_concept_id,
-     vo.person_id AS person_id,
-     vo.provider_id AS provider_id,
+     enc.patid AS person_id,
+     enc.providerid AS provider_id,
      0 AS qualifier_concept_id,
      null AS qualifier_source_value,
      NULL AS unit_concept_id,
@@ -195,12 +204,14 @@ SELECT
      NULL AS value_as_number,
      NULL AS value_as_string,
      tobacco as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id
-FROM SITE_pcornet.vital vt
-left join SITE_pedsnet.visit_occurrence vo 
-     on vt.encounterid=vo.visit_source_value
-WHERE vt.tobacco is not null;
-
+     enc.encounterid AS visit_occurrence_id
+FROM 
+     SITE_pcornet.vital vt
+left join 
+     SITE_pcornet.encounter enc 
+     on vt.encounterid = enc.encounterid
+WHERE 
+     vt.tobacco is not null;
 commit;
 
 begin;
@@ -225,18 +236,20 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      4219336 AS observation_concept_id,
-     case when vt.measure_date is not null then
-     vt.measure_date::date 
-     else '0001-01-01':: date end AS observation_date,
-     case when vt.measure_time is not null and vt.measure_date is not null then
-     (vt.measure_date|| ' '|| vt.measure_time)::timestamp
-     else '0001-01-01'::timestamp end  AS observation_datetime,
+     case 
+          when vt.measure_date is not null then vt.measure_date::date 
+          else '0001-01-01':: date 
+     end AS observation_date,
+     case 
+          when vt.measure_time is not null and vt.measure_date is not null then (vt.measure_date|| ' '|| vt.measure_time)::timestamp
+          else '0001-01-01'::timestamp
+     end AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
      'Tobacco Type|'||vt.tobacco_type||'|'||coalesce(vt.raw_tobacco_type,' ') as observation_source_value,
      38000280 AS observation_type_concept_id,
-     vo.person_id AS person_id,
-     vo.provider_id AS provider_id,
+     enc.patid AS person_id,
+     enc.providerid AS provider_id,
      0 AS qualifier_concept_id,
      null AS qualifier_source_value,
      NULL AS unit_concept_id,
@@ -254,12 +267,14 @@ SELECT
      NULL AS value_as_number,
      NULL AS value_as_string,
      tobacco_type as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id
-FROM SITE_pcornet.vital vt
-left join SITE_pedsnet.visit_occurrence vo 
-     on vt.encounterid=vo.visit_source_value
-WHERE vt.tobacco_type is not null;
-
+     enc.encounterid AS visit_occurrence_id
+FROM 
+     SITE_pcornet.vital vt
+left join 
+     SITE_pcornet.encounter enc 
+     on vt.encounterid = enc.encounterid
+WHERE 
+     vt.tobacco_type is not null;
 commit;
 
 begin;
@@ -284,18 +299,20 @@ INSERT INTO SITE_pedsnet.observation(
      visit_occurrence_id)
 SELECT 
      4275495 AS observation_concept_id,
-     case when vt.measure_date is not null then vt.measure_date::date
-        else '0001-01-01'::date	
+     case 
+          when vt.measure_date is not null then vt.measure_date::date
+          else '0001-01-01'::date	
 	end AS observation_date,
-     case when vt.measure_time is not null and vt.measure_date is not null then
-     (vt.measure_date || ' '|| vt.measure_time)::timestamp
-      else '0001-01-01'::timestamp end AS observation_datetime,
+     case 
+          when vt.measure_time is not null and vt.measure_date is not null then (vt.measure_date || ' '|| vt.measure_time)::timestamp
+          else '0001-01-01'::timestamp 
+     end AS observation_datetime,
      nextval('SITE_pedsnet.obs_seq') AS observation_id,
      0 AS observation_source_concept_id,
      'Smoking|'||vt.smoking||'|'||coalesce(vt.raw_smoking,' ') AS observation_source_value,
      38000280 AS observation_type_concept_id,
-     vo.person_id AS person_id,
-     vo.provider_id AS provider_id,
+     enc.patid AS person_id,
+     enc.providerid AS provider_id,
      0 AS qualifier_concept_id,
      null AS qualifier_source_value,
      NULL AS unit_concept_id,
@@ -314,26 +331,29 @@ SELECT
      NULL AS value_as_number,
      NULL AS value_as_string,
      smoking as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id
-FROM SITE_pcornet.vital vt
-left join SITE_pedsnet.visit_occurrence vo 
-     on vt.encounterid=vo.visit_source_value
-WHERE vt.smoking is not null;
+     enc.encounterid AS visit_occurrence_id
+FROM 
+     SITE_pcornet.vital vt
+left join 
+     SITE_pcornet.encounter enc 
+     on vt.encounterid = enc.encounterid
+WHERE 
+     vt.smoking is not null;
 commit;
 
 -- add sexual_orientation
-AS=Asexual 
-BI=Bisexual 
-GA=Gay 
-LE=Lesbian 
-QU=Queer 
-QS=Questioning 
-ST=Straight 
-SE=Something else 
-MU=Multiple sexual orientations 
-DC=Decline to answer
-NI=No information 
-UN=Unknow n 
-OT=Other
+-- AS=Asexual 
+-- BI=Bisexual 
+-- GA=Gay 
+-- LE=Lesbian 
+-- QU=Queer 
+-- QS=Questioning 
+-- ST=Straight 
+-- SE=Something else 
+-- MU=Multiple sexual orientations 
+-- DC=Decline to answer
+-- NI=No information 
+-- UN=Unknown
+-- OT=Other
 
 --add gender identity

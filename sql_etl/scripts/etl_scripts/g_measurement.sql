@@ -22,9 +22,10 @@ create table if not exists SITE_pedsnet.meas_vital_ht as
 SELECT distinct
      3023540 AS measurement_concept_id, 
      v_ht.measure_date AS measurement_date, 
-     case when v_ht.measure_time is not null 
-	then (v_ht.measure_date || ' '|| v_ht.measure_time)::timestamp
-     else v_ht.measure_date::timestamp end AS measurement_datetime,
+     case 
+          when v_ht.measure_time is not null then (v_ht.measure_date || ' '|| v_ht.measure_time)::timestamp
+          else v_ht.measure_date::timestamp 
+     end AS measurement_datetime,
      null as measurement_order_date, 
      null as measurement_order_datetime, 
      null as measurement_result_date, 
@@ -36,7 +37,7 @@ SELECT distinct
      person.person_id  AS person_id, 
      0  as priority_concept_id, 
      null as priority_source_value, 
-     vo.provider_id as provider_id, 
+     enc.providerid as provider_id, 
      null as range_high, 
      null as range_high_operator_concept_id, 
      null as range_high_source_value, 
@@ -49,17 +50,26 @@ SELECT distinct
      9237 AS unit_source_concept_id, 
      'cm (converted from inches)' AS unit_source_value, 
      NULL AS value_as_concept_id,
-     case when SITE_pedsnet.isnumeric(v_ht.ht::varchar) then
-	(v_ht.ht::numeric*2.54) end AS value_as_number,
+     case 
+          when SITE_pedsnet.isnumeric(v_ht.ht::varchar) then (v_ht.ht::numeric*2.54) 
+     end AS value_as_number,
      v_ht.ht AS value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id 
-FROM SITE_pcornet.vital v_ht
-left join SITE_pcornet.encounter enc on enc.encounterid = v_ht.encounterid
-inner join SITE_pedsnet.person person on v_ht.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-     on v_ht.encounterid=vo.visit_source_value
-LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_ht.vital_source
-where v_ht.ht is not null;
+     enc.encounterid AS visit_occurrence_id 
+FROM 
+     SITE_pcornet.vital v_ht
+left join 
+     SITE_pcornet.encounter enc 
+     on enc.encounterid = v_ht.encounterid
+inner join 
+     SITE_pedsnet.person person 
+     on v_ht.patid=person.person_source_value
+LEFT JOIN 
+     cdmh_staging.p2o_vital_term_xwalk vt 
+     ON vt.src_cdm_tbl = 'VITAL' 
+     AND vt.src_cdm_column = 'VITAL_SOURCE' 
+     AND vt.src_code = v_ht.vital_source
+where 
+     v_ht.ht is not null;
 
 commit;
 
@@ -87,11 +97,14 @@ case
 end as range_low, 
 range_low_operator_concept_id::int, range_low_source_value, specimen_concept_id::int, 
 specimen_source_value, unit_concept_id,unit_source_concept_id, unit_source_value, value_as_concept_id::int,
- case when SITE_pedsnet.isnumeric(value_as_number::varchar) 
-	then value_as_number::numeric end as value_as_number, 
+ case 
+     when SITE_pedsnet.isnumeric(value_as_number::varchar) 
+	then value_as_number::numeric 
+end as value_as_number, 
 value_source_value,
 visit_occurrence_id
-from SITE_pedsnet.meas_vital_ht;
+from 
+     SITE_pedsnet.meas_vital_ht;
 
 commit;
 
@@ -101,9 +114,11 @@ create table if not exists SITE_pedsnet.meas_vital_wt as
 SELECT
      3013762 AS measurement_concept_id, 
      v_wt.measure_date AS measurement_date,
-     case when v_wt.measure_time is not null 
-        then (v_wt.measure_date || ' '|| v_wt.measure_time)::timestamp
-     else v_wt.measure_date::timestamp end AS measurement_datetime,
+     case 
+          when v_wt.measure_time is not null 
+          then (v_wt.measure_date || ' '|| v_wt.measure_time)::timestamp
+          else v_wt.measure_date::timestamp 
+     end AS measurement_datetime,
      null as measurement_order_date, 
      null as measurement_order_datetime, 
      null as measurement_result_date, 
@@ -113,9 +128,9 @@ SELECT
      2000000033 as measurement_type_concept_id, 
      4172703 AS operator_concept_id, 
      person.person_id AS person_id, 
-     0  as priority_concept_id, 
+     0 as priority_concept_id, 
      null as priority_source_value, 
-     vo.provider_id as provider_id, 
+     enc.providerid as provider_id, 
      null as range_high, 
      null as range_high_operator_concept_id, 
      null as range_high_source_value, 
@@ -128,17 +143,26 @@ SELECT
      8739 AS unit_source_concept_id, 
      'kg (converted from pounds)' AS unit_source_value, 
      NULL AS value_as_concept_id,
-     case when SITE_pedsnet.isnumeric(v_wt.wt::varchar) then (v_wt.wt::numeric*0.453592)
+     case 
+          when SITE_pedsnet.isnumeric(v_wt.wt::varchar) then (v_wt.wt::numeric*0.453592)
      end AS value_as_number,
      v_wt.wt as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id
-FROM SITE_pcornet.vital v_wt
-left join SITE_pcornet.encounter enc on enc.encounterid = v_wt.encounterid
-inner join SITE_pedsnet.person person on v_wt.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-     on v_wt.encounterid=vo.visit_source_value
-LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_wt.vital_source
-where v_wt.wt is not null;
+     enc.encounterid AS visit_occurrence_id
+FROM 
+     SITE_pcornet.vital v_wt
+left join 
+     SITE_pcornet.encounter enc 
+     on enc.encounterid = v_wt.encounterid
+inner join 
+     SITE_pedsnet.person person 
+     on v_wt.patid=person.person_source_value
+LEFT JOIN 
+     cdmh_staging.p2o_vital_term_xwalk vt 
+     ON vt.src_cdm_tbl = 'VITAL' 
+     AND vt.src_cdm_column = 'VITAL_SOURCE' 
+     AND vt.src_code = v_wt.vital_source
+where 
+     v_wt.wt is not null;
 
 commit;
 
@@ -180,9 +204,11 @@ create table if not exists SITE_pedsnet.meas_vital_sys as
 SELECT
      coalesce(sys_con.source_concept_id::int, 3004249) AS measurement_concept_id, 
      v_sys.measure_date AS measurement_date, 
-     case when v_sys.measure_time is not null 
-        then (v_sys.measure_date || ' '|| v_sys.measure_time)::timestamp
-     else v_sys.measure_date::timestamp end AS measurement_datetime,
+     case 
+          when v_sys.measure_time is not null 
+          then (v_sys.measure_date || ' '|| v_sys.measure_time)::timestamp
+          else v_sys.measure_date::timestamp 
+     end AS measurement_datetime,
      null as measurement_order_date, 
      null as measurement_order_datetime, 
      null as measurement_result_date, 
@@ -192,9 +218,9 @@ SELECT
      2000000033 as measurement_type_concept_id, 
      4172703 AS operator_concept_id, 
      person.person_id  AS person_id, 
-     0  as priority_concept_id, 
+     0 as priority_concept_id, 
      null as priority_source_value, 
-     vo.provider_id as provider_id, 
+     enc.providerid as provider_id, 
      null as range_high, 
      null as range_high_operator_concept_id, 
      null as range_high_source_value, 
@@ -207,15 +233,19 @@ SELECT
      0 AS unit_source_concept_id, 
      'millimeter mercury column' AS unit_source_value, 
      NULL AS value_as_concept_id,
-     case when (SITE_pedsnet.isnumeric(v_sys.systolic::varchar)) then
-        v_sys.systolic::numeric end AS value_as_number,
+     case 
+          when (SITE_pedsnet.isnumeric(v_sys.systolic::varchar)) then v_sys.systolic::numeric 
+     end AS value_as_number,
      v_sys.systolic as value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id
-FROM SITE_pcornet.vital v_sys
-left join SITE_pcornet.encounter enc on enc.encounterid = v_sys.encounterid
-inner join SITE_pedsnet.person person on v_sys.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-     on v_sys.encounterid=vo.visit_source_value
+     enc.encounterid AS visit_occurrence_id
+FROM 
+     SITE_pcornet.vital v_sys
+left join 
+     SITE_pcornet.encounter enc 
+     on enc.encounterid = v_sys.encounterid
+inner join 
+     SITE_pedsnet.person person 
+     on v_sys.patid=person.person_source_value
 left join 
      (
           select target_concept, source_concept_id
@@ -223,8 +253,13 @@ left join
           where source_concept_class='BP Position'
           and not(concept_description like '%Diastolic%')
      ) as sys_con on sys_con.target_concept = v_sys.bp_position
-LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_sys.vital_source
-where v_sys.systolic is not null;
+LEFT JOIN 
+     cdmh_staging.p2o_vital_term_xwalk vt 
+     ON vt.src_cdm_tbl = 'VITAL' 
+     AND vt.src_cdm_column = 'VITAL_SOURCE' 
+     AND vt.src_code = v_sys.vital_source
+where 
+     v_sys.systolic is not null;
 
 commit;
 
@@ -266,9 +301,11 @@ create table if not exists SITE_pedsnet.meas_vital_dia as
 SELECT
      3012888 AS measurement_concept_id, 
      v_dia.measure_date AS measurement_date, 
-     case when v_dia.measure_time is not null 
-        then (v_dia.measure_date || ' '|| v_dia.measure_time)::timestamp
-     else v_dia.measure_date::timestamp end AS measurement_datetime, 
+     case 
+          when v_dia.measure_time is not null 
+          then (v_dia.measure_date || ' '|| v_dia.measure_time)::timestamp
+          else v_dia.measure_date::timestamp 
+     end AS measurement_datetime, 
      null as measurement_order_date, 
      null as measurement_order_datetime, 
      null as measurement_result_date, 
@@ -280,7 +317,7 @@ SELECT
      person.person_id  AS person_id, 
      0  as priority_concept_id, 
      null as priority_source_value, 
-     vo.provider_id as provider_id, 
+     enc.providerid as provider_id, 
      null as range_high, 
      null as range_high_operator_concept_id, 
      null as range_high_source_value, 
@@ -293,15 +330,20 @@ SELECT
      0 AS unit_source_concept_id, 
      'millimeter mercury column' AS unit_source_value, 
      NULL AS value_as_concept_id,
-     case when SITE_pedsnet.isnumeric(v_dia.diastolic::varchar)
-        then v_dia.diastolic::numeric end as value_as_number,
+     case 
+          when SITE_pedsnet.isnumeric(v_dia.diastolic::varchar)
+          then v_dia.diastolic::numeric 
+     end as value_as_number,
      coalesce(dia_con.concept_description,' ') AS value_source_value,
-     vo.visit_occurrence_id AS visit_occurrence_id
-FROM SITE_pcornet.vital v_dia
-left join SITE_pcornet.encounter enc on enc.encounterid = v_dia.encounterid
-inner join SITE_pedsnet.person person on v_dia.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-     on v_dia.encounterid=vo.visit_source_value
+     enc.encounterid AS visit_occurrence_id
+FROM 
+     SITE_pcornet.vital v_dia
+left join 
+     SITE_pcornet.encounter enc 
+     on enc.encounterid = v_dia.encounterid
+inner join 
+     SITE_pedsnet.person person 
+     on v_dia.patid=person.person_source_value
 left join 
      (
           select target_concept, source_concept_id, concept_description
@@ -309,8 +351,13 @@ left join
           where source_concept_class='BP Position'
           and not(concept_description like '%Systolic%')
      ) as dia_con on dia_con.target_concept = v_dia.bp_position
-LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_dia.vital_source
-where v_dia.diastolic is not null ;
+LEFT JOIN 
+     cdmh_staging.p2o_vital_term_xwalk vt 
+     ON vt.src_cdm_tbl = 'VITAL' 
+     AND vt.src_cdm_column = 'VITAL_SOURCE' 
+     AND vt.src_code = v_dia.vital_source
+where 
+     v_dia.diastolic is not null ;
 
 commit;
 
@@ -350,45 +397,56 @@ begin;
 -- pulling the original_bmi data
 Create table if not exists SITE_pedsnet.meas_vital_bmi as
 SELECT
-3038553 AS measurement_concept_id, 
-v_bmi.measure_date AS measurement_date,
-case when v_bmi.measure_time is not null then (v_bmi.measure_date || ' '|| v_bmi.measure_time)::timestamp
-else v_bmi.measure_date::timestamp end AS measurement_datetime, 
-null as measurement_order_date, 
-null as measurement_order_datetime, 
-null as measurement_result_date, 
-null as measurement_result_datetime, 
-0 AS measurement_source_concept_id,
-'Original BMI' AS measurement_source_value, 
-2000000033 as measurement_type_concept_id, 
-4172703 AS operator_concept_id, 
-person.person_id  AS person_id, 
-0  as priority_concept_id, 
-null as priority_source_value, 
-vo.provider_id as provider_id, 
-null as range_high, 
-null as range_high_operator_concept_id, 
-null as range_high_source_value, 
-null as range_low, 
-null as range_low_operator_concept_id, 
-null as range_low_source_value, 
-null as specimen_concept_id, 
-null as specimen_source_value, 
-null AS unit_concept_id, 
-null as unit_source_concept_id,
-null AS unit_source_value, 
-NULL AS value_as_concept_id,
-case when SITE_pedsnet.isnumeric(v_bmi.original_bmi::varchar)
-        then v_bmi.original_bmi::numeric end as value_as_number,
-v_bmi.original_bmi AS value_source_value,
-vo.visit_occurrence_id AS visit_occurrence_id
-FROM SITE_pcornet.vital v_bmi
-left join SITE_pcornet.encounter enc on enc.encounterid = v_bmi.encounterid
-inner join SITE_pedsnet.person person on v_bmi.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-     on v_bmi.encounterid=vo.visit_source_value
-LEFT JOIN cdmh_staging.p2o_vital_term_xwalk   vt ON vt.src_cdm_tbl = 'VITAL' AND vt.src_cdm_column = 'VITAL_SOURCE' AND vt.src_code = v_bmi.vital_source
-where v_bmi.original_bmi is not null ;
+     3038553 AS measurement_concept_id, 
+     v_bmi.measure_date AS measurement_date,
+     case 
+          when v_bmi.measure_time is not null then (v_bmi.measure_date || ' '|| v_bmi.measure_time)::timestamp
+          else v_bmi.measure_date::timestamp 
+     end AS measurement_datetime, 
+     null as measurement_order_date, 
+     null as measurement_order_datetime, 
+     null as measurement_result_date, 
+     null as measurement_result_datetime, 
+     0 AS measurement_source_concept_id,
+     'Original BMI' AS measurement_source_value, 
+     2000000033 as measurement_type_concept_id, 
+     4172703 AS operator_concept_id, 
+     person.person_id  AS person_id, 
+     0  as priority_concept_id, 
+     null as priority_source_value, 
+     enc.providerid as provider_id, 
+     null as range_high, 
+     null as range_high_operator_concept_id, 
+     null as range_high_source_value, 
+     null as range_low, 
+     null as range_low_operator_concept_id, 
+     null as range_low_source_value, 
+     null as specimen_concept_id, 
+     null as specimen_source_value, 
+     null AS unit_concept_id, 
+     null as unit_source_concept_id,
+     null AS unit_source_value, 
+     NULL AS value_as_concept_id,
+     case 
+          when SITE_pedsnet.isnumeric(v_bmi.original_bmi::varchar) then v_bmi.original_bmi::numeric 
+     end as value_as_number,
+     v_bmi.original_bmi AS value_source_value,
+     enc.encounterid AS visit_occurrence_id
+FROM 
+     SITE_pcornet.vital v_bmi
+left join 
+     SITE_pcornet.encounter enc 
+     on enc.encounterid = v_bmi.encounterid
+inner join 
+     SITE_pedsnet.person person 
+     on v_bmi.patid=person.person_source_value
+LEFT JOIN 
+     cdmh_staging.p2o_vital_term_xwalk vt 
+     ON vt.src_cdm_tbl = 'VITAL' 
+     AND vt.src_cdm_column = 'VITAL_SOURCE' 
+     AND vt.src_code = v_bmi.vital_source
+where 
+     v_bmi.original_bmi is not null ;
 
 commit;
 
@@ -642,20 +700,27 @@ select distinct
                else null
           end,
           c.concept_id,0)  as measurement_concept_id,
-     case when lab.result_date is  not null and result_date_valid then lab.result_date::date
-     when lab.specimen_date is not null and specimen_date_valid then lab.specimen_date::date
-     else '0001-01-01'::date end as measurement_date,
-     case when lab.result_date is not null and result_date_valid then lab.result_date::timestamp
-     when lab.specimen_date is not null and specimen_date_valid then lab.specimen_date::timestamp
-     else '0001-01-01'::timestamp end as measurement_datetime,
-     case when order_date_valid then lab.lab_order_date::date
+     case 
+          when lab.result_date is  not null and result_date_valid then lab.result_date::date
+          when lab.specimen_date is not null and specimen_date_valid then lab.specimen_date::date
+          else '0001-01-01'::date 
+     end as measurement_date,
+     case 
+          when lab.result_date is not null and result_date_valid then lab.result_date::timestamp
+          when lab.specimen_date is not null and specimen_date_valid then lab.specimen_date::timestamp
+          else '0001-01-01'::timestamp 
+     end as measurement_datetime,
+     case 
+          when order_date_valid then lab.lab_order_date::date
      end as measurement_order_date,
-     case when order_date_valid then lab.lab_order_date::
-timestamp
+     case 
+          when order_date_valid then lab.lab_order_date::timestamp
      end as measurement_order_datetime,
-     case when result_date_valid then lab.result_date::date
+     case 
+          when result_date_valid then lab.result_date::date
      end as measurement_result_date,
-     case when result_date_valid then lab.result_date::timestamp
+     case 
+          when result_date_valid then lab.result_date::timestamp
      end as measurement_result_datetime,
      coalesce(c.concept_id,0) as measurement_source_concept_id,
      coalesce(lab.LAB_LOINC,' ') as measurement_source_value,
@@ -668,11 +733,11 @@ timestamp
      person.person_id AS person_id,  
      coalesce(priority.source_concept_id::int,44814650) as priority_concept_id,
      null as priority_source_value,
-     vo.provider_id as provider_id,
+     enc.providerid as provider_id,
      case
-        when lab.norm_range_high !~ '^[0-9\.]+$' then null
-	when not SITE_pedsnet.isnumeric(lab.norm_range_high::text) then null 
-        else lab.norm_range_high::numeric
+          when lab.norm_range_high !~ '^[0-9\.]+$' then null
+	     when not SITE_pedsnet.isnumeric(lab.norm_range_high::text) then null 
+          else lab.norm_range_high::numeric
      end as range_high,
      coalesce(
 		case 
@@ -681,9 +746,9 @@ timestamp
 		end,0) as range_high_operator_concept_id, 
      null as range_high_source_value,
      case
-        when lab.norm_range_low !~ '^[0-9\.]+$' then null
-	when not SITE_pedsnet.isnumeric(lab.norm_range_low::text) then null
-        else lab.norm_range_low::numeric 
+          when lab.norm_range_low !~ '^[0-9\.]+$' then null
+	     when not SITE_pedsnet.isnumeric(lab.norm_range_low::text) then null
+          else lab.norm_range_low::numeric 
      end as range_low,
      coalesce(
 		case 
@@ -788,15 +853,23 @@ timestamp
           when lower(trim(result_qual)) = 'no information' then 46237210
           else 45877393 
      end as value_as_concept_id,
-     case when SITE_pedsnet.isnumeric(lab.result_num::varchar)
-        then lab.result_num::numeric end as value_as_number,
-     case when (SITE_pedsnet.isnumeric(lab.result_num::varchar)) and (lab.result_num::text != '0') then lab.result_num::text
-     when lab.raw_result IS NOT NULL then lab.raw_result
-     else 'Unknown' end as value_source_value, 
-     vo.visit_occurrence_id as visit_occurrence_id
-from SITE_pcornet.LAB_RESULT_CM as lab
-inner join SITE_pedsnet.person person on lab.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo on lab.encounterid=vo.visit_source_value
+     case 
+          when SITE_pedsnet.isnumeric(lab.result_num::varchar) then lab.result_num::numeric 
+     end as value_as_number,
+     case 
+          when (SITE_pedsnet.isnumeric(lab.result_num::varchar)) and (lab.result_num::text != '0') then lab.result_num::text
+          when lab.raw_result IS NOT NULL then lab.raw_result
+          else 'Unknown' 
+     end as value_source_value, 
+     enc.encounterid as visit_occurrence_id
+from 
+     SITE_pcornet.LAB_RESULT_CM as lab
+inner join 
+     SITE_pedsnet.person person 
+     on lab.patid = person.person_source_value
+left join 
+     SITE_pcornet.encounter enc 
+     on lab.encounterid = enc.encounterid
 left join 
      (
           select target_concept, source_concept_id
@@ -847,8 +920,14 @@ left join
           and not (target_concept = '/uL' and concept_description = '/cumm')
           and not (target_concept = 'U/mL' and pcornet_name is null)
      ) as units on lab.result_unit = units.target_concept
-left join pcornet_maps.pedsnet_pcornet_valueset_map priority on priority.target_concept = lab.priority and priority.source_concept_class = 'Lab priority'
-left join vocabulary.concept c on lab.lab_loinc=c.concept_code and c.vocabulary_id='LOINC'
+left join 
+     pcornet_maps.pedsnet_pcornet_valueset_map priority 
+     on priority.target_concept = lab.priority 
+     and priority.source_concept_class = 'Lab priority'
+left join 
+     vocabulary.concept c 
+     on lab.lab_loinc=c.concept_code 
+     and c.vocabulary_id='LOINC'
 left join  
      (
           select target_concept, source_concept_id
@@ -958,11 +1037,15 @@ with
 SELECT distinct
      nextval('SITE_pedsnet.measurement_id_seq') AS measurement_id,
      coalesce(lnc.concept_id,0) AS measurement_concept_id,
-     case when clin.obsclin_start_date is not null then clin.obsclin_start_date
-     else '0001-01-01'::date end AS measurement_date,
-     case when clin.obsclin_start_date is not null and clin.obsclin_start_time is not null then	(clin.obsclin_start_date || ' '|| clin.obsclin_start_time)::timestamp 
-     when clin.obsclin_start_date is not null then clin.obsclin_start_date::timestamp
-     else '0001-01-01'::timestamp end AS measurement_datetime, 
+     case 
+          when clin.obsclin_start_date is not null then clin.obsclin_start_date
+          else '0001-01-01'::date 
+     end AS measurement_date,
+     case 
+          when clin.obsclin_start_date is not null and clin.obsclin_start_time is not null then (clin.obsclin_start_date || ' '|| clin.obsclin_start_time)::timestamp 
+          when clin.obsclin_start_date is not null then clin.obsclin_start_date::timestamp
+          else '0001-01-01'::timestamp 
+     end AS measurement_datetime, 
      null::date as measurement_order_date, 
      null::timestamp as measurement_order_datetime, 
      null::date as measurement_result_date, 
@@ -976,11 +1059,11 @@ SELECT distinct
           when clin.obsclin_result_modifier ='LE' then 4171754
           when clin.obsclin_result_modifier ='LT' then 4171756
           else 4172703 -- Equal
-          end AS operator_concept_id, 
+     end AS operator_concept_id, 
      person.person_id  AS person_id, 
      0  as priority_concept_id, 
      null as priority_source_value, 
-     vo.provider_id as provider_id, 
+     enc.providerid as provider_id, 
      null::int as range_high, 
      null::int as range_high_operator_concept_id, 
      null as range_high_source_value, 
@@ -1006,20 +1089,34 @@ SELECT distinct
                when clin.obsclin_result_qual = 'OT' then 44814649
                else qual.concept_id
           end,0) AS value_as_concept_id,
-     case when (SITE_pedsnet.isnumeric(clin.obsclin_result_num::varchar)) then
-	clin.obsclin_result_num::numeric end AS value_as_number, 
-     coalesce(clin.obsclin_result_text,
-                 clin.obsclin_result_qual,
-                 clin.obsclin_result_num::text,' ') AS value_source_value,
-    vo.visit_occurrence_id AS visit_occurrence_id
-FROM SITE_pcornet.obs_clin clin
-inner join SITE_pedsnet.person person on clin.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-     on clin.encounterid=vo.visit_source_value
-left join lnc on clin.obsclin_code=lnc.concept_code
-left join unit on clin.obsclin_result_unit=unit.concept_code
-left join qual on clin.obsclin_result_qual=qual.concept_code
-where obsclin_type='LC';
+     case 
+          when (SITE_pedsnet.isnumeric(clin.obsclin_result_num::varchar)) then clin.obsclin_result_num::numeric 
+     end AS value_as_number, 
+     coalesce(
+          clin.obsclin_result_text,
+          clin.obsclin_result_qual,
+          clin.obsclin_result_num::text,
+          ' ') AS value_source_value,
+    enc.encounterid AS visit_occurrence_id
+FROM 
+     SITE_pcornet.obs_clin clin
+inner join 
+     SITE_pedsnet.person person 
+     on clin.patid=person.person_source_value
+left join 
+     SITE_pcornet.encounter enc 
+     on clin.encounterid=enc.encounterid
+left join 
+     lnc 
+     on clin.obsclin_code=lnc.concept_code
+left join 
+     unit 
+     on clin.obsclin_result_unit=unit.concept_code
+left join 
+     qual 
+     on clin.obsclin_result_qual=qual.concept_code
+where 
+     obsclin_type='LC';
 
 commit;
 
@@ -1074,15 +1171,20 @@ with
 SELECT distinct
      nextval('SITE_pedsnet.measurement_id_seq') AS measurement_id,
      coalesce(sm.concept_id,0) AS measurement_concept_id, 
-     case when clin.obsclin_start_date is not null then clin.obsclin_start_date      else '0001-01-01'::date end AS measurement_date,
-     case when clin.obsclin_start_date is not null and clin.obsclin_start_time is not null then (clin.obsclin_start_date || ' '|| clin.obsclin_start_time)::timestamp
-     when clin.obsclin_start_date is not null then clin.obsclin_start_date::timestamp
-     else '0001-01-01'::timestamp end AS measurement_datetime,
+     case 
+          when clin.obsclin_start_date is not null then clin.obsclin_start_date      
+          else '0001-01-01'::date 
+     end AS measurement_date,
+     case 
+          when clin.obsclin_start_date is not null and clin.obsclin_start_time is not null then (clin.obsclin_start_date || ' '|| clin.obsclin_start_time)::timestamp
+          when clin.obsclin_start_date is not null then clin.obsclin_start_date::timestamp
+          else '0001-01-01'::timestamp 
+     end AS measurement_datetime,
      null::date as measurement_order_date, 
      null::timestamp as measurement_order_datetime, 
      null::date as measurement_result_date, 
      null::timestamp as measurement_result_datetime, 
-      coalesce(sm.concept_id,0) AS measurement_source_concept_id,
+     coalesce(sm.concept_id,0) AS measurement_source_concept_id,
      coalesce(clin.raw_obsclin_name,clin.OBSCLIN_CODE,sm.concept_name,' ') AS measurement_source_value, 
      2000000033 as measurement_type_concept_id, 
      case 
@@ -1091,11 +1193,11 @@ SELECT distinct
           when clin.obsclin_result_modifier ='LE' then 4171754
           when clin.obsclin_result_modifier ='LT' then 4171756
           else 4172703 -- Equal
-          end AS operator_concept_id, 
+     end AS operator_concept_id, 
      person.person_id  AS person_id, 
-     0  as priority_concept_id, 
+     0 as priority_concept_id, 
      null as priority_source_value, 
-     vo.provider_id as provider_id, 
+     enc.providerid as provider_id, 
      null::int as range_high, 
      null::int as range_high_operator_concept_id, 
      null as range_high_source_value, 
@@ -1121,19 +1223,33 @@ SELECT distinct
                when clin.obsclin_result_qual = 'OT' then 44814649
                else qual.concept_id
           end,0) AS value_as_concept_id,
-     case when (SITE_pedsnet.isnumeric(clin.obsclin_result_num::varchar)) then
-        clin.obsclin_result_num::numeric end AS value_as_number,
-     coalesce(clin.obsclin_result_text,
-                 clin.obsclin_result_qual,
-                 clin.obsclin_result_num::text,' ') AS value_source_value,
-    vo.visit_occurrence_id AS visit_occurrence_id
-FROM SITE_pcornet.obs_clin clin
-inner join SITE_pedsnet.person person on clin.patid=person.person_source_value
-left join SITE_pedsnet.visit_occurrence vo 
-     on clin.encounterid=vo.visit_source_value
-left join sm on clin.obsclin_code=sm.concept_code
-left join unit on clin.obsclin_result_unit=unit.concept_code
-left join qual on clin.obsclin_result_qual=qual.concept_code
-where obsclin_type='SM';
+     case 
+          when (SITE_pedsnet.isnumeric(clin.obsclin_result_num::varchar)) then clin.obsclin_result_num::numeric 
+     end AS value_as_number,
+     coalesce(
+          clin.obsclin_result_text,
+          clin.obsclin_result_qual,
+          clin.obsclin_result_num::text,
+          ' ') AS value_source_value,
+    enc.encounterid AS visit_occurrence_id
+FROM 
+     SITE_pcornet.obs_clin clin
+inner join 
+     SITE_pedsnet.person person 
+     on clin.patid=person.person_source_value
+left join 
+     SITE_pcornet.encounter enc 
+     on clin.encounterid=enc.encounterid
+left join 
+     sm 
+     on clin.obsclin_code=sm.concept_code
+left join 
+     unit 
+     on clin.obsclin_result_unit=unit.concept_code
+left join 
+     qual 
+     on clin.obsclin_result_qual=qual.concept_code
+where 
+     obsclin_type='SM';
 
 commit;
