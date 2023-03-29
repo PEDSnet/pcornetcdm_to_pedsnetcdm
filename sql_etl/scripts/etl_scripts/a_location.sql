@@ -15,7 +15,7 @@ select
     42046186 as country_concept_id,
     'United States' as country_source_value
  FROM SITE_pcornet.encounter enc
- WHERE enc.facility_type IS NOT NULL
+ WHERE enc.facility_id IS NOT NULL
  GROUP BY facility_location;
 commit;
 
@@ -39,10 +39,7 @@ select
     'United States' as country_source_value
 FROM 
     (select 
-        case
-            when address_zip5 is not null then address_zip5
-            else address_zip9
-        end as zip,
+        coalesce(address_zip5,address_zip9) as zip,
         address_city,
         address_state
     from SITE_pcornet.lds_address_history
