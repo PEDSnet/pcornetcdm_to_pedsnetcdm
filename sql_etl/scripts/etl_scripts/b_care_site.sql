@@ -21,8 +21,8 @@ INSERT INTO SITE_pedsnet.care_site(
     place_of_service_source_value,
     specialty_concept_id, 
     specialty_source_value)
-SELECT 
-    distinct on (facilityid)facilityid AS care_site_id,
+SELECT distinct
+    facilityid AS care_site_id,
     enc.facility_type AS care_site_name,
     coalesce(
         case when enc.facility_type is not null then substr(enc.facility_type, 1, 50) else null end,

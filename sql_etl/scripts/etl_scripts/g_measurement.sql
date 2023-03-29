@@ -111,7 +111,7 @@ commit;
 begin;
 -- pulling data from vitals wt
 create table if not exists SITE_pedsnet.meas_vital_wt as
-SELECT
+SELECT distinct
      3013762 AS measurement_concept_id, 
      v_wt.measure_date AS measurement_date,
      case 
@@ -201,7 +201,7 @@ commit;
 begin;
 -- puling the systolica data
 create table if not exists SITE_pedsnet.meas_vital_sys as
-SELECT
+SELECT distinct
      coalesce(sys_con.source_concept_id::int, 3004249) AS measurement_concept_id, 
      v_sys.measure_date AS measurement_date, 
      case 
@@ -298,7 +298,7 @@ commit;
 begin;
 -- puling the dystolic data
 create table if not exists SITE_pedsnet.meas_vital_dia as
-SELECT
+SELECT distinct
      3012888 AS measurement_concept_id, 
      v_dia.measure_date AS measurement_date, 
      case 
@@ -396,7 +396,7 @@ commit;
 begin;
 -- pulling the original_bmi data
 Create table if not exists SITE_pedsnet.meas_vital_bmi as
-SELECT
+SELECT distinct
      3038553 AS measurement_concept_id, 
      v_bmi.measure_date AS measurement_date,
      case 

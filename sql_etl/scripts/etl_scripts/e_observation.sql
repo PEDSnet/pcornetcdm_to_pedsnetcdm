@@ -30,7 +30,7 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_string,
      value_source_value, 
      visit_occurrence_id)
-SELECT 
+SELECT distinct
      44813951 AS observation_concept_id,
      case 
           when enc.discharge_date is not null and  SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date
@@ -90,7 +90,7 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_string,
      value_source_value, 
      visit_occurrence_id)
-SELECT 
+SELECT distinct
      3040464 AS observation_concept_id,
      case 
           when enc.discharge_date is not null and SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date
@@ -171,7 +171,7 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_string, 
      value_source_value,
      visit_occurrence_id)
-SELECT 
+SELECT distinct
      4005823 AS observation_concept_id,
      case 
           when vt.measure_date is not null then vt.measure_date::date
@@ -234,7 +234,7 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_string, 
      value_source_value,
      visit_occurrence_id)
-SELECT 
+SELECT distinct
      4219336 AS observation_concept_id,
      case 
           when vt.measure_date is not null then vt.measure_date::date 
@@ -297,7 +297,7 @@ INSERT INTO SITE_pedsnet.observation(
      value_as_string,
      value_source_value,
      visit_occurrence_id)
-SELECT 
+SELECT distinct
      4275495 AS observation_concept_id,
      case 
           when vt.measure_date is not null then vt.measure_date::date

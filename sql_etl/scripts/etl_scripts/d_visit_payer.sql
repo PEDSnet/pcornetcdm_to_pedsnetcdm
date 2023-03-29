@@ -74,7 +74,7 @@ where
 	payer_type_secondary = '23'
 )
 
-select
+select distinct
 	coalesce(payer_info.plan_class,'Other/Unknown') as plan_class,
 	payer_info.plan_name as plan_name,
 	coalesce(payer_info.plan_type,'Other/Unknown') as plan_type,

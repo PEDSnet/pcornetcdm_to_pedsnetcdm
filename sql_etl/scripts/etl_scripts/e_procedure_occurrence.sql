@@ -15,8 +15,7 @@ INSERT INTO SITE_pedsnet.procedure_occurrence (
       provider_id, 
       quantity, 
       visit_occurrence_id)
-SELECT 
-      distinct 
+SELECT distinct 
       row_number() over (order by proc.proceduresid)::bigint AS PROCEDURE_OCCURRENCE_ID,
       0 as modifier_concept_id,
       null as modifier_source_value,

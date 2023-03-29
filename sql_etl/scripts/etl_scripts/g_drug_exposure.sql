@@ -74,7 +74,7 @@ insert into SITE_pedsnet.drug_exposure(
 	stop_reason,
 	visit_occurrence_id)
 
-select
+select distinct
 	case 
 		when(SITE_pedsnet.isnumeric(dispense_sup::varchar)) then dispense_sup::numeric
 	end as days_supply,	
@@ -200,7 +200,7 @@ insert into SITE_pedsnet.drug_exposure(
 	stop_reason,
 	visit_occurrence_id)
 
-select
+select distinct
 	case 
 		when SITE_pedsnet.is_int(rx_days_supply::varchar) then rx_days_supply::int
 	end as days_supply,
@@ -334,7 +334,7 @@ insert into SITE_pedsnet.drug_exposure(
 	stop_reason, 
 	visit_occurrence_id)
 
-select
+select distinct
 	null as days_supply,
 	0 as dispense_as_written_concept_id,
 	coalesce(

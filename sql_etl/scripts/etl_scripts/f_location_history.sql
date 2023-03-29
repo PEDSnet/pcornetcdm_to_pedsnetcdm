@@ -14,7 +14,7 @@ insert into SITE_pedsnet.location_history(
 	start_date, 
 	start_datetime
 )
-select
+select distinct
  	nextval('SITE_pedsnet.loc_hist_seq') as location_history_id,
 	'Person' as domain_id,
 	address_period_end::date as end_date,

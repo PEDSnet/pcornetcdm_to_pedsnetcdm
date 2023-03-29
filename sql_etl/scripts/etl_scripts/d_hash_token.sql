@@ -8,7 +8,7 @@ insert into SITE_pedsnet.hash_token(
 	token_05, 
 	token_16,
 	token_encryption_key)
-select
+select distinct
 	person.person_id,
 	token_01,
 	token_02, 

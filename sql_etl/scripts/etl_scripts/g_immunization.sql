@@ -36,7 +36,7 @@ insert into SITE_pedsnet.immunization(
 	procedure_occurrence_id, 
 	provider_id, 
 	visit_occurrence_id)
-select
+select distinct
 	coalesce(
 		case
 			when imm.vx_body_site = 'BN' then 46233552
@@ -320,7 +320,7 @@ insert into SITE_pedsnet.immunization(
 	procedure_occurrence_id, 
 	provider_id, 
 	visit_occurrence_id)
-select
+select distinct
 	0 as imm_body_site_concept_id,
 	null as imm_body_site_source_value,
 	null as imm_dose_unit_concept_id, 
@@ -460,7 +460,7 @@ insert into SITE_pedsnet.immunization(
 	procedure_occurrence_id, 
 	provider_id, 
 	visit_occurrence_id)
-select
+select distinct
 	0 as imm_body_site_concept_id, 
 	null as imm_body_site_source_value, 
 	dose_unit_concept_id as imm_dose_unit_concept_id, 

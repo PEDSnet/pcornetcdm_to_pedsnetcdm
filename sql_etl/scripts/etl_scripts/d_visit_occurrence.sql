@@ -27,8 +27,8 @@ INSERT INTO SITE_pedsnet.visit_occurrence (
     visit_start_date, 
     visit_start_datetime, 
     visit_type_concept_id)
-SELECT 
-    distinct on (encounterid) encounterid AS visit_occurrence_id,
+SELECT distinct
+    encounterid AS visit_occurrence_id,
     vsrc.target_concept_id AS admitted_from_concept_id,
     coalesce(vsrc.SRC_TYPE_DISCRIPTION,'') || ' | ' || coalesce(enc.admitting_source,enc.raw_admitting_source) AS admitted_from_source_value,
     cs.care_site_id as care_site_id,

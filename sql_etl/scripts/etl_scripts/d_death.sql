@@ -11,7 +11,7 @@ INSERT INTO SITE_pedsnet.death (
 	death_impute_concept_id, 
 	death_type_concept_id, 
 	person_id)
-SELECT 
+SELECT distinct
 	coalesce(
 		case
 			when dc.death_cause_code='09' then cr_icd9.concept_id_2

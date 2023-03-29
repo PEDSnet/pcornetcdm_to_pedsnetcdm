@@ -29,7 +29,7 @@ INSERT INTO SITE_pedsnet.condition_occurrence(
         provider_id,
         stop_reason,
         visit_occurrence_id)
-SELECT 
+SELECT distinct
     coalesce(
         case
             --covid diagnosis codes
@@ -208,7 +208,7 @@ INSERT INTO SITE_pedsnet.condition_occurrence(
         provider_id,
         stop_reason,
         visit_occurrence_id)
-SELECT 
+SELECT distinct
     coalesce(
         case
             --covid diagnosis codes

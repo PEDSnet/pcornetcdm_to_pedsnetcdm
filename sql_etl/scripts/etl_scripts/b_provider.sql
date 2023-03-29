@@ -9,8 +9,8 @@ INSERT INTO SITE_pedsnet.provider(
     care_site_id,
     specialty_concept_id,
     specialty_source_value)
-SELECT 
-    distinct on (providerid)providerid AS provider_id,
+SELECT distinct 
+    prov.providerid AS provider_id,
     prov.providerid as provider_source_value,
     coalesce(
         case
