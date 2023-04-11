@@ -39,13 +39,13 @@ SELECT distinct
     enc.providerid AS provider_id,
     coalesce(typ.source_concept_id::int,0) AS visit_concept_id,
     case 
-        when is_date(enc.discharge_date::varchar) then enc.discharge_date::date
-        when is_date(enc.admit_date::varchar) then enc.admit_date::date
+        when SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date
+        when SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::date
 		else '9999-12-31'::date
     end AS visit_end_date,
     case 
-        when is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
-        when is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
+        when SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
+        when SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
 		else '9999-12-31'::timestamp
     end AS visit_end_datetime,
     0 AS visit_source_concept_id,
@@ -75,5 +75,6 @@ left join
     pcornet_maps.pedsnet_pcornet_valueset_map typ 
     on typ.target_concept = enc.enc_type 
     and typ.source_concept_class = 'Encounter type'
-    and source_concept_id not in ('2000000469','42898160');                                         
+    and source_concept_id not in ('2000000469','42898160')
+ON CONFLICT (visit_occurrence_id) DO NOTHING;                                         
 commit;                                 

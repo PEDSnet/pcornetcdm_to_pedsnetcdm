@@ -37,5 +37,6 @@ left join pcornet_maps.pedsnet_pcornet_valueset_map gender_map
     and prov.provider_sex=gender_map.target_concept
 left join pcornet_maps.pedsnet_pcornet_valueset_map specialty_map
     on specialty_map.source_concept_class = 'Provider Specialty' 
-    and prov.provider_specialty_primary=specialty_map.target_concept;
+    and prov.provider_specialty_primary=specialty_map.target_concept
+ON CONFLICT (provider_id) DO NOTHING;
 commit;

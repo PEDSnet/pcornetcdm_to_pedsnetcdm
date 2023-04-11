@@ -48,9 +48,9 @@ SELECT distinct
      38000280 AS observation_type_concept_id,
      enc.patid AS person_id,
      enc.providerid AS provider_id,
-     NULL AS qualifier_concept_id,
+     NULL::integer AS qualifier_concept_id,
      NULL AS qualifier_source_value,
-     NULL AS unit_concept_id,
+     NULL::integer AS unit_concept_id,
      NULL AS unit_source_value,
      case 
           when enc.discharge_disposition='A' then 4161979 -- Alive
@@ -59,7 +59,7 @@ SELECT distinct
           when enc.discharge_disposition='OT' then 44814649 -- Other
           when enc.discharge_disposition='UN' then 44814653 -- Unknown
      end as value_as_concept_id,           
-     NULL AS value_as_number,
+     NULL::numeric AS value_as_number,
      NULL AS value_as_string,
      enc.discharge_disposition as value_source_value,
      enc.encounterid AS visit_occurrence_id
@@ -110,7 +110,7 @@ SELECT distinct
      enc.providerid AS provider_id,
      4269228 AS qualifier_concept_id,
      'Primary' AS qualifier_source_value, -- Only primary DRG recorded in PCORnet
-     NULL AS unit_concept_id,
+     NULL::integer AS unit_concept_id,
      NULL AS unit_source_value,
      case 
           when 
@@ -121,7 +121,7 @@ SELECT distinct
           then drg.concept_id 
           else msdrg.concept_id
      end as value_as_concept_id,           
-     NULL AS value_as_number,
+     NULL::numeric AS value_as_number,
      NULL AS value_as_string,
      case 
           when
@@ -189,7 +189,7 @@ SELECT distinct
      enc.providerid AS provider_id,
      0 AS qualifier_concept_id,
      null AS qualifier_source_value,
-     NULL AS unit_concept_id,
+     NULL::integer AS unit_concept_id,
      NULL AS unit_source_value,
      case 
           when tobacco='01' then 4005823 --Current user
@@ -201,7 +201,7 @@ SELECT distinct
           when tobacco='UN' then 44814649 --Unknown
           when tobacco='OT' then 44814653 --Other
      end as value_as_concept_id,           
-     NULL AS value_as_number,
+     NULL::numeric AS value_as_number,
      NULL AS value_as_string,
      tobacco as value_source_value,
      enc.encounterid AS visit_occurrence_id
@@ -211,7 +211,8 @@ left join
      SITE_pcornet.encounter enc 
      on vt.encounterid = enc.encounterid
 WHERE 
-     vt.tobacco is not null;
+     vt.tobacco is not null and
+     enc.patid is not null;
 commit;
 
 begin;
@@ -252,7 +253,7 @@ SELECT distinct
      enc.providerid AS provider_id,
      0 AS qualifier_concept_id,
      null AS qualifier_source_value,
-     NULL AS unit_concept_id,
+     NULL::integer AS unit_concept_id,
      NULL AS unit_source_value,
      case 
           when tobacco_type='01' then 42530793 --Smoked Tobaccbo only
@@ -264,7 +265,7 @@ SELECT distinct
           when tobacco_type='UN' then 44814649 --Unknown
           when tobacco_type='OT' then 44814653 --Other
          end as value_as_concept_id,           
-     NULL AS value_as_number,
+     NULL::numeric AS value_as_number,
      NULL AS value_as_string,
      tobacco_type as value_source_value,
      enc.encounterid AS visit_occurrence_id
@@ -274,7 +275,8 @@ left join
      SITE_pcornet.encounter enc 
      on vt.encounterid = enc.encounterid
 WHERE 
-     vt.tobacco_type is not null;
+     vt.tobacco_type is not null and
+     enc.patid is not null;
 commit;
 
 begin;
@@ -315,7 +317,7 @@ SELECT distinct
      enc.providerid AS provider_id,
      0 AS qualifier_concept_id,
      null AS qualifier_source_value,
-     NULL AS unit_concept_id,
+     NULL::integer AS unit_concept_id,
      NULL AS unit_source_value,
      case 
           when smoking='01' then 42709996 --Current everyday smoker
@@ -328,7 +330,7 @@ SELECT distinct
           when smoking='UN' then 44814649 --Unknown
           when smoking='OT' then 44814653 --Other
          end as value_as_concept_id,           
-     NULL AS value_as_number,
+     NULL::numeric AS value_as_number,
      NULL AS value_as_string,
      smoking as value_source_value,
      enc.encounterid AS visit_occurrence_id
@@ -338,7 +340,8 @@ left join
      SITE_pcornet.encounter enc 
      on vt.encounterid = enc.encounterid
 WHERE 
-     vt.smoking is not null;
+     vt.smoking is not null
+     and enc.patid is not null;
 commit;
 
 -- add sexual_orientation

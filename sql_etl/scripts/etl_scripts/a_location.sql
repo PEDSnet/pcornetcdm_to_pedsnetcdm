@@ -15,7 +15,7 @@ select
     42046186 as country_concept_id,
     'United States' as country_source_value
  FROM SITE_pcornet.encounter enc
- WHERE enc.facility_id IS NOT NULL
+ WHERE enc.facilityid IS NOT NULL
  GROUP BY facility_location;
 commit;
 

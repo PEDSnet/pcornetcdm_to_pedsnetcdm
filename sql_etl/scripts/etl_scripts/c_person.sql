@@ -53,7 +53,7 @@ SELECT distinct
   coalesce(lang.concept_description,'') || ' | ' || coalesce(PAT_PREF_LANGUAGE_SPOKEN,raw_pat_pref_language_spoken) as language_source_value,
   9999999 AS location_id,
   demo.patid AS person_source_value, 
-  null as pn_gestational_age, 
+  null::numeric as pn_gestational_age, 
   ppp.provider_id AS provider_id,
   case
       when race_map.source_concept_id !~ '^[0-9]+$' then 44814650
@@ -82,7 +82,8 @@ left join
 left join 
   pcornet_maps.pedsnet_pcornet_valueset_map race_map
   on demo.race=race_map.target_concept
-  and race_map.source_concept_class = 'Race';
+  and race_map.source_concept_class = 'Race'
+ON CONFLICT (person_id) DO NOTHING;
 commit;
 
 -- begin;
@@ -100,4 +101,4 @@ commit;
 --  set location_id = x_walk.location_id
 --  from x_walk
 --  where p.person_id::varchar = x_walk.patid;
---  commit;
+--  commit;SITE_pedsnet.person

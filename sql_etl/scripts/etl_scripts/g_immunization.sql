@@ -323,15 +323,15 @@ insert into SITE_pedsnet.immunization(
 select distinct
 	0 as imm_body_site_concept_id,
 	null as imm_body_site_source_value,
-	null as imm_dose_unit_concept_id, 
+	null::integer as imm_dose_unit_concept_id, 
 	null as imm_dose_unit_source_value, 
-	null as imm_exp_date, 
-	null as imm_exp_datetime, 
+	null::date as imm_exp_date, 
+	null::timestamp as imm_exp_datetime, 
 	null as imm_lot_num, 
 	null as imm_manufacturer, 
 	po.procedure_date as imm_recorded_date,
 	po.procedure_datetime as imm_recorded_datetime,
-	null as imm_route_concept_id,
+	null::integer as imm_route_concept_id,
 	null as imm_route_source_value,
 	case
 		when po.procedure_concept_id = 42639775 then 724904
@@ -381,8 +381,8 @@ select distinct
 	2000001288 as immunization_type_concept_id, 
 	person.person_id as person_id,
 	po.procedure_occurrence_id as procedure_occurrence_id,
-	vo.providerid as provider_id,
-	vo.visit_occurrence_id as visit_occurrence_id
+	po.provider_id as provider_id,
+	po.visit_occurrence_id as visit_occurrence_id
 from 
 	SITE_pedsnet.procedure_occurrence po
 inner join 
@@ -465,8 +465,8 @@ select distinct
 	null as imm_body_site_source_value, 
 	dose_unit_concept_id as imm_dose_unit_concept_id, 
 	dose_unit_source_value as imm_dose_unit_source_value, 
-	null as imm_exp_date, 
-	null as imm_exp_datetime, 
+	null::date as imm_exp_date, 
+	null::timestamp as imm_exp_datetime, 
 	lot_number as imm_lot_num, 
 	null as imm_manufacturer, 
 	drug_exposure_start_date as imm_recorded_date, 

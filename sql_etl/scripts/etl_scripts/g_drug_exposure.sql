@@ -86,11 +86,11 @@ select distinct
 		end,0) as dose_unit_concept_id,
 	dispense_dose_disp_unit as dose_unit_source_value,
 	coalesce(ndc_map.concept_id_2,0) drug_concept_id,
-	null as drug_exposure_end_date,
-	null as drug_exposure_end_datetime,
+	null::date as drug_exposure_end_date,
+	null::timestamp as drug_exposure_end_datetime,
 	nextval('SITE_pedsnet.drug_exposure_seq') AS drug_exposure_id,
-	null as drug_exposure_order_date,
-	null as drug_exposure_order_datetime,
+	null::date as drug_exposure_order_date,
+	null::timestamp as drug_exposure_order_datetime,
 	case
         when dispense_date is null then '0001-01-01'::date
 	    else dispense_date::date
@@ -117,7 +117,7 @@ select distinct
 	null as provider_id,
 	case when SITE_pedsnet.isnumeric(dispense_amt::varchar)
 		then dispense_amt::numeric end as quantity,
-	null as refills,
+	null::integer as refills,
 	coalesce(
 		case
 			when disp.dispense_route = 'OT' then 44814649
@@ -335,7 +335,7 @@ insert into SITE_pedsnet.drug_exposure(
 	visit_occurrence_id)
 
 select distinct
-	null as days_supply,
+	null::integer as days_supply,
 	0 as dispense_as_written_concept_id,
 	coalesce(
 		case 
@@ -353,8 +353,8 @@ select distinct
 	medadmin_stop_date::date as drug_exposure_end_date,
 	(medadmin_stop_date || ' '|| medadmin_stop_time)::timestamp as drug_exposure_end_datetime,
  	nextval('SITE_pedsnet.drug_exposure_seq') AS drug_exposure_id,
-	null as drug_exposure_order_date,
-	null as drug_exposure_order_datetime,
+	null::date as drug_exposure_order_date,
+	null::timestamp as drug_exposure_order_datetime,
 	case
         when medadmin_start_date is null then '0001-01-01'::date
 	    else medadmin_start_date
@@ -378,8 +378,8 @@ select distinct
 	null as lot_number,
 	person.person_id as person_id,
 	enc.providerid as provider_id,
-	null as quantity,
-	null as refills,
+	null::numeric as quantity,
+	null::integer as refills,
 	coalesce(
 		case 
 			when medadmin.medadmin_route = 'OT' then 44814649
