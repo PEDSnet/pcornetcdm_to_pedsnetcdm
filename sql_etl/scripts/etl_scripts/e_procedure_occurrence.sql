@@ -35,7 +35,8 @@ SELECT distinct
       null::date as procedure_end_date,
       case
             when proc.px_date is null then '0001-01-01'::timestamp
-	      else proc.px_date::timestamp
+            when SITE_pedsnet.is_date(proc.px_date::varchar) then proc.px_date::timestamp
+            else '0001-01-01'::timestamp
       end as procedure_datetime,
       null::timestamp as procedure_end_datetime,
       case

@@ -130,7 +130,7 @@ SELECT distinct
             else NULL
         end,
     44814650)::int as condition_source_concept_id,
-    left(cond.condition,248) || ' | ' || cond.condition_type as condition_source_value,
+    left(coalesce(cond.condition, ''),248) || ' | ' || coalesce(cond.condition_type,'') as condition_source_value,
     case 
         when SITE_pedsnet.is_date(cond.resolve_date::varchar) then cond.resolve_date::date 
     end as condition_end_date,
@@ -310,7 +310,7 @@ SELECT distinct
             else NULL
         end,
     44814650)::int as condition_source_concept_id,
-    left(cond.dx,248) || ' | ' || dx_type as condition_source_value,
+    left(coalesce(cond.dx,''),248) || ' | ' || coalesce(dx_type,'') as condition_source_value,
     case 
         when cond.dx_date is not null and SITE_pedsnet.is_date(cond.dx_date::varchar) then cond.dx_date::date
         when cond.admit_date is not null and SITE_pedsnet.is_date(cond.admit_date::varchar) then cond.admit_date::date
