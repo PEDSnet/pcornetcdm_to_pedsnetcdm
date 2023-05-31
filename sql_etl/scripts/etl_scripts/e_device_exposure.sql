@@ -81,9 +81,9 @@ select
     0 as device_source_concept_id,
     px as device_source_value,
     44818707 as device_type_concept_id
-    person.patid::bigint as person_id,
-    enc.providerid::bigint as provider_id,
-    enc.encounterid::bigint as visit_occurrence_id
+    person.patid as person_id,
+    enc.providerid as provider_id,
+    enc.encounterid as visit_occurrence_id
 from 
     SITE_pcornet.procedures proc
 inner join 
@@ -174,9 +174,9 @@ select
     0 as device_source_concept_id,
     OBSGEN_TYPE || OBSGEN_CODE  as device_source_value,
     44818707 as device_type_concept_id
-    og.patid::bigint as person_id,
-    enc.providerid::bigint as provider_id,
-    enc.encounterid::bigint as visit_occurrence_id
+    og.patid as person_id,
+    enc.providerid as provider_id,
+    enc.encounterid as visit_occurrence_id
 from 
     SITE_pcornet.obs_gen og 
 inner join 
