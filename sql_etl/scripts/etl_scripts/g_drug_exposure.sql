@@ -136,11 +136,14 @@ left join
 	vocabulary.concept ndc 
 	on disp.ndc=ndc.concept_code 
 	and ndc.vocabulary_id='NDC' 
-	and ndc.invalid_reason is null
 left join 
 	vocabulary.concept_relationship ndc_map 
 	on ndc.concept_id=ndc_map.concept_id_1 
-	and ndc_map.relationship_id='Maps to'
+	and (
+		ndc_map.relationship_id='Maps to'
+		or ndc_map.relationship_id = 'Non-standard to Standard map (OMOP)'
+		)
+	and ndc_map.concept_id_2 in (select concept_id from vocabulary.concept where vocabulary_id = 'RxNorm')
 left join 
 	pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
 	on disp.dispense_dose_disp_unit = ucum_maps.target_concept 
@@ -402,11 +405,14 @@ left join
 	on medadmin.medadmin_code=ndc.concept_code 
 	and medadmin_type='ND' 
 	and ndc.vocabulary_id='NDC' 
-	and ndc.invalid_reason is null
 left join 
 	vocabulary.concept_relationship ndc_map 
 	on ndc.concept_id=ndc_map.concept_id_1 
-	and ndc_map.relationship_id='Maps to'
+	and (
+		ndc_map.relationship_id='Maps to'
+		or ndc_map.relationship_id = 'Non-standard to Standard map (OMOP)'
+		)
+	and ndc_map.concept_id_2 in (select concept_id from vocabulary.concept where vocabulary_id = 'RxNorm')
 left join 
 	vocabulary.concept rxnorm 
 	on medadmin.medadmin_code = rxnorm.concept_code 
