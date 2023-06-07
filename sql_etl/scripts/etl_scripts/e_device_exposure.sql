@@ -7,9 +7,11 @@ INSERT INTO SITE_pedsnet.device_exposure (
     device_concept_id, 
     device_exposure_id,
 	device_exposure_start_date, 
+    device_exposure_start_datetime,
 	device_source_concept_id,
 	device_source_value, 
 	device_type_concept_id, 
+    placement_concept_id
 	person_id, 
 	provider_id, 
 	visit_occurrence_id
@@ -77,10 +79,20 @@ select
         else 0
     end as device_concept_id,
     nextval('SITE_pedsnet.device_seq') as device_exposure_id,
-    coalesce(px_date,proc.admit_date) as device_exposure_start_date,
+    case 
+        when proc.px_date is not null and SITE_pedsnet.is_date(proc.px_date::varchar) then proc.px_date::date
+        when proc.admit_date is not null and SITE_pedsnet.is_date(proc.admit_date::varchar) then proc.admit_date::date
+        else '0001-01-01'::date
+    end as device_exposure_start_date,
+    case
+        when proc.px_date is null then '0001-01-01'::timestamp
+        when SITE_pedsnet.is_date(proc.px_date::varchar) then proc.px_date::timestamp
+        else '0001-01-01'::timestamp
+    end as device_exposure_start_datetime,
     0 as device_source_concept_id,
     px as device_source_value,
-    44818707 as device_type_concept_id
+    44818707 as device_type_concept_id,
+    44814650 as placement_concept_id,
     person.patid as person_id,
     enc.providerid as provider_id,
     enc.encounterid as visit_occurrence_id
@@ -160,9 +172,11 @@ INSERT INTO SITE_pedsnet.device_exposure (
     device_concept_id, 
     device_exposure_id,
 	device_exposure_start_date, 
+    device_exposure_start_datetime,
 	device_source_concept_id,
 	device_source_value, 
 	device_type_concept_id, 
+    placement_concept_id,
 	person_id, 
 	provider_id, 
 	visit_occurrence_id
@@ -170,10 +184,20 @@ INSERT INTO SITE_pedsnet.device_exposure (
 select 
     44791135 as device_concept_id,
     nextval('SITE_pedsnet.device_seq') as device_exposure_id,
-    OBSGEN_START_DATE as device_exposure_start_date,
+    case 
+        when og.OBSGEN_START_DATE is not null and SITE_pedsnet.is_date(og.OBSGEN_START_DATE::varchar) then og.OBSGEN_START_DATE::date
+        when og.OBSGEN_START_DATE is not null and SITE_pedsnet.is_date(og.OBSGEN_START_DATE::varchar) then og.OBSGEN_START_DATE::date
+        else '0001-01-01'::date
+    end as device_exposure_start_date,
+    case
+        when og.OBSGEN_START_DATE is null then '0001-01-01'::timestamp
+        when SITE_pedsnet.is_date(og.OBSGEN_START_DATE::varchar) then og.OBSGEN_START_DATE::timestamp
+        else '0001-01-01'::timestamp
+    end as device_exposure_start_datetime,
     0 as device_source_concept_id,
     OBSGEN_TYPE || OBSGEN_CODE  as device_source_value,
-    44818707 as device_type_concept_id
+    44818707 as device_type_concept_id,
+    44814650 as placement_concept_id,
     og.patid as person_id,
     enc.providerid as provider_id,
     enc.encounterid as visit_occurrence_id
