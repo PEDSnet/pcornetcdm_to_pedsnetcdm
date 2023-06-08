@@ -29,23 +29,34 @@ INSERT INTO SITE_pedsnet.location(
     location_source_value,
     country_concept_id,
     country_source_value)
-select 
+select distinct
  	nextval('SITE_pedsnet.loc_seq') AS location_id,
     address_city as city,
     address_state as state,
 	zip as zip,
-	'patient history | ' || zip as location_source_value,
+	'patient history | ' || zip || ' | geocode | ' || coalesce(GEOCODE_STATE,'') || ' | ' || coalesce(GEOCODE_COUNTY,'') || ' | ' || coalesce(GEOCODE_TRACT,'') || ' | ' || coalesce(GEOCODE_GROUP,'') as location_source_value,
     42046186 as country_concept_id,
     'United States' as country_source_value
 FROM 
     (select 
+        addressid,
         coalesce(address_zip5,address_zip9) as zip,
         address_city,
         address_state
     from SITE_pcornet.lds_address_history
 	) as lds
-where zip is not null
-GROUP BY zip, address_city, address_state;
+left join 
+    SITE_pcornet.private_address_geocode pag
+    on pag.addressid = lds.addressid
+GROUP BY 
+    zip, 
+    address_city,
+    address_state,
+    GEOCODE_STATE,
+    GEOCODE_COUNTY,
+    GEOCODE_TRACT,
+    GEOCODE_GROUP
+;
 commit;
 
 -- census block group locations

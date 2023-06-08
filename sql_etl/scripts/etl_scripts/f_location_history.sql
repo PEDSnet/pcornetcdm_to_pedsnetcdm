@@ -27,6 +27,7 @@ select distinct
 	address_period_start::timestamp as start_datetime
 from
 	(select
+		addressid,
 	 	patid,
 	 	address_period_start,
 	 	address_period_end,
@@ -36,8 +37,18 @@ from
         end as zip
     from SITE_pcornet.lds_address_history
 	) as lds
-inner join SITE_pedsnet.person person on lds.patid=person.person_source_value
-inner join SITE_pedsnet.location loc on lds.zip = loc.zip 
-	and loc.location_source_value like '%patient history%';
-
+inner join 
+	SITE_pedsnet.person person 
+	on lds.patid=person.person_source_value
+left join 
+    SITE_pcornet.private_address_geocode pag
+    on pag.addressid = lds.addressid
+left join 
+	SITE_pedsnet.location loc
+	on loc.location_source_value like '%patient history%'
+	and lds.zip = loc.zip
+	and coalesce(pag.GEOCODE_STATE,'') = trim(split_part(loc.location_source_value,'|',3))
+	and coalesce(pag.GEOCODE_COUNTY,'') = trim(split_part(loc.location_source_value,'|',4))
+	and coalesce(pag.GEOCODE_TRACT ,'') = trim(split_part(loc.location_source_value,'|',5))
+	and coalesce(pag.GEOCODE_GROUP ,'') = trim(split_part(loc.location_source_value,'|',6));
 commit;
