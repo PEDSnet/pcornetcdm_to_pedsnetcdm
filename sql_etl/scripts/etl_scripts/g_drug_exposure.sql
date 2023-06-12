@@ -166,7 +166,6 @@ left join
 			where domain_id = 'Route' and standard_concept = 'S' 
 		) as voc2
 		on route_maps.source_concept_id = voc2.concept_id::varchar
-		where vocabulary_id = 'SNOMED'
 	) as route 
 	on disp.dispense_route = route.target_concept
 ;
@@ -299,7 +298,6 @@ left join
 			where domain_id = 'Route' and standard_concept = 'S' 
 		) as voc2
 		on route_maps.source_concept_id = voc2.concept_id::varchar
-		where vocabulary_id = 'SNOMED'
 	) as route 
 	on presc.rx_route = route.target_concept
 ;
