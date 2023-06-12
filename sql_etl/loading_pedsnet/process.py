@@ -361,49 +361,42 @@ def load_maps():
         # endregion
 
         # region check if the schema exisit
-        print("Checking whether pcornet_maps schema exists...")
         cur.execute(
             """select exists(select 1 from information_schema.schemata where schema_name = \'""" + schema + """\');""")
         schema_exist = cur.fetchone()[0]
 
         if not schema_exist:
-            print('pcornet_maps schema does not exist...\n Creating schema ...')
+            print('% schema does not exist..... \n Creating schema ....' % schema)
             cur.execute(query.create_schema(schema))
-            print('Schema created.')
+            print('% schema created' % schema)
             conn.commit()
             # set the search pat to the schema
             cur.execute("SET search_path TO " + schema + ";")
             time.sleep(0.1)
-        else:
-            print("pcornet_maps schema exists. Continuing...")
         # endregion
 
         # region create tables
         try:
-            print('Creating and populating pedsnet_pcornet_valueset_map table if it does not exist...')
+            print('\ncreating and populating the mapping table ...')
             cur.execute(query.create_table(schema))
             conn.commit()
 
             # region import the file to the database
-            cur.execute("""select count(*) from pcornet_maps.pedsnet_pcornet_valueset_map""")
-            rows = cur.fetchone()[0]
-            if rows == 0:
-                print('Populating table...')
-                if os.path.isfile('data/concept_map.txt'):
-                    f = io.open('data/concept_map.txt', 'r', encoding="utf8")
-                    cur.execute("SET search_path TO " + schema + ";")
-                    cur.copy_from(file = f, table = 'pedsnet_pcornet_valueset_map', columns=(
-                     "source_concept_class",
-                     "target_concept",
-                     "pcornet_name",
-                     "source_concept_id",
-                     "concept_description",
-                     "value_as_concept_id"),
-                                sep="\t")
-                    conn.commit()
-                print("...Table populated.")
-            else:
-                print('pedsnet_pcornet_valueset_map table already exists and is populated. Continuing...')
+            if os.path.isfile('data/pedsnet_pcornet_valueset_map.csv'):
+                columns = (
+                    "source_concept_class",
+                    "target_concept",
+                    "pcornet_name",
+                    "source_concept_id",
+                    "concept_description",
+                    "value_as_concept_id"
+                )
+                column_names = ','.join(columns)
+                f = io.open('data/pedsnet_pcornet_valueset_map.csv', 'r', encoding="utf8")
+                copy_cmd = f"copy pedsnet_pcornet_valueset_map({column_names}) from stdout (format csv, HEADER TRUE)"
+                cur.execute("SET search_path TO " + schema + ";")
+                cur.copy_expert(copy_cmd, f)
+                conn.commit()
         except (Exception, psycopg2.OperationalError) as error:
             print(error)
         # endregion
@@ -429,7 +422,7 @@ def load_maps():
             print(error)
         # endregion
 
-        print('Closing database connection...')
+        print('\nPcornet valueset map loaded ... \nClosing database connection...')
         cur.close()
     except (Exception, psycopg2.OperationalError) as error:
         print(error)
@@ -441,5 +434,4 @@ def load_maps():
         if conn is not None:
             conn.close()
             print('Database connection closed.')
-
 # endregion
