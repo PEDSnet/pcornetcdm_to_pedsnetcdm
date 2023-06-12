@@ -896,29 +896,7 @@ left join
           select target_concept, source_concept_id
           from pcornet_maps.pedsnet_pcornet_valueset_map
           where source_concept_class = 'Result unit'
-		  and source_concept_id <> 'null'
-          and not (target_concept = '10*3/uL' and pcornet_name is null)
-          and not (target_concept = '10*6/uL' and pcornet_name is null)
-          and not (target_concept = 'a' and concept_description = 'y | year')
-          and not (target_concept = '[APL''U]/mL' and pcornet_name is null)
-          and not (target_concept = '{breaths}/min' and concept_description = 'breaths/min')
-          and not (target_concept = '{cells}/[HPF]' and concept_description <> 'cells per high power field')
-          and not (target_concept = '{cells}/uL' and concept_description = 'cells/cumm')
-          and not (target_concept = '[GPL''U]/mL' and pcornet_name is null)
-          and not (target_concept = '{index_val}' and concept_description <> 'index value')
-          and not (target_concept = '[IU]/g{Hb}' and pcornet_name is null)
-          and not (target_concept = 'k[IU]/L' and concept_description = 'kilo-international unit per liter')
-          and not (target_concept = 'meq/L' and pcornet_name is null)
-          and not (target_concept = 'mmol/mol{creat}' and concept_description = 'mmol/mol cr')
-          and not (target_concept = '[MPL''U]/mL' and pcornet_name is null)
-          and not (target_concept = 'NI' and source_concept_id = '0')
-          and not (target_concept = '%{normal}' and concept_description = 'NEG>CULTURE')
-          and not (target_concept = '[pH]' and pcornet_name is null)
-          and not (target_concept = '{ratio}' and pcornet_name is null)
-          and not (target_concept = 'ug{FEU}/mL' and pcornet_name is null)
-          and not (target_concept = 'U/g{Hb}' and pcornet_name is null) 
-          and not (target_concept = '/uL' and concept_description = '/cumm')
-          and not (target_concept = 'U/mL' and pcornet_name is null)
+		and source_concept_id <> 'null'
      ) as units on lab.result_unit = units.target_concept
 left join 
      pcornet_maps.pedsnet_pcornet_valueset_map priority 
@@ -933,52 +911,6 @@ left join
           select target_concept, source_concept_id
           from pcornet_maps.pedsnet_pcornet_valueset_map
           where source_concept_class = 'Specimen concept'
-          and not(target_concept = 'ABSCESS' and source_concept_id <> '4001183')
-          and not(target_concept = 'ANAL' and source_concept_id <> '4002895')
-          and not(target_concept = 'BLD' and source_concept_id <> '4001225')
-          and not(target_concept = 'BODY_FLD' and source_concept_id <> '4204181')
-          and not(target_concept = 'BONE' and source_concept_id <> '4328578')
-          and not(target_concept = 'BONE_MARROW' and source_concept_id <> '4000623')
-          and not(target_concept = 'BREAST' and source_concept_id <> '4132242')
-          and not(target_concept = 'BRONCHIAL' and source_concept_id <> '4001187')
-          and not(target_concept = 'CALCULUS' and source_concept_id <> '4001065')
-          and not(target_concept = 'COLON' and source_concept_id <> '4002892')
-          and not(target_concept = 'CSF' and source_concept_id <> '4124259')
-          and not(target_concept = 'CVX_VAG' and source_concept_id <> '45765695')
-          and not(target_concept = 'EAR' and source_concept_id <> '4204951')
-          and not(target_concept = 'EYE' and source_concept_id <> '4001190')
-          and not(target_concept = 'GENITAL' and source_concept_id <> '4001063')
-          and not(target_concept = 'KIDNEY' and source_concept_id <> '4133742')
-          and not(target_concept = 'KIDNEY.FNA' and source_concept_id <> '4048981')
-          and not(target_concept = 'LIVER' and source_concept_id <> '4002224')
-          and not(target_concept = 'LIVER.FNA' and source_concept_id <> '4335802')
-          and not(target_concept = 'LUNG' and source_concept_id <> '4133172')
-          and not(target_concept = 'LYMPH_NODE' and source_concept_id <> '4124291')
-          and not(target_concept = 'LYMPH_NODE.FNA' and source_concept_id <> '4333886')
-          and not(target_concept = 'MILK' and source_concept_id <> '4001058')
-          and not(target_concept = 'OVARY' and source_concept_id <> '4027387')
-          and not(target_concept = 'PANCREAS' and source_concept_id <> '4133175')
-          and not(target_concept = 'PENIS' and source_concept_id <> '4002896')
-          and not(target_concept = 'PLACENTA' and source_concept_id <> '4001192')
-          and not(target_concept = 'PLAS' and source_concept_id <> '4000626')
-          and not(target_concept = 'PROSTATE' and source_concept_id <> '4001186')
-          and not(target_concept = 'PROSTATE.FNA' and source_concept_id <> '40480935')
-          and not(target_concept = 'RESPIRATORY' and source_concept_id <> '4119536')
-          and not(target_concept = 'RESPIRATORY.LOWER' and source_concept_id <> '4119538')
-          and not(target_concept = 'RESPIRATORY.UPPER' and source_concept_id <> '4119537')
-          and not(target_concept = 'SALIVA' and source_concept_id <> '4001062')
-          and not(target_concept = 'SALIVARY_GLAND.FNA' and source_concept_id <> '4265164')
-          and not(target_concept = 'SER' and source_concept_id <> '4001181')
-          and not(target_concept = 'SINUS' and source_concept_id <> '4332520')
-          and not(target_concept = 'SKIN' and source_concept_id <> '43531265')
-          and not(target_concept = 'SPECIMEN' and source_concept_id <> '4048506')
-          and not(target_concept = 'STOOL' and source_concept_id <> '4002879')
-          and not(target_concept = 'THYROID' and source_concept_id <> '4164619')
-          and not(target_concept = 'THYROID.FNA' and source_concept_id <> '4204318')
-          and not(target_concept = 'TISS.FNA' and source_concept_id <> '4046275')
-          and not(target_concept = 'TISSUE' and source_concept_id <> '4002890')
-          and not(target_concept = 'URINE' and source_concept_id <> '4046280')
-          and not(target_concept = 'XXX.SWAB' and source_concept_id <> '4120698')
      ) as spec_con on spec_con.target_concept = lab.specimen_source
 ,LATERAL(SELECT SITE_pedsnet.is_date(lab.result_date::varchar),
 	SITE_pedsnet.is_date(lab.specimen_date::varchar),
