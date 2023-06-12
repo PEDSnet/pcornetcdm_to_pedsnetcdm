@@ -62,10 +62,9 @@ left join
     and prov_spec.source_concept_id is not null 
 left join 
     pcornet_maps.pedsnet_pcornet_valueset_map facility_spec 
-    on prov_spec.source_concept_class='Facility type'
+    on facility_spec.source_concept_class='Facility type'
     and vx.src_visit_type=facility_spec.source_concept_id
     and enc.facility_type=facility_spec.target_concept
-    and prov_spec.target_concept = prov.provider_specialty_primary
 left join 
     pcornet_maps.pedsnet_pcornet_valueset_map place 
     on place.target_concept = enc.facility_type
