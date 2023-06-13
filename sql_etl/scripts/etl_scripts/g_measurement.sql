@@ -249,7 +249,7 @@ inner join
 left join 
      (
           select target_concept, source_concept_id
-          from pcornet_maps.pedsnet_pcornet_valueset_map 
+          from pcornet_maps.pcornet_pedsnet_valueset_map 
           where source_concept_class='BP Position'
           and not(concept_description like '%Diastolic%')
      ) as sys_con on sys_con.target_concept = v_sys.bp_position
@@ -347,7 +347,7 @@ inner join
 left join 
      (
           select target_concept, source_concept_id, concept_description
-          from pcornet_maps.pedsnet_pcornet_valueset_map 
+          from pcornet_maps.pcornet_pedsnet_valueset_map 
           where source_concept_class='BP Position'
           and not(concept_description like '%Systolic%')
      ) as dia_con on dia_con.target_concept = v_dia.bp_position
@@ -873,33 +873,33 @@ left join
 left join 
      (
           select target_concept, source_concept_id
-          from pcornet_maps.pedsnet_pcornet_valueset_map 
+          from pcornet_maps.pcornet_pedsnet_valueset_map 
           where source_concept_class = 'Result modifier'
           and not (target_concept = 'OT' and source_concept_id = '0')
      ) as opa on opa.target_concept = lab.result_modifier
 left join 
      (
           select target_concept, source_concept_id
-          from pcornet_maps.pedsnet_pcornet_valueset_map 
+          from pcornet_maps.pcornet_pedsnet_valueset_map 
           where source_concept_class = 'Result modifier'
           and not (target_concept = 'OT' and source_concept_id = '0')
      ) as hi_mod on hi_mod.target_concept = lab.NORM_MODIFIER_HIGH
 left join 
      (
           select target_concept, source_concept_id
-          from pcornet_maps.pedsnet_pcornet_valueset_map 
+          from pcornet_maps.pcornet_pedsnet_valueset_map 
           where source_concept_class = 'Result modifier'
           and not (target_concept = 'OT' and source_concept_id = '0')
      ) as lo_mod on lo_mod.target_concept = lab.NORM_MODIFIER_LOW
 	left join 
      (
           select target_concept, source_concept_id
-          from pcornet_maps.pedsnet_pcornet_valueset_map
+          from pcornet_maps.pcornet_pedsnet_valueset_map
           where source_concept_class = 'Result unit'
 		and source_concept_id <> 'null'
      ) as units on lab.result_unit = units.target_concept
 left join 
-     pcornet_maps.pedsnet_pcornet_valueset_map priority 
+     pcornet_maps.pcornet_pedsnet_valueset_map priority 
      on priority.target_concept = lab.priority 
      and priority.source_concept_class = 'Lab priority'
 left join 
@@ -909,7 +909,7 @@ left join
 left join  
      (
           select target_concept, source_concept_id
-          from pcornet_maps.pedsnet_pcornet_valueset_map
+          from pcornet_maps.pcornet_pedsnet_valueset_map
           where source_concept_class = 'Specimen concept'
      ) as spec_con on spec_con.target_concept = lab.specimen_source
 ,LATERAL(SELECT SITE_pedsnet.is_date(lab.result_date::varchar),

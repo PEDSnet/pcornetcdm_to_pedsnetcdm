@@ -32,10 +32,10 @@ SELECT distinct
     coalesce(prov.provider_specialty_primary,'')||'|'||coalesce(specialty_map.concept_description,'') as specialty_source_value
 FROM 
     SITE_pcornet.provider prov
-left join pcornet_maps.pedsnet_pcornet_valueset_map gender_map 
+left join pcornet_maps.pcornet_pedsnet_valueset_map gender_map 
     on gender_map.source_concept_class='Gender' 
     and prov.provider_sex=gender_map.target_concept
-left join pcornet_maps.pedsnet_pcornet_valueset_map specialty_map
+left join pcornet_maps.pcornet_pedsnet_valueset_map specialty_map
     on specialty_map.source_concept_class = 'Provider Specialty' 
     and prov.provider_specialty_primary=specialty_map.target_concept
 ON CONFLICT (provider_id) DO NOTHING;

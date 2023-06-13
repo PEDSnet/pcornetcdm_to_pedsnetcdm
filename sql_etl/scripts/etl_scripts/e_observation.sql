@@ -360,3 +360,5 @@ commit;
 -- OT=Other
 
 --add gender identity
+
+-- add obs_gen records

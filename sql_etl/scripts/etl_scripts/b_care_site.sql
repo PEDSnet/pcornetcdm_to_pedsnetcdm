@@ -56,17 +56,17 @@ LEFT JOIN
     AND vx.cdm_name = 'PCORnet'
     AND vx.src_visit_type = coalesce(TRIM(enc.enc_type), 'UN')
 left join 
-    pcornet_maps.pedsnet_pcornet_valueset_map prov_spec 
+    pcornet_maps.pcornet_pedsnet_valueset_map prov_spec 
     on prov_spec.source_concept_class='Provider Specialty'
     and prov_spec.target_concept = prov.provider_specialty_primary
     and prov_spec.source_concept_id is not null 
 left join 
-    pcornet_maps.pedsnet_pcornet_valueset_map facility_spec 
+    pcornet_maps.pcornet_pedsnet_valueset_map facility_spec 
     on facility_spec.source_concept_class='Facility type'
     and vx.src_visit_type=facility_spec.source_concept_id
     and enc.facility_type=facility_spec.target_concept
 left join 
-    pcornet_maps.pedsnet_pcornet_valueset_map place 
+    pcornet_maps.pcornet_pedsnet_valueset_map place 
     on place.target_concept = enc.facility_type
     and place.source_concept_id is not null
     and place.value_as_concept_id is null

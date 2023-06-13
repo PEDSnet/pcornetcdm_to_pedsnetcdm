@@ -145,7 +145,7 @@ left join
 		)
 	and ndc_map.concept_id_2 in (select concept_id from vocabulary.concept where vocabulary_id = 'RxNorm')
 left join 
-	pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
+	pcornet_maps.pcornet_pedsnet_valueset_map as ucum_maps
 	on disp.dispense_dose_disp_unit = ucum_maps.target_concept 
 	and ucum_maps.source_concept_class = 'Dose unit'
 left join 
@@ -158,7 +158,7 @@ left join
 	(select target_concept, source_concept_id, concept_id
 	 from
 		(select target_concept, source_concept_id
-		from pcornet_maps.pedsnet_pcornet_valueset_map
+		from pcornet_maps.pcornet_pedsnet_valueset_map
 		where source_concept_class = 'Route') as route_maps
 		inner join (
 			select concept_id, vocabulary_id
@@ -276,7 +276,7 @@ left join
 	and vocabulary_id='RxNorm' 
 	and standard_concept='S'
 left join 
-	pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
+	pcornet_maps.pcornet_pedsnet_valueset_map as ucum_maps
 	on presc.rx_dose_ordered_unit = ucum_maps.target_concept 
 	and source_concept_class = 'Dose unit'
 left join 
@@ -290,7 +290,7 @@ left join
 	 from
 		(select 
 		 target_concept, source_concept_id
-		from pcornet_maps.pedsnet_pcornet_valueset_map
+		from pcornet_maps.pcornet_pedsnet_valueset_map
 		where source_concept_class = 'Route') as route_maps
 		inner join (
 			select concept_id, vocabulary_id
@@ -418,7 +418,7 @@ left join
 	and rxnorm.vocabulary_id='RxNorm' 
 	and rxnorm.standard_concept='S'
 left join 
-	pcornet_maps.pedsnet_pcornet_valueset_map as ucum_maps
+	pcornet_maps.pcornet_pedsnet_valueset_map as ucum_maps
 	on medadmin.medadmin_dose_admin_unit = ucum_maps.target_concept 
 	and ucum_maps.source_concept_class = 'Dose unit'
 left join 
@@ -431,7 +431,7 @@ left join
 	(select target_concept, source_concept_id, concept_id
 	 from
 		(select target_concept, source_concept_id
-		from pcornet_maps.pedsnet_pcornet_valueset_map
+		from pcornet_maps.pcornet_pedsnet_valueset_map
 		where source_concept_class = 'Route') as route_maps
 		inner join (
 			select concept_id, vocabulary_id

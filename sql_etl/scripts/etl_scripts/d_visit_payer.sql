@@ -20,7 +20,7 @@ select
 from 
 	SITE_pcornet.encounter enc
 left join 
-	pcornet_maps.pedsnet_pcornet_valueset_map payer_map
+	pcornet_maps.pcornet_pedsnet_valueset_map payer_map
 	on enc.payer_type_primary=payer_map.target_concept
 	and payer_map.source_concept_class='Payer'
 where 
@@ -52,7 +52,7 @@ select
 from 
 	SITE_pcornet.encounter enc
 left join 
-	pcornet_maps.pedsnet_pcornet_valueset_map payer_map
+	pcornet_maps.pcornet_pedsnet_valueset_map payer_map
 	on enc.payer_type_secondary=payer_map.target_concept
 	and payer_map.source_concept_class='Payer'
 where 

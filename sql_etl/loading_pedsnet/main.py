@@ -41,11 +41,11 @@ def cli(searchpath, pwprompt, user, database, host, options, testscript, pedsnet
     # endregion
 
     # grabs values from .ini file if already created -> less to manually input during testing
-    if os.path.isfile(configfile_name):
-        db_params = config.config('db')
-        host = db_params['host']
-        database = db_params['database']
-        searchpath = config.config('schema')['schema']
+    # if os.path.isfile(configfile_name):
+    #     db_params = config.config('db')
+    #     host = db_params['host']
+    #     database = db_params['database']
+    #     searchpath = config.config('schema')['schema']
 
 
     # region verify

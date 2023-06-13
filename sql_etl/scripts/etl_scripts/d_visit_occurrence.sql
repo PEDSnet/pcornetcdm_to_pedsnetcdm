@@ -72,7 +72,7 @@ LEFT JOIN
     AND disp.cdm_source = 'PCORnet'
     AND disp.src_discharge_status = enc.discharge_status
 left join 
-    pcornet_maps.pedsnet_pcornet_valueset_map typ 
+    pcornet_maps.pcornet_pedsnet_valueset_map typ 
     on typ.target_concept = enc.enc_type 
     and typ.source_concept_class = 'Encounter type'
     and source_concept_id not in ('2000000469','42898160')

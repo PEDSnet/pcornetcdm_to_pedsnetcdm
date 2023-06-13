@@ -382,7 +382,7 @@ def load_maps():
             conn.commit()
 
             # region import the file to the database
-            if os.path.isfile('data/pedsnet_pcornet_valueset_map.csv'):
+            if os.path.isfile('data/pcornet_pedsnet_valueset_map.csv'):
                 columns = (
                     "source_concept_class",
                     "target_concept",
@@ -392,8 +392,8 @@ def load_maps():
                     "value_as_concept_id"
                 )
                 column_names = ','.join(columns)
-                f = io.open('data/pedsnet_pcornet_valueset_map.csv', 'r', encoding="utf8")
-                copy_cmd = f"copy pedsnet_pcornet_valueset_map({column_names}) from stdout (format csv, HEADER TRUE)"
+                f = io.open('data/pcornet_pedsnet_valueset_map.csv', 'r', encoding="utf8")
+                copy_cmd = f"copy pcornet_pedsnet_valueset_map({column_names}) from stdout (format csv, HEADER TRUE)"
                 cur.execute("SET search_path TO " + schema + ";")
                 cur.copy_expert(copy_cmd, f)
                 conn.commit()

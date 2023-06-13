@@ -171,7 +171,7 @@ left join
 	and imm.vx_code_type='NDC' 
 	and c_ndc.vocabulary_id='NDC'
 left join 
-	pcornet_maps.pedsnet_pcornet_valueset_map unit_map
+	pcornet_maps.pcornet_pedsnet_valueset_map unit_map
 	on imm.vx_dose_unit = unit_map.target_concept 
 	and unit_map.target_concept = 'Dose unit'
 left join 
@@ -180,7 +180,7 @@ left join
 	from 
 		(
 		select target_concept, source_concept_id
-		from pcornet_maps.pedsnet_pcornet_valueset_map
+		from pcornet_maps.pcornet_pedsnet_valueset_map
 		where source_concept_class = 'Route'
 		) as maps
 	inner join 

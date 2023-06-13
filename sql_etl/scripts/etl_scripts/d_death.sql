@@ -55,7 +55,7 @@ left join
 	SITE_pcornet.death_cause dc 
 	on dc.patid=d.patid
 left join 
-	pcornet_maps.pedsnet_pcornet_valueset_map impu 
+	pcornet_maps.pcornet_pedsnet_valueset_map impu 
 	on impu.source_concept_class = 'death date impute' 
 	and impu.target_concept = d.death_date_impute
 left join 

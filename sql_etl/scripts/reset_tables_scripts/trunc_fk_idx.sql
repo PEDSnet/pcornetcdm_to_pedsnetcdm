@@ -12,7 +12,7 @@ BEGIN
 		FROM (
      			SELECT table_name
      			FROM information_schema.tables
-     			WHERE table_type = 'BASE TABLE' AND table_schema = _schema AND table_name not in ('pedsnet_pcornet_valueset_map','harvest')
+     			WHERE table_type = 'BASE TABLE' AND table_schema = _schema AND table_name not in ('pedsnet_pcornet_valueset_map','pcornet_pedsnet_valueset_map','harvest')
      		)t
 	LOOP
 	    EXECUTE selectrow.qry;
@@ -30,7 +30,7 @@ BEGIN
      				       FROM information_schema.tables
      				       WHERE table_type = 'BASE TABLE' AND
                                              table_schema =  _schema AND
-                                             tablename not in ('pedsnet_pcornet_valueset_map','harvest')
+                                             tablename not in ('pedsnet_pcornet_valueset_map','harvest','pcornet_pedsnet_valueset_map')
                 		   )
         	 )i
      LOOP
@@ -44,7 +44,7 @@ BEGIN
          	  	FROM information_schema.table_constraints
                 WHERE table_schema = _schema AND
                       constraint_name like '%_fk_%' and
-                      table_name not in ('pedsnet_pcornet_valueset_map','harvest')
+                      table_name not in ('pedsnet_pcornet_valueset_map','harvest','pcornet_pedsnet_valueset_map')
               )tbl
      LOOP
      	EXECUTE select_fk.query_fk;

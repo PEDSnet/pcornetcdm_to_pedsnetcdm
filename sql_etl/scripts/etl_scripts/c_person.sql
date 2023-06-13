@@ -67,20 +67,20 @@ left join
   SITE_pedsnet.person_primary_provider ppp
   on ppp.patid = demo.patid
 left join 
-  pcornet_maps.pedsnet_pcornet_valueset_map lang 
+  pcornet_maps.pcornet_pedsnet_valueset_map lang 
   on source_concept_class = 'Language' 
   and source_concept_id is not null 
 	and lang.target_concept = demo.pat_pref_language_spoken
 left join 
-  pcornet_maps.pedsnet_pcornet_valueset_map gender_map 
+  pcornet_maps.pcornet_pedsnet_valueset_map gender_map 
   on demo.sex=gender_map.target_concept
   and gender_map.source_concept_class='Gender'
 left join 
-  pcornet_maps.pedsnet_pcornet_valueset_map ethnicity_map 
+  pcornet_maps.pcornet_pedsnet_valueset_map ethnicity_map 
   on demo.hispanic = ethnicity_map.target_concept
   and ethnicity_map.source_concept_class='Hispanic'
 left join 
-  pcornet_maps.pedsnet_pcornet_valueset_map race_map
+  pcornet_maps.pcornet_pedsnet_valueset_map race_map
   on demo.race=race_map.target_concept
   and race_map.source_concept_class = 'Race'
 ON CONFLICT (person_id) DO NOTHING;
