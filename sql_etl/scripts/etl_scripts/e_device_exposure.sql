@@ -11,7 +11,7 @@ INSERT INTO SITE_pedsnet.device_exposure (
 	device_source_concept_id,
 	device_source_value, 
 	device_type_concept_id, 
-    placement_concept_id
+    placement_concept_id,
 	person_id, 
 	provider_id, 
 	visit_occurrence_id
