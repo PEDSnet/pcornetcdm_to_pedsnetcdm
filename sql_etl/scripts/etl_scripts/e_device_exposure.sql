@@ -90,7 +90,7 @@ select
         else '0001-01-01'::timestamp
     end as device_exposure_start_datetime,
     0 as device_source_concept_id,
-    px || '|procedures' ||as device_source_value,
+    px || '| procedures' as device_source_value,
     44818707 as device_type_concept_id,
     44814650 as placement_concept_id,
     person.patid as person_id,
