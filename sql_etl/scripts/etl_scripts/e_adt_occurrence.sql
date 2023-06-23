@@ -8,6 +8,7 @@ insert into SITE_pedsnet.adt_occurrence (
     visit_occurrence_id,
     adt_date,
     adt_datetime,
+    care_site_id,
     service_concept_id,
     adt_type_concept_id,
     service_source_value
@@ -52,6 +53,7 @@ insert into SITE_pedsnet.adt_occurrence (
     visit_occurrence_id,
     adt_date,
     adt_datetime,
+    care_site_id,
     service_concept_id,
     adt_type_concept_id,
     service_source_value
@@ -70,6 +72,7 @@ select
         when SITE_pedsnet.is_date(proc.px_date::varchar) then proc.px_date::timestamp
         else '0001-01-01'::timestamp
     end as adt_datetime,
+    enc.facilityid as care_site_id,
     2000000078 as service_concept_id, --PICU
     2000000083 as adt_type_concept_id, --admission
     'procedures ' || px || ' ' || raw_px as service_source_value
