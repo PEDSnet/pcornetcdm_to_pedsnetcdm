@@ -41,7 +41,7 @@ left join
 where 
     OBSGEN_TYPE= 'PC_COVID'
     and OBSGEN_CODE = '2000'
-    and RESULT_TEXT <> 'N';
+    and OBSGEN_RESULT_TEXT <> 'N';
 commit;
 
 -- insert ICU submissions that are procedures
