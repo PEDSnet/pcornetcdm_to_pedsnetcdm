@@ -8,7 +8,9 @@ begin
                   return false;
 end;
 $$ language plpgsql;
+commit;
 
+begin;
 INSERT INTO SITE_pedsnet.visit_occurrence ( 
     visit_occurrence_id,
     admitted_from_concept_id,
@@ -38,16 +40,20 @@ SELECT distinct
     NULL AS preceding_visit_occurrence_id,
     enc.providerid AS provider_id,
     coalesce(typ.source_concept_id::int,0) AS visit_concept_id,
-    case 
-        when SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::date
-        when SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::date
-		else '9999-12-31'::date
-    end AS visit_end_date,
-    case 
-        when SITE_pedsnet.is_date(enc.discharge_date::varchar) then enc.discharge_date::timestamp
-        when SITE_pedsnet.is_date(enc.admit_date::varchar) then enc.admit_date::timestamp
-		else '9999-12-31'::timestamp
-    end AS visit_end_datetime,
+    coalesce(
+        case 
+            when SITE_pedsnet.is_date(enc.discharge_date::varchar) and enc.discharge_date is not null then enc.discharge_date::date
+            when SITE_pedsnet.is_date(enc.admit_date::varchar) and enc.admit_date is not null then enc.admit_date::date
+        end,
+        '9999-12-31'::date
+    ) AS visit_end_date,
+    coalesce(
+        case 
+            when SITE_pedsnet.is_date(enc.discharge_date::varchar) and enc.discharge_date is not null then enc.discharge_date::timestamp
+            when SITE_pedsnet.is_date(enc.admit_date::varchar) and enc.admit_date is not null then enc.admit_date::timestamp
+        end,
+        '9999-12-31'::timestamp
+     ) AS visit_end_datetime,
     0 AS visit_source_concept_id,
     enc.encounterid AS visit_source_value,
     enc.admit_date AS visit_start_date,
