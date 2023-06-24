@@ -2,14 +2,14 @@ create sequence if not exists SITE_pedsnet.geocode_seq;
 
 begin;
 insert into SITE_pedsnet.location_fips(
-    geocode_id BIGINT NOT NULL AUTO_INCREMENT, 
-    location_id BIGINT NOT NULL, 
-    geocode_state VARCHAR(2) NOT NULL,
-    geocode_county VARCHAR(3) NOT NULL, 
-    geocode_tract VARCHAR(6) NOT NULL, 
-    geocode_group VARCHAR(1) NOT NULL, 
-	geocode_year INTEGER NOT NULL, 
-	geocode_shapefile VARCHAR(256)
+    geocode_id, 
+    location_id, 
+    geocode_state,
+    geocode_county, 
+    geocode_tract, 
+    geocode_group, 
+	geocode_year, 
+	geocode_shapefile
 )
 select 
     nextval('SITE_pedsnet.geocode_seq') as geocode_id,
