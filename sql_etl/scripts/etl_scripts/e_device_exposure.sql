@@ -1,4 +1,3 @@
-
 create sequence if not exists SITE_pedsnet.device_seq;
 
 -- add ventilator from procedures
@@ -76,6 +75,9 @@ select
         when px = '243184006' then 4347913
         when px = '226000000000000' then 44790095
         when px = '232000000000000' then 44791135
+        when px = '129121000' then 4044008
+        when px = '26412008' then 4097216
+        when px = '449071006' then 40493026
         else 0
     end as device_concept_id,
     nextval('SITE_pedsnet.device_seq') as device_exposure_id,
@@ -93,7 +95,7 @@ select
     px || '| procedures' as device_source_value,
     44818707 as device_type_concept_id,
     44814650 as placement_concept_id,
-    person.patid as person_id,
+    proc.patid as person_id,
     enc.providerid as provider_id,
     enc.encounterid as visit_occurrence_id
 from 
@@ -162,7 +164,10 @@ where px in
     '243182005',
     '243184006',
     '226000000000000',
-    '232000000000000'
+    '232000000000000',
+    '129121000',
+    '26412008',
+    '449071006'
     );
 commit;
 
