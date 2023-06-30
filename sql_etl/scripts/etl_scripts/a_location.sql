@@ -34,7 +34,7 @@ select distinct
     address_city as city,
     address_state as state,
 	zip as zip,
-	'patient history | ' || zip || ' | geocode | ' || coalesce(GEOCODE_STATE,'') || ' | ' || coalesce(GEOCODE_COUNTY,'') || ' | ' || coalesce(GEOCODE_TRACT,'') || ' | ' || coalesce(GEOCODE_GROUP,'') as location_source_value,
+	'patient history | ' || coalesce(zip,'') || ' | geocode | ' || coalesce(GEOCODE_STATE,'') || ' | ' || coalesce(GEOCODE_COUNTY,'') || ' | ' || coalesce(GEOCODE_TRACT,'') || ' | ' || coalesce(GEOCODE_GROUP,'') as location_source_value,
     42046186 as country_concept_id,
     'United States' as country_source_value
 FROM 

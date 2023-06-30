@@ -60,10 +60,10 @@ left join
 left join 
 	SITE_pedsnet.location loc
 	on loc.location_source_value like '%patient history%'
-	and lds.zip = loc.zip
-	and coalesce(pag.GEOCODE_STATE,'') = trim(split_part(loc.location_source_value,'|',3))
-	and coalesce(pag.GEOCODE_COUNTY,'') = trim(split_part(loc.location_source_value,'|',4))
-	and coalesce(pag.GEOCODE_TRACT ,'') = trim(split_part(loc.location_source_value,'|',5))
-	and coalesce(pag.GEOCODE_GROUP ,'') = trim(split_part(loc.location_source_value,'|',6))
+	and coalesce(lds.zip,'') = trim(split_part(loc.location_source_value,'|',2))
+	and coalesce(pag.GEOCODE_STATE,'') = trim(split_part(loc.location_source_value,'|',4))
+	and coalesce(pag.GEOCODE_COUNTY,'') = trim(split_part(loc.location_source_value,'|',5))
+	and coalesce(pag.GEOCODE_TRACT ,'') = trim(split_part(loc.location_source_value,'|',6))
+	and coalesce(pag.GEOCODE_GROUP ,'') = trim(split_part(loc.location_source_value,'|',7))
 ;
 commit;
