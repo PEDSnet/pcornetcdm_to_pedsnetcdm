@@ -14,22 +14,30 @@ insert into SITE_pedsnet.location_fips(
 select 
     nextval('SITE_pedsnet.geocode_seq') as geocode_id,
     loc.location_id as location_id,
-    case
-        when SITE_pedsnet.isnumeric(GEOCODE_STATE::varchar) and length(GEOCODE_STATE) = 2 then GEOCODE_STATE
-        else substring(GEOCODE_GROUP,1,2)
-    end as geocode_state,
-    case 
-        when SITE_pedsnet.isnumeric(GEOCODE_COUNTY::varchar) and length(GEOCODE_COUNTY) = 3 then GEOCODE_COUNTY
-        else substring(GEOCODE_GROUP,3,3)
-    end as geocode_county,
-    case 
-        when SITE_pedsnet.isnumeric(GEOCODE_TRACT::varchar) and length(GEOCODE_TRACT) = 6 then GEOCODE_TRACT
-        else substring(GEOCODE_GROUP,6,6)
-    end as geocode_tract,
-    case 
-        when SITE_pedsnet.isnumeric(GEOCODE_GROUP::varchar) and length(GEOCODE_GROUP) = 1 then GEOCODE_GROUP
-        else substring(GEOCODE_GROUP,12,1)
-    end as GEOCODE_GROUP,
+    coalesce(
+        case
+            when SITE_pedsnet.isnumeric(GEOCODE_STATE::varchar) and length(GEOCODE_STATE) = 2 then GEOCODE_STATE
+            else substring(GEOCODE_GROUP,1,2)
+        end,
+        ' ') as geocode_state,
+    coalesce(
+        case 
+            when SITE_pedsnet.isnumeric(GEOCODE_COUNTY::varchar) and length(GEOCODE_COUNTY) = 3 then GEOCODE_COUNTY
+            else substring(GEOCODE_GROUP,3,3)
+        end,
+        ' ') as geocode_county,
+    coalesce(
+        case 
+            when SITE_pedsnet.isnumeric(GEOCODE_TRACT::varchar) and length(GEOCODE_TRACT) = 6 then GEOCODE_TRACT
+            else substring(GEOCODE_GROUP,6,6)
+        end,
+        ' ') as geocode_tract,
+    coalesce(
+        case 
+            when SITE_pedsnet.isnumeric(GEOCODE_GROUP::varchar) and length(GEOCODE_GROUP) = 1 then GEOCODE_GROUP
+            else substring(GEOCODE_GROUP,12,1)
+        end,
+        ' ') as GEOCODE_GROUP,
     coalesce(
         case
             when trim(GEOCODE_CUSTOM_TEXT) = '2010' then 2010
