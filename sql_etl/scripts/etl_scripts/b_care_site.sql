@@ -21,8 +21,8 @@ INSERT INTO SITE_pedsnet.care_site(
     place_of_service_source_value,
     specialty_concept_id, 
     specialty_source_value)
-SELECT distinct
-    facilityid AS care_site_id,
+SELECT 
+    distinct on (facilityid)facilityid AS care_site_id,
     enc.facility_type AS care_site_name,
     coalesce(
         case when enc.facility_type is not null then substr(enc.facility_type, 1, 50) else null end,
@@ -60,11 +60,12 @@ left join
     on prov_spec.source_concept_class='Provider Specialty'
     and prov_spec.target_concept = prov.provider_specialty_primary
     and prov_spec.source_concept_id is not null 
-left join 
-    pcornet_maps.pcornet_pedsnet_valueset_map facility_spec 
-    on facility_spec.source_concept_class='Facility type'
-    and vx.src_visit_type=facility_spec.source_concept_id
-    and enc.facility_type=facility_spec.target_concept
+ left join 
+     pcornet_maps.pcornet_pedsnet_valueset_map facility_spec 
+     on prov_spec.source_concept_class='Facility type'
+     and vx.src_visit_type=facility_spec.source_concept_id
+     and enc.facility_type=facility_spec.target_concept
+     and prov_spec.target_concept = prov.provider_specialty_primary
 left join 
     pcornet_maps.pcornet_pedsnet_valueset_map place 
     on place.target_concept = enc.facility_type
