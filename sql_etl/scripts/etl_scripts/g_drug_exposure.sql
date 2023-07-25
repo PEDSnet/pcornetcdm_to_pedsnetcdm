@@ -272,7 +272,7 @@ left join
     on presc.encounterid = enc.encounterid
 left join 
 	vocabulary.concept as rxnorm 
-	on presc.rxnorm_cui = rxnorm.concept_code 
+	on trim(presc.rxnorm_cui) = rxnorm.concept_code 
 	and vocabulary_id='RxNorm' 
 	and standard_concept='S'
 left join 
