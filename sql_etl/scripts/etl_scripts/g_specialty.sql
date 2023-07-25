@@ -21,7 +21,7 @@ select
 		else 4225752 
 	end as entity_type_concept_id,
 	pro.specialty_concept_id as specialty_concept_id,
-	pro.specialty_source_value as specialty_source_value
+	coalesce(pro.specialty_source_value, pro.specialty_concept_id, ' ') as specialty_source_value
 from
 	SITE_pedsnet.provider pro
 where
@@ -40,7 +40,7 @@ select
 		else 4225752 
 	end as entity_type_concept_id,	
 	cs.specialty_concept_id as specialty_concept_id,
-	cs.specialty_source_value as specialty_source_value
+	coalesce(cs.specialty_source_value, cs.specialty_concept_id, ' ') as specialty_source_value
 from
 	SITE_pedsnet.care_site cs
 where
