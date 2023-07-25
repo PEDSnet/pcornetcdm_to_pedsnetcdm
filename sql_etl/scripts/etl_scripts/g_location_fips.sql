@@ -73,5 +73,8 @@ left join
 	and coalesce(pag.GEOCODE_COUNTY,'') = trim(split_part(loc.location_source_value,'|',5))
 	and coalesce(pag.GEOCODE_TRACT ,'') = trim(split_part(loc.location_source_value,'|',6))
 	and coalesce(pag.GEOCODE_GROUP ,'') = trim(split_part(loc.location_source_value,'|',7))
+where 
+    trim(pag.geocode_state) <> 'NA' 
+    and pag.geocode_state is not null
 ;
 commit;

@@ -48,6 +48,9 @@ FROM
 left join 
     SITE_pcornet.private_address_geocode pag
     on pag.addressid = lds.addressid
+where 
+    trim(pag.geocode_state) <> 'NA' 
+    and pag.geocode_state is not null
 GROUP BY 
     zip, 
     address_city,
