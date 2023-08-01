@@ -30,15 +30,15 @@ SELECT
         enc.facilityid
     ) AS care_site_source_value,
     loc.location_id location_id,
-    case 
-        when(SITE_pedsnet.isnumeric(place.source_concept_id::varchar)) then place.source_concept_id::int 
-        else 44814650 
+    case
+        when place.source_concept_id ~ '^[0-9]+$' then place.source_concept_id::int
+        else 44814650
     end AS place_of_service_concept_id,
     substr(enc.facility_type, 1, 50) AS place_of_service_source_value,
-    case 
-        when(SITE_pedsnet.isnumeric(facility_spec.value_as_concept_id::varchar)) then facility_spec.value_as_concept_id::int 
-        when (SITE_pedsnet.isnumeric(prov_spec.source_concept_id::varchar)) then prov_spec.source_concept_id::int 
-        else 44814650 
+    case
+        when facility_spec.value_as_concept_id ~ '^[0-9]+$' then facility_spec.value_as_concept_id::int
+        when prov_spec.source_concept_id ~ '^[0-9]+$' then prov_spec.source_concept_id::int
+        else 44814650
     end as speciality_concept_id,
     coalesce(
         facility_spec.target_concept,

@@ -155,9 +155,6 @@ ALTER TABLE SITE_pedsnet.visit_occurrence
     ALTER COLUMN preceding_visit_occurrence_id TYPE CHARACTER VARYING(256);
 
 ALTER TABLE SITE_pedsnet.visit_occurrence
-    ALTER COLUMN admitted_from_concept_id TYPE CHARACTER VARYING(256);
-
-ALTER TABLE SITE_pedsnet.visit_occurrence
     ALTER COLUMN care_site_id TYPE CHARACTER VARYING(256);
 
 ALTER TABLE SITE_pedsnet.visit_occurrence

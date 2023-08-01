@@ -42,7 +42,8 @@ left join
 where 
     OBSGEN_TYPE= 'PC_COVID'
     and OBSGEN_CODE = '2000'
-    and OBSGEN_RESULT_TEXT <> 'N';
+    and OBSGEN_RESULT_TEXT <> 'N'
+    and enc.encounterid is not null;
 commit;
 
 -- insert ICU submissions that are procedures
@@ -84,11 +85,12 @@ inner join
 left join 
     SITE_pcornet.encounter enc
     on proc.encounterid=enc.encounterid
-where 
-    px in (
+where
+    enc.encounterid is not null
+    and px in (
         '99291', -- ICU
         '99292', -- ICU
         '99293', -- PICU
         '99294' -- PICU
         )
-
+commit;
