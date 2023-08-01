@@ -92,5 +92,4 @@ where
         '99292', -- ICU
         '99293', -- PICU
         '99294' -- PICU
-        )
 commit;
