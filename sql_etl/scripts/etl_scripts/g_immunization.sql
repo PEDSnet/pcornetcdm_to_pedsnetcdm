@@ -168,7 +168,7 @@ left join
 left join 
 	vocabulary.concept c_ndc
     on imm.vx_code=c_ndc.concept_code 
-	and imm.vx_code_type='NDC' 
+	and imm.vx_code_type='ND' 
 	and c_ndc.vocabulary_id='NDC'
 left join 
 	pcornet_maps.pcornet_pedsnet_valueset_map unit_map
