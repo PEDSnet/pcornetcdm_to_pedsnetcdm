@@ -20,13 +20,18 @@ SELECT distinct
       0 as modifier_concept_id,
       null as modifier_source_value,
       person.person_id,
-      coalesce(case
-            when c_hcpcs.concept_id is not null then c_hcpcs.concept_id
-            when proc.px_type='CH' then c_cpt.concept_id
-            when proc.px_type='10' then c_icd9.concept_id
-            when proc.px_type='09' then c_icd10.concept_id
-            else 0 
-      end, 0) as procedure_concept_id,
+      coalesce(
+            case
+                  when c_hcpcs.concept_id is not null AND c_hcpcs.standard_concept = 'S' then c_hcpcs.concept_id
+                  when proc.px_type='CH' AND c_cpt.standard_concept = 'S' then c_cpt.concept_id
+                  when proc.px_type='10' AND c_icd9.standard_concept = 'S' then c_icd9.concept_id
+                  when proc.px_type='09' AND c_icd10.standard_concept = 'S' then c_icd10.concept_id
+                  when proc.px_type='LC' AND c_loinc.standard_concept = 'S' then c_loinc.concept_id
+                  when proc.px_type='ND' AND c_ndc.standard_concept = 'S' then c_ndc.concept_id
+                  when wide_net.standard_concept = 'S' then wide_net.concept_id
+		  	else cr_wide_net.concept_id_2
+            end, 
+            0) as procedure_concept_id,
       case 
             when proc.px_date is not null and SITE_pedsnet.is_date(proc.px_date::varchar) then proc.px_date::date
             when proc.admit_date is not null and SITE_pedsnet.is_date(proc.admit_date::varchar) then proc.admit_date::date
@@ -66,6 +71,16 @@ left join
       SITE_pcornet.encounter enc 
       on proc.encounterid = enc.encounterid
 left join 
+      vocabulary.concept c_loinc
+      on proc.px=c_loinc.concept_code 
+      and proc.px_type='LC' 
+      and c_loinc.vocabulary_id='LOINC'
+left join 
+      vocabulary.concept c_ndc
+      on proc.px=c_ndc.concept_code 
+      and proc.px_type='ND' 
+      and c_ndc.vocabulary_id='NDC'   
+left join 
       vocabulary.concept c_hcpcs
       on proc.px=c_hcpcs.concept_code 
       and proc.px_type='CH' 
@@ -80,11 +95,18 @@ left join
       vocabulary.concept c_icd10
       on proc.px=c_icd10.concept_code 
       and proc.px_type='10' 
-      and c_cpt.vocabulary_id='ICD10CM'
+      and c_cpt.vocabulary_id='ICD10PCS'
  left join 
       vocabulary.concept c_icd9
       on proc.px=c_icd9.concept_code 
       and proc.px_type='09' 
-      and c_cpt.vocabulary_id='ICD9CM';
+      and c_cpt.vocabulary_id='ICD9CM'
+left join 
+      vocabulary.concept wide_net
+      on proc.px = wide_net.concept_code 
+left join 
+      vocabulary.concept_relationship cr_wide_net
+      on wide_net.concept_id = cr_wide_net.concept_id_1
+      and cr_wide_net.relationship_id = 'Maps To';
 
 commit;													   
