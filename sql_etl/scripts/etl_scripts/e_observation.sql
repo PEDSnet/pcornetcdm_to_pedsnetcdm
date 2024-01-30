@@ -1,14 +1,3 @@
-create sequence if not exists SITE_pedsnet.obs_seq;
-
-create or replace function SITE_pedsnet.is_date(s varchar) returns boolean as $$
-begin
-          perform s::date;
-          return true;
-        exception when others then
-                  return false;
-end;
-$$ language plpgsql;
-
 begin;
 -- adding PEDSnet discharge status (PCORnet discharge disposition) 
 INSERT INTO SITE_pedsnet.observation(

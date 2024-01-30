@@ -1,20 +1,6 @@
 -- /* sequence is needed as the vital need to be transpose one id multiple values */
 create sequence if not exists SITE_pedsnet.measurement_id_seq;
 
--- -- create index if not exists lab_result_cm_idx on SITE_pcornet.lab_result_cm (lab_result_cm_id);
-
-CREATE OR REPLACE FUNCTION SITE_pedsnet.isnumeric(text) RETURNS BOOLEAN AS $$
-DECLARE x NUMERIC;
-BEGIN
-        x = $1::NUMERIC;
-            RETURN TRUE;
-        EXCEPTION WHEN others THEN
-                RETURN FALSE;
-END;
-$$
-STRICT
-LANGUAGE plpgsql IMMUTABLE;
-
 begin;
 
 -- pulling data from vitals ht

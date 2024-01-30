@@ -1,16 +1,4 @@
 begin;
-
-create or replace function SITE_pedsnet.is_date(s varchar) returns boolean as $$
-begin
-          perform s::date;
-          return true;
-        exception when others then
-                  return false;
-end;
-$$ language plpgsql;
-commit;
-
-begin;
 INSERT INTO SITE_pedsnet.visit_occurrence ( 
     visit_occurrence_id,
     admitted_from_concept_id,

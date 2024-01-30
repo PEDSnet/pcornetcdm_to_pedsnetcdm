@@ -1,14 +1,4 @@
 create sequence if not exists SITE_pedsnet.imm_seq;
-
-create or replace function SITE_pedsnet.is_date(s varchar) returns boolean as $$
-begin
-          perform s::date;
-          return true;
-        exception when others then
-                  return false;
-end;
-$$ language plpgsql;
-
 -- pull from pcornet.immunization table
 begin;
 insert into SITE_pedsnet.immunization(

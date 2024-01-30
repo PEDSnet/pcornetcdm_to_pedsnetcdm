@@ -1,16 +1,3 @@
-
-CREATE OR REPLACE FUNCTION SITE_pedsnet.isnumeric(character varying) RETURNS BOOLEAN AS $$
-DECLARE x NUMERIC;
-BEGIN
-        x = $1::NUMERIC;
-            RETURN TRUE;
-        EXCEPTION WHEN others THEN
-                RETURN FALSE;
-END;
-$$
-STRICT
-LANGUAGE plpgsql IMMUTABLE;
-
 begin;
 INSERT INTO SITE_pedsnet.care_site(
     care_site_id,
