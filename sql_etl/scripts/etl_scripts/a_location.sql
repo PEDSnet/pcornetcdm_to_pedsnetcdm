@@ -62,25 +62,8 @@ GROUP BY
 ;
 commit;
 
--- census block group locations
--- begin;
--- INSERT INTO SITE_pedsnet.location(
---     location_id,
---     location_source_value,
---     census_block_group)
--- select 
---  	nextval('SITE_pedsnet.loc_seq') AS location_id,
---     'census block group | ' || GEOCODE_BLOCK as location_source_value,
---     GEOCODE_BLOCK as census_block_group
---  FROM 
---     SITE_pcornet.PRIVATE_ADDRESS_GEOCODE
---  GROUP BY 
---     GEOCODE_BLOCK;
--- commit;
-
- -- default location
- begin;
- INSERT INTO SITE_pedsnet.location(
+begin;
+INSERT INTO SITE_pedsnet.location(
     location_id)
- values(9999999);
+values(9999999);
 commit;
