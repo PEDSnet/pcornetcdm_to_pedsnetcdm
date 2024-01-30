@@ -203,12 +203,12 @@ SELECT distinct
             when cond.dx = '398447004' then 320651::int
             when cond.dx = '713084008' then 37016927::int
             when cond.dx = '1240521000000100' then 37310254::int
-            when cond.dx = '1240441000000100' then 37310260::int
-            when cond.dx = '1240571000000100' then 37310283::int
-            when cond.dx = '1240561000000100' then 37310284::int
-            when cond.dx = '1240551000000100' then 37310285::int
-            when cond.dx = '1240541000000100' then 37310286::int
-            when cond.dx = '1240531000000100' then 37310287::int
+            when cond.dx = '1240441000000108' then 37310260::int
+            when cond.dx = '1240571000000101' then 37310283::int
+            when cond.dx = '1240561000000108' then 37310284::int
+            when cond.dx = '1240551000000105' then 37310285::int
+            when cond.dx = '1240541000000107' then 37310286::int
+            when cond.dx = '1240531000000103' then 37310287::int
             when cond.dx = '840546002' then 37311059::int
             when cond.dx = '840539006' then 37311061::int
             when cond.dx = '441590008' then 40479642::int
@@ -216,39 +216,13 @@ SELECT distinct
             when cond.dx = '408688009' then 4248811::int
             when cond.dx = '186747009' then 439676::int
             when cond.dx = '702547000' then 45765578::int
-            when cond.dx = 'OMOP4873948' then 756022::int
-            when cond.dx = 'OMOP4873906' then 756023::int
-            when cond.dx = 'OMOP4873964' then 756027::int
-            when cond.dx = 'OMOP4873909' then 756031::int
-            when cond.dx = 'OMOP4873949' then 756035::int
-            when cond.dx = 'OMOP4873953' then 756037::int
-            when cond.dx = 'OMOP4873907' then 756039::int
-            when cond.dx = 'OMOP4873957' then 756041::int
-            when cond.dx = 'OMOP4873911' then 756044::int
-            when cond.dx = 'OMOP4873954' then 756045::int
-            when cond.dx = 'OMOP4873958' then 756047::int
-            when cond.dx = 'OMOP4873947' then 756050::int
-            when cond.dx = 'OMOP4873910' then 756061::int
-            when cond.dx = 'OMOP4873951' then 756062::int
-            when cond.dx = 'OMOP4873946' then 756064::int
-            when cond.dx = 'OMOP4873950' then 756068::int
-            when cond.dx = 'OMOP4873959' then 756069::int
-            when cond.dx = 'OMOP4873956' then 756072::int
-            when cond.dx = 'OMOP4873952' then 756075::int
-            when cond.dx = 'OMOP4873961' then 756076::int
-            when cond.dx = 'OMOP4873960' then 756077::int
-            when cond.dx = 'OMOP4873955' then 756079::int
-            when cond.dx = 'OMOP4873908' then 756081::int
-            when cond.dx = 'OMOP4873963' then 756082::int
-            when cond.dx = 'OMOP4873962' then 756083::int
             when cond.dx = '840544004' then 37311060::int
             when cond.dx = '840533007' then 37311065::int
-            when cond.dx = 'OMOP4912978' then 704996::int
-            when cond.dx = '138389411000119000' then 3661405::int
-            when cond.dx = '674814021000119000' then 3661406::int
-            when cond.dx = '882784691000119000' then 3661408::int
-            when cond.dx = '189486241000119000' then 3662381::int
-            when cond.dx = '880529761000119000' then 3663281::int
+            when cond.dx = '138389411000119105' then 3661405::int
+            when cond.dx = '674814021000119106' then 3661406::int
+            when cond.dx = '882784691000119100' then 3661408::int
+            when cond.dx = '189486241000119100' then 3662381::int
+            when cond.dx = '880529761000119102' then 3663281::int
             when cond.dx = '870588003' then 3655975::int
             when cond.dx = '870590002' then 3655976::int
             when cond.dx = '870591003' then 3655977::int
@@ -262,15 +236,6 @@ SELECT distinct
             when cond.dx = '870577009' then 3655973::int
             when cond.dx = '1240581000000100' then 37310282::int
             when cond.dx = '870577009' then 3655973::int
-            when cond.dx = 'Z86.16' then 3661980::int
-            --misc codes
-            when cond.dx = 'OMOP5042964' then 703578::int
-            when cond.dx = 'M35.81' then 713856::int
-            when cond.dx = 'U10' then 931072::int
-            when cond.dx = 'U10.9' then 931073::int
-            --pasc code
-            when cond.dx = 'U09.9' then 766503::int
-            --derive by dx_type
             when cond.dx_type='09' or cond.dx_type='ICD09' then cr_icd9.concept_id_2
             when cond.dx_type='10' or cond.dx_type='ICD10' then cr_icd10.concept_id_2
             when cond.dx_type='SM' then c_snomed.concept_id
@@ -282,13 +247,18 @@ SELECT distinct
             when cond.dx ~ '^[A-Z][0-9][0-9A-Z].?[0-9A-Z]{0,4}$' then cr_icd10.concept_id_2
             else NULL
         end,
-    44814650)::int as condition_concept_id,
+    0)::int as condition_concept_id,
     nextval('SITE_pedsnet.cond_occ_seq') as condition_occurrence_id,
     coalesce(
         case
+            --misc codes
+            when cond.dx = 'M35.81' then 713856::int
+            when cond.dx = 'U10' then 931072::int
+            when cond.dx = 'U10.9' then 931073::int
+            --pasc code
+            when cond.dx = 'U09.9' then 766503::int
             when cond.dx_type='09' or cond.dx_type='ICD09' then c_icd9.concept_id
             when cond.dx_type='10' or cond.dx_type='ICD10' then c_icd10.concept_id
-            when cond.dx_type='SM' then c_snomed.concept_id
             -- RegEx for ICD09 codes if condition_type <>'09' 
             when cond.dx ~ '^V[0-9]{2}.?[0-9]{0,2}$' then c_icd9.concept_id
             when cond.dx ~ '^E[0-9]{3}.?[0-9]?$' then c_icd9.concept_id
@@ -297,7 +267,7 @@ SELECT distinct
             when cond.dx ~ '^[A-Z][0-9][0-9A-Z].?[0-9A-Z]{0,4}$' then c_icd10.concept_id
             else NULL
         end,
-    44814650)::int as condition_source_concept_id,
+    0)::int as condition_source_concept_id,
     left(coalesce(cond.dx,''),248) || ' | ' || coalesce(dx_type,'') as condition_source_value,
     case 
         when cond.dx_date is not null and SITE_pedsnet.is_date(cond.dx_date::varchar) then cond.dx_date::date
