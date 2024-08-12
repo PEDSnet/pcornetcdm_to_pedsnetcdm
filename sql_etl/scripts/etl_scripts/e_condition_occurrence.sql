@@ -144,12 +144,6 @@ SELECT distinct
     nextval('SITE_pedsnet.cond_occ_seq') as condition_occurrence_id,
     coalesce(
         case
-            --misc codes
-            when cond.dx = 'M35.81' then 713856::int
-            when cond.dx = 'U10' then 931072::int
-            when cond.dx = 'U10.9' then 931073::int
-            --pasc code
-            when cond.dx = 'U09.9' then 766503::int
             when cond.dx_type='09' or cond.dx_type='ICD09' then c_icd9.concept_id
             when cond.dx_type='10' or cond.dx_type='ICD10' then c_icd10.concept_id
             -- RegEx for ICD09 codes if condition_type <>'09' 
