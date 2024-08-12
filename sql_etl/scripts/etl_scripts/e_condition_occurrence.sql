@@ -102,10 +102,22 @@ left join
     vocabulary.concept_relationship cr_icd9
     on c_icd9.concept_id = cr_icd9.concept_id_1
     and cr_icd9.relationship_id='Maps to'
+    and cr_icd9.concept_id_2 in 
+	(
+	select concept_id 
+	from vocabulary.concept
+	where vocabulary_id='SNOMED' 
+	)
 left join 
     vocabulary.concept_relationship cr_icd10
     on c_icd10.concept_id = cr_icd10.concept_id_1
-    and cr_icd10.relationship_id='Maps to';
+    and cr_icd10.relationship_id='Maps to'
+    and cr_icd10.concept_id_2 in 
+	(
+	select concept_id 
+	from vocabulary.concept
+	where vocabulary_id='SNOMED' 
+	);
 commit;
 
 begin;
@@ -224,8 +236,20 @@ left join
     vocabulary.concept_relationship cr_icd9
     on c_icd9.concept_id = cr_icd9.concept_id_1
     and cr_icd9.relationship_id='Maps to'
+    and cr_icd9.concept_id_2 in 
+	(
+	select concept_id 
+	from vocabulary.concept
+	where vocabulary_id='SNOMED' 
+	)
 left join 
     vocabulary.concept_relationship cr_icd10
     on c_icd10.concept_id = cr_icd10.concept_id_1
-    and cr_icd10.relationship_id='Maps to';
+    and cr_icd10.relationship_id='Maps to'
+    and cr_icd10.concept_id_2 in 
+	(
+	select concept_id 
+	from vocabulary.concept
+	where vocabulary_id='SNOMED' 
+	);
 commit;
