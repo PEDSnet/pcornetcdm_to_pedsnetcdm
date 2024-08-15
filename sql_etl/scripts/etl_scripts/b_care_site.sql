@@ -1,4 +1,15 @@
 begin;
+WITH encounter_care_site as (
+    SELECT distinct on (facilityid)
+	facilityid,
+	facility_type,
+	raw_facility_type,
+	providerid,
+	enc_type,
+	facility_location
+    FROM SITE_pcornet.encounter
+    WHERE facilityid is not null
+)
 INSERT INTO SITE_pedsnet.care_site(
     care_site_id,
     care_site_name,
@@ -33,7 +44,7 @@ SELECT
         enc.facility_type
     ) as specialty_source_value
 FROM 
-    SITE_pcornet.encounter enc
+    encounter_care_site enc
 left join 
     SITE_pcornet.provider prov 
     on prov.providerid = enc.providerid
